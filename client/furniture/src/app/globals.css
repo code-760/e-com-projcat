@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family:cha;
+    src: url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&display=swap');
+}
+
+.slick-dots {
+    bottom: 20px !important; /* dots ko thoda upar le aata hai */
+  }
+ 
+  
+
+/* Position fix karne ke liye */
+
+
+ .slick-prev:before,
+.slick-next:before {
+  color: #000 !important;  /* black arrows */
+  font-size: 25px !important;
+  opacity: 1 !important;  /* make visible */
+}
+
+.slick-prev {
+  left: 1100px !important;
+  top: -30px !important;
+  z-index: 20 !important;
+}
+
+.slick-next {
+  right: 10px !important;
+   top: -30px !important;
+  z-index: 20 !important;
+}
+
+.secroll-side-bar::-webkit-scrollbar{
+  width: 6px;
+
+}
+.secroll-side-bar::-webkit-scrollbar-track{
+   background: #f1f1f1; 
+}
+.secroll-side-bar::-webkit-scrollbar-thumb {
+  background-color: #c09578; /* scroll ka color */
+ 
+}
+
+.secroll-side-bar::-webkit-scrollbar-thumb:hover {
+  background: #a67855;      /* hover color */
+}

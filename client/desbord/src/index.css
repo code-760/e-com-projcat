@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+.bagraundimg{
+    background-image: url(https://cdn.pixabay.com/photo/2025/10/09/14/14/muztagh-9883659_1280.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+.formimg{
+    background-image: url(https://cdn.pixabay.com/photo/2025/09/29/11/48/feather-9862263_1280.jpg);
+}
