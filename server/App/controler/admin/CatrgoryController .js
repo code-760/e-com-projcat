@@ -148,6 +148,7 @@ let getditelds = async (req, rec) => {
   rec.send({
     status: true,
     messages: " color detles",
+    path: process.env.CATEGROYIMAGEPATH,
     data,
   });
 };
