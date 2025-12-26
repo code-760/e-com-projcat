@@ -62,6 +62,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/Material_update/:id?" element={<Add_Material />} />
 
         <Route path="/Add_sidebar" element={<Add_sidebar />} />
+        <Route path="/sidebar-update/:id?" element={<Add_sidebar />} />
         <Route path="/ViewSlider" element={<Viewslider />} />
 
         <Route path="/Add_Category" element={<Add_Category />} />
@@ -75,12 +76,18 @@ createRoot(document.getElementById("root")).render(
         <Route path="/ViewSubSubCategory" element={<Viewsubsubcategory />} />
 
         <Route path="/Add_Why_Choose_Us" element={<Add_Why_Choose_Us />} />
+        <Route
+          path="/Add-Why-Choose-Us-updete/:id?"
+          element={<Add_Why_Choose_Us />}
+        />
         <Route path="/View_why_chooseUs" element={<View_why_chooseUs />} />
 
-         <Route path="/Add_Testimonial" element={<Add_Testimonial />} />
+        <Route path="/Add_Testimonial" element={<Add_Testimonial />} />
+        <Route path="/Update_Testimonial/:id?" element={<Add_Testimonial />} />
         <Route path="/Viewtestimonial" element={<View_testimonial />} />
 
         <Route path="/ViewSubCategory" element={<Viewsubcategory />} />
+        <Route path="/Update-SubCategory/:id?" element={<Add_Sub_category />} />
         <Route path="/Add_Sub_category" element={<Add_Sub_category />} />
 
         <Route path="/View_Product" element={<View_Product />} />

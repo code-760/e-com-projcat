@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { LuCloudUpload } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { MdDelete } from "react-icons/md";
+import swal from "sweetalert";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Add_Category() {
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
@@ -36,7 +38,7 @@ export default function Add_Category() {
               Navigate("/ViewCategory");
             }, 2000);
           } else {
-            toast.error(fainlrec.error?.colorcode || fainlrec.error?.colorName);
+            toast.error(fainlrec.error?.categoryName);
           }
         });
     } else {
@@ -53,7 +55,7 @@ export default function Add_Category() {
               Navigate("/ViewCategory");
             }, 2000);
           } else {
-            toast.error(fainlrec.error?.colorcode || fainlrec.error?.colorName);
+            toast.error(fainlrec.error?.categoryName);
           }
         });
     }
@@ -94,6 +96,7 @@ export default function Add_Category() {
 
   return (
     <div>
+      <ToastContainer/>
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         {id ? "update" : "Add Category"}
       </h2>
@@ -114,9 +117,8 @@ export default function Add_Category() {
 
           <div className=" relative border-2 border-dashed overflow-hidden  group-hover:border-[rgba(62,53,53,0.66)]  w-full h-full bg-gray-100  flex items-center justify-center mb-4">
             <div className=" top-0 left-0 absolute ">
-              <div className=" relative">
+              
                 <img src={perview} alt="" className="" width={"100%"} />
-              </div>
             </div>
 
             <input

@@ -1,9 +1,13 @@
-const { categoryModel } = require("../../models/Category.model ");
+const { TastimonialModel } = require("../../models/Tastimonial.Model");
 
-// categoryModel.syncIndexes();
+// TastimonialModel.syncIndexes();
 
-let categorycreate = async (req, rec) => {
+let Tastimonialcreate = async (req, rec) => {
+  console.log(req.body);
+
   let insertobj = { ...req.body };
+
+  console.log();
 
   if (req.file) {
     if (
@@ -11,21 +15,22 @@ let categorycreate = async (req, rec) => {
       req.file.filename != null &&
       req.file.filename != undefined
     ) {
-      insertobj["categoryimg"] = req.file.filename;
+      // console.log(req.file.filename);
+
+      insertobj["Tastimonialimg"] = req.file.filename;
     }
-    
   }
 
-  console.log(insertobj);
+  // console.log(insertobj);
 
   try {
-    let category = await new categoryModel(insertobj);
-    let categoryRec = await category.save();
+    let Tastimonial = await new TastimonialModel(insertobj);
+    let TastimonialRec = await Tastimonial.save();
 
     rec.send({
       status: true,
       messages: "create api",
-      categoryRec,
+      TastimonialRec,
     });
   } catch (err) {
     // console.log(err.code);
@@ -36,14 +41,14 @@ let categorycreate = async (req, rec) => {
     for (let key in err.errors) {
       error[key] = err.errors[key].message;
 
-      console.log(key, err.errors[key].message);
+      // console.log(key, err.errors[key].message);
     }
 
     console.log(err.error);
 
     if (err.code == "11000") {
       // unoce key
-      error["categoryName"] = "categorName is exite....";
+      error["TastimonialName"] = "TastimonialName is exite....";
     }
 
     rec.send({
@@ -54,26 +59,27 @@ let categorycreate = async (req, rec) => {
   }
 };
 
-let categoryviwe = async (req, rec) => {
-  let filtercategory = {
+let Tastimonialviwe = async (req, rec) => {
+  let filterTastimonial = {
     deletdat: null,
   };
 
-  let date = await categoryModel.find(filtercategory);
+  let date = await TastimonialModel.find(filterTastimonial);
 
   rec.send({
     status: true,
     messages: "create api",
-    path: process.env.CATEGROYIMAGEPATH,
+    path: process.env.TASSTIMONIALIMAGEPATH
+,
     date,
   });
 };
 
-let categorydelete = async (req, rec) => {
+let Tastimonialdelete = async (req, rec) => {
   //  singal delete
   let { id } = req.params;
 
-  let softdelRes = await categoryModel.updateOne(
+  let softdelRes = await TastimonialModel.updateOne(
     {
       _id: id,
     },
@@ -87,7 +93,7 @@ let categorydelete = async (req, rec) => {
 
   rec.send({
     status: true,
-    messages: " category deleted",
+    messages: " Tastimonial deleted",
     softdelRes,
   });
 };
@@ -95,7 +101,7 @@ let categorydelete = async (req, rec) => {
 let multidelete = async (req, rec) => {
   let { ids } = req.body;
   //arry
-  let softdelRes = await categoryModel.updateMany(
+  let softdelRes = await TastimonialModel.updateMany(
     {
       _id: { $in: ids },
     },
@@ -109,21 +115,22 @@ let multidelete = async (req, rec) => {
 
   rec.send({
     status: true,
-    messages: " category deleted",
+    messages: " Tastimonial deleted",
     softdelRes,
   });
 };
 
 let changeStatus = async (req, res) => {
+  console.log(req.body);
   let { ids } = req.body;
 
-  let updetdeta = await categoryModel.updateMany(
+  let updetdeta = await TastimonialModel.updateMany(
     { _id: ids },
     [
       {
         $set: {
-          categorystatus: {
-            $not: "$categorystatus",
+          Tastimonialstatus: {
+            $not: "$Tastimonialstatus",
           },
         },
       },
@@ -141,28 +148,31 @@ let changeStatus = async (req, res) => {
 let getditelds = async (req, rec) => {
   let { id } = req.params;
 
-  let data = await categoryModel.findOne({ _id: id });
+  let data = await TastimonialModel.findOne({ _id: id });
 
   console.log(data);
 
   rec.send({
     status: true,
     messages: " color detles",
-    path: process.env.CATEGROYIMAGEPATH,
+    path: process.env.TASSTIMONIALIMAGEPATH,
     data,
   });
 };
 
-let catUpdate = async (req, res) => {
+let TastimonialUpdate = async (req, res) => {
   let { id } = req.params;
-  let { categoryName, categoryimg, categoryOder } = req.body;
+  let { TastimonialName, Tastimonialimg, Order, Description,Rating,Message } = req.body;
 
   console.log(req.body);
 
   let updateObj = {
-    categoryName,
-    categoryimg,
-    categoryOder,
+    TastimonialName,
+    Tastimonialimg,
+    Order,
+    Description,
+    Rating,
+    Message
   };
 
   if (req.file) {
@@ -171,11 +181,11 @@ let catUpdate = async (req, res) => {
       req.file.filename != null &&
       req.file.filename != undefined
     ) {
-      updateObj["categoryimg"] = req.file.filename;
+      updateObj["Tastimonialimg"] = req.file.filename;
     }
   }
 
-  let updateRes = await categoryModel.updateOne(
+  let updateRes = await TastimonialModel.updateOne(
     { _id: id },
     {
       $set: updateObj,
@@ -189,11 +199,11 @@ let catUpdate = async (req, res) => {
 };
 
 module.exports = {
-  categorycreate,
-  categoryviwe,
-  categorydelete,
+  Tastimonialcreate,
+  Tastimonialviwe,
+  Tastimonialdelete,
   multidelete,
   changeStatus,
-  catUpdate,
   getditelds,
+  TastimonialUpdate,
 };

@@ -41,14 +41,14 @@ let WhyChooseUscreate = async (req, rec) => {
     for (let key in err.errors) {
       error[key] = err.errors[key].message;
 
-      console.log(key, err.errors[key].message);
+      // console.log(key, err.errors[key].message);
     }
 
     console.log(err.error);
 
     if (err.code == "11000") {
       // unoce key
-      error["WhyChooseUsName"] = "categorName is exite....";
+      error["WhyChooseUsName"] = "WhyChooseUsName is exite....";
     }
 
     rec.send({
@@ -144,10 +144,63 @@ let changeStatus = async (req, res) => {
   });
 };
 
+let getditelds = async (req, rec) => {
+  let { id } = req.params;
+
+  let data = await WhyChooseUsModel.findOne({ _id: id });
+
+  console.log(data);
+
+  rec.send({
+    status: true,
+    messages: " color detles",
+    path: process.env.WHYCHOOSEUSIMAGEPATH,
+    data,
+  });
+};
+
+let WhyChooseUsUpdate = async (req, res) => {
+  let { id } = req.params;
+  let { Title, WhyChooseUsimg, Order, Description } = req.body;
+
+  console.log(req.body);
+
+  let updateObj = {
+    Title,
+    WhyChooseUsimg,
+    Order,
+    Description,
+  };
+
+  if (req.file) {
+    if (
+      req.file.filename != "" &&
+      req.file.filename != null &&
+      req.file.filename != undefined
+    ) {
+      updateObj["WhyChooseUsimg"] = req.file.filename;
+    }
+  }
+
+  let updateRes = await WhyChooseUsModel.updateOne(
+    { _id: id },
+    {
+      $set: updateObj,
+    }
+  );
+  res.send({
+    _status: true,
+    _message: "Color Updated",
+    updateRes,
+  });
+};
+
 module.exports = {
   WhyChooseUscreate,
   WhyChooseUsviwe,
   WhyChooseUsdelete,
   multidelete,
   changeStatus,
+  getditelds,
+  WhyChooseUsUpdate,
 };

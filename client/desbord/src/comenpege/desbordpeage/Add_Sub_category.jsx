@@ -1,45 +1,68 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineCloudDownload } from "react-icons/md";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { LuCloudUpload } from "react-icons/lu";
 import axios from "axios";
+import swal from "sweetalert";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Add_Sub_category() {
+  let { id } = useParams();
   let [perview, setperview] = useState();
   let [parntcategroydeta, setparntcategroydeta] = useState([]);
+  let [formvalue, setformvalue] = useState({
+    SubcategoryName: "",
+    Category: "",
+    SubcategoryOder: "",
+    Subcategoryimg: "",
+  });
 
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
 
   let Navigate = useNavigate();
 
-
-  let savesubcategroy=(e)=>{
-     e.preventDefault();
+  let savesubcategroy = (e) => {
+    e.preventDefault();
     let Form = e.target;
 
     let Formdata = new FormData(Form);
 
-    axios
-      .post(`${apibaseurl}/Subcategory/create`, Formdata)
-      .then((rec) => rec.data)
+    if (id) {
+      axios
+        .put(`${apibaseurl}/Subcategory/update/${id}`, Formdata)
+        .then((rec) => rec.data)
 
-      .then((fainlrec) => {
+        .then((fainlrec) => {
+          // fainlrec ==ture to deta  save
 
-       
-        
-        // fainlrec ==ture to deta  save
+          if (fainlrec.status) {
+            swal("Successfully", "Your data is added!", "success");
+            setTimeout(() => {
+              Navigate("/ViewSubCategory");
+            }, 2000);
+          } else {
+            toast.error(fainlrec.error?.Description || fainlrec.error?.Title);
+          }
+        });
+    } else {
+      axios
+        .post(`${apibaseurl}/Subcategory/create`, Formdata)
+        .then((rec) => rec.data)
 
-        if (fainlrec.status) {
-          swal("Successfully", "Your data is added!", "success");
-          setTimeout(() => {
-            Navigate("/ViewSubCategory");
-          }, 2000);
-        } else {
-          toast.error(fainlrec.error?.colorcode || fainlrec.error?.colorName);
-        }
-      });
+        .then((fainlrec) => {
+          // fainlrec ==ture to deta  save
 
-  }
+          if (fainlrec.status) {
+            swal("Successfully", "Your data is added!", "success");
+            setTimeout(() => {
+              Navigate("/ViewSubCategory");
+            }, 2000);
+          } else {
+            toast.error(fainlrec.error?.SubcategoryName);
+          }
+        });
+    }
+  };
 
   let getparentcategroy = () => {
     axios
@@ -47,20 +70,60 @@ export default function Add_Sub_category() {
       .then((rec) => rec.data)
       .then((finlrec) => {
         setparntcategroydeta(finlrec.date);
-        console.log(finlrec.date);
+        // console.log(finlrec.date);
+      });
+  };
+  let getsetvalue = (e) => {
+    let oldobj = { ...formvalue };
+
+    let inputName = e.target.name;
+    let inputvalue = e.target.value;
+
+    oldobj[inputName] = inputvalue;
+
+    setformvalue(oldobj);
+  };
+
+  let getdilels = () => {
+    axios
+      .get(`${apibaseurl}/Subcategory/get-deteils/${id}`)
+      .then((rec) => rec.data)
+
+      .then((finlRec) => {
+        console.log(finlRec);
+        // backend me fineone ka use
+        let { SubcategoryName, Category, SubcategoryOder, Subcategoryimg } =
+          finlRec.data;
+        // console.log( finlRec.data);
+
+        setformvalue({
+          SubcategoryName,
+          Category: Category._id,
+          SubcategoryOder,
+          Subcategoryimg,
+        });
+        console.log(finlRec.path + finlRec.data.Subcategoryimg);
+        setperview(finlRec.path + finlRec.data.Subcategoryimg);
       });
   };
 
   useEffect(() => {
+    if (id) {
+      getdilels();
+    }
     getparentcategroy();
   }, []);
 
   return (
     <div>
+      <ToastContainer />
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         Add Sub category
       </h2>
-      <form onSubmit={savesubcategroy} className=" grid grid-cols-[40%_auto]  mx-auto bg-white rounded-lg shadow-lg p-8">
+      <form
+        onSubmit={savesubcategroy}
+        className=" grid grid-cols-[40%_auto]  mx-auto bg-white rounded-lg shadow-lg p-8"
+      >
         {/* Add Photo Section */}
         <div className="flex flex-col items-center justify-center border-r pr-8">
           <div className=" relative border-2 border-dashed overflow-hidden  group-hover:border-[rgba(62,53,53,0.66)]  w-full h-full bg-gray-100  flex items-center justify-center mb-4">
@@ -97,11 +160,12 @@ export default function Add_Sub_category() {
           <select
             name="Category"
             id=""
+            onChange={getsetvalue}
+            value={formvalue.Category}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
+            <option value=""> select catgroy Name </option>
             {parntcategroydeta.map((obj, index) => {
-              console.log(obj);
-
               return (
                 <option value={obj._id} key={index}>
                   {obj.categoryName}
@@ -119,6 +183,8 @@ export default function Add_Sub_category() {
           <input
             id="categoryName"
             type="text"
+            onChange={getsetvalue}
+            value={formvalue.SubcategoryName}
             name="SubcategoryName"
             className="mb-4 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
             placeholder="Enter category name"
@@ -129,6 +195,8 @@ export default function Add_Sub_category() {
           <input
             id="order"
             type="number"
+            onChange={getsetvalue}
+            value={formvalue.SubcategoryOder}
             name="SubcategoryOder"
             className="mb-6 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
             placeholder="Enter order"

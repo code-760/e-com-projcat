@@ -31,6 +31,7 @@ let Sliderscreate = async (req, rec) => {
     rec.send({
       status: true,
       messages: "create api",
+    
       SlidersRec,
     });
   } catch (err) {
@@ -145,10 +146,63 @@ let changeStatus = async (req, res) => {
   });
 };
 
+let getditelds = async (req, rec) => {
+  let { id } = req.params;
+
+  let data = await SlidersModel.findOne({ _id: id });
+
+  console.log(data);
+
+  rec.send({
+    status: true,
+    messages: " color detles",
+    path: process.env.SLIDERIMAGEPATH,
+    data,
+  });
+};
+
+let SlidersUpdate = async (req, res) => {
+  let { id } = req.params;
+  let { Title, Slidersimg, Order, } = req.body;
+
+  console.log(req.body);
+
+  let updateObj = {
+    Title,
+    Slidersimg,
+    Order,
+   
+  };
+
+  if (req.file) {
+    if (
+      req.file.filename != "" &&
+      req.file.filename != null &&
+      req.file.filename != undefined
+    ) {
+      updateObj["Slidersimg"] = req.file.filename;
+    }
+  }
+
+  let updateRes = await SlidersModel.updateOne(
+    { _id: id },
+    {
+      $set: updateObj,
+    }
+  );
+  res.send({
+    _status: true,
+    _message: "Color Updated",
+    updateRes,
+  });
+};
+
 module.exports = {
   Sliderscreate,
   Slidersviwe,
   Slidersdelete,
   multidelete,
   changeStatus,
+  SlidersUpdate,
+  getditelds
 };

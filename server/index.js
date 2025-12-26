@@ -10,8 +10,10 @@ App.use(express.json())
 
 App.use('/admin',adminRoutes)
 App.use('/uploads/category',express.static("uploads/category"))
+App.use('/uploads/Subcategory',express.static("uploads/Subcategory"))
 App.use('/uploads/WhyChooseUs',express.static("uploads/WhyChooseUs"))
 App.use('/uploads/Sliders',express.static("uploads/Sliders"))
+App.use('/uploads/Tastimonial',express.static("uploads/Tastimonial"))
 
 
 

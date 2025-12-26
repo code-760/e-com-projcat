@@ -1,7 +1,7 @@
 let express=require("express")
 let SliderRoutes=express.Router()
 
-const { Sliderscreate, Slidersviwe, Slidersdelete, multidelete, changeStatus } = require("../../controler/admin/SlidersController");
+const { Sliderscreate, Slidersviwe, Slidersdelete, multidelete, changeStatus, getditelds, SlidersUpdate } = require("../../controler/admin/SlidersController");
 // let multer = require("multer");
 const { fileuplode } = require("../../middlewera/fileupdole");
 
@@ -17,5 +17,7 @@ let uploads=fileuplode("uploads/Sliders")
 
  SliderRoutes.post("/multidelete", multidelete);
  SliderRoutes.post("/change-status", changeStatus);
+ SliderRoutes.get("/get-deteils/:id", getditelds);
+ SliderRoutes.put("/update/:id", uploads.single("Sliders"),SlidersUpdate);
 
 module.exports = { SliderRoutes };

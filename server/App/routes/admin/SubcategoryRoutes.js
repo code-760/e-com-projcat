@@ -10,6 +10,8 @@ const {
   multidelete,
   changeStatus,
   parnetcategroy,
+  getditelds,
+  SubcategoryUpdate,
 } = require("../../controler/admin/Subcategorycontrollet");
 
 // let uplodes = multer({ dest: "uploads/category" });
@@ -25,5 +27,7 @@ SubcategoryRoutes.delete("/delete/:id", Subcategorydelete);
 
 SubcategoryRoutes.post("/multidelete", multidelete);
 SubcategoryRoutes.post("/change-status", changeStatus);
+SubcategoryRoutes.get("/get-deteils/:id",getditelds);
+SubcategoryRoutes.put("/update/:id", uploads.single("Subcategoryimg"),SubcategoryUpdate);
 
 module.exports = { SubcategoryRoutes };

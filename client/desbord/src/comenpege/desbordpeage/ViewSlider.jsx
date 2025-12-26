@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { FaPenNib } from "react-icons/fa";
+import { Link } from "react-router";
 
 export default function Viewslider() {
   let [date, setdate] = useState([]);
   let [path, setpath] = useState();
+   let [allids, setallids] = useState([]);
 
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
 
@@ -22,7 +24,7 @@ export default function Viewslider() {
   };
   // console.log(date);
 
-  let [allids, setallids] = useState([]);
+ 
 
   let getChacdebox = (e) => {
     if (e.target.checked) {
@@ -77,6 +79,10 @@ export default function Viewslider() {
     getSliders();
   }, []);
   let [searchbox, setsearchbox] = useState(false);
+
+  let toteldata = date.length;
+  let activdata = date.filter((v) => v.Subcategorystatus).length;
+  let dactivdeta = toteldata - activdata;
   return (
     <div>
       <div className="container mx-auto px-4 sm:px-8">
@@ -117,10 +123,10 @@ export default function Viewslider() {
                     >
                       <FaFilter />
                     </button>
-                    <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                    <button  onClick={deleterow} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
                       Delete
                     </button>
-                    <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                    <button   onClick={changestatus} className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
                       Change Status
                     </button>
                   </div>
@@ -136,15 +142,15 @@ export default function Viewslider() {
                   <span className="text-gray-600 font-medium">
                     Total Emails:{" "}
                   </span>
-                  <span className="text-gray-900">150</span>
+                  <span className="text-gray-900">{toteldata}</span>
                 </div>
                 <div className="bg-green-100 rounded-lg px-4 py-2">
                   <span className="text-green-600 font-medium">Active: </span>
-                  <span className="text-green-900">120</span>
+                  <span className="text-green-900">{activdata}</span>
                 </div>
                 <div className="bg-red-100 rounded-lg px-4 py-2">
                   <span className="text-red-600 font-medium">Deactive: </span>
-                  <span className="text-red-900">30</span>
+                  <span className="text-red-900">{dactivdeta}</span>
                 </div>
               </div>
               <div className="flex space-x-2"></div>
@@ -155,7 +161,8 @@ export default function Viewslider() {
               <thead>
                 <tr>
                   <th className="px-10 py-3  border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    <input type="checkbox" />
+                    <input type="checkbox" checked={date.length == allids.length}
+                      onClick={getallchecked}  />
                     Name
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
@@ -184,7 +191,12 @@ export default function Viewslider() {
                   <div className="flex   items-center">
                     <div className="ml-3">
                       <p className="text-gray-900 whitespace-no-wrap">
-                        <input type="checkbox" />
+                        <input
+                              type="checkbox"
+                              onChange={getChacdebox}
+                              value={obj._id}
+                              checked={allids.includes(obj._id)}
+                            />
                        {obj.Title}
                       </p>
                     </div>
@@ -203,15 +215,30 @@ export default function Viewslider() {
                   <p className="text-gray-900 whitespace-no-wrap">{obj.Order}</p>
                 </td>
 
+
                 <td className=" border-b border-gray-200 bg-white text-sm">
+
+                  
+                {
+                  obj.Slidersstatus?
                   <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                     Activate
                   </button>
+                  :
+                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                    Dactivate
+                  </button>
+
+
+                }
+                  
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  <Link to={`/sidebar-update/${obj._id}`}>
                   <button className="px-5 py-5 rounded-full ml-2 bg-blue-500 text-white  hover:bg-blue-600 transition-colors">
                     <FaPenNib />
                   </button>
+                  </Link>
                 </td>
               </tr>
 

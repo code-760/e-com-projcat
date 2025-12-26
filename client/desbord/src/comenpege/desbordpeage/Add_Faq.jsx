@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import swal from "sweetalert";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Add_Faq() {
 
@@ -113,6 +115,7 @@ export default function Add_Faq() {
 
   return (
     <div>
+      <ToastContainer/>
       <h2 className="text-2xl font-bold mb-6 text-gray-800">{id? "update Faq":"Add Faq"}</h2>
       <div className=" bg-gray-100 p-8">
         <div className="  mx-auto bg-white rounded-lg shadow-md p-6">

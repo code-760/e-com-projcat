@@ -8,7 +8,8 @@ const { CategoryRoutes } = require("./categoryRoutes ");
 const { SubcategoryModel } = require("../../models/Subcategory");
 const { SubcategoryRoutes } = require("./SubcategoryRoutes");
 const { WhyChooseUsRoutes } = require("./WhyChooseUsRoutes");
-const {  SliderRoutes } = require("./SlidersRoutes");
+const { SliderRoutes } = require("./SlidersRoutes");
+const { TastimonialRoutes } = require("./TastimonialRoutes");
 
 let adminRoutes = express.Router();
 
@@ -18,11 +19,10 @@ adminRoutes.use("/material", materialRoutes);
 
 adminRoutes.use("/Faq", FaqRoutes);
 adminRoutes.use("/Country", CountryRoutes);
-adminRoutes.use("/category",CategoryRoutes);
-adminRoutes.use("/Subcategory",SubcategoryRoutes);
-adminRoutes.use("/WhyChooseUs",WhyChooseUsRoutes);
-adminRoutes.use("/Slider",SliderRoutes);
-
-
+adminRoutes.use("/category", CategoryRoutes);
+adminRoutes.use("/Subcategory", SubcategoryRoutes);
+adminRoutes.use("/WhyChooseUs", WhyChooseUsRoutes);
+adminRoutes.use("/Slider", SliderRoutes);
+adminRoutes.use("/Tastimonial", TastimonialRoutes);
 
 module.exports = { adminRoutes };

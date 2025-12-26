@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { FaPenNib } from "react-icons/fa";
+import { Link } from "react-router";
 
 export default function View_why_chooseUs() {
   let [date, setdate] = useState([]);
@@ -76,7 +77,7 @@ export default function View_why_chooseUs() {
 
   useEffect(() => {
     getWhyChooseUs();
-  }, []);
+  }, [deleterow]);
 
   let toteldata = date.length;
   let activdata = date.filter((v) => v.WhyChooseUsstatus).length;
@@ -246,11 +247,12 @@ export default function View_why_chooseUs() {
                       </td>
                     )}
 
-                   n
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                      <button className="px-5 py-5 rounded-full ml-2 bg-blue-500 text-white  hover:bg-blue-600 transition-colors">
-                        <FaPenNib />
-                      </button>
+                      <Link to={`/Add-Why-Choose-Us-updete/${obj._id}`}>
+                        <button className="px-5 py-5 rounded-full ml-2 bg-blue-500 text-white  hover:bg-blue-600 transition-colors">
+                          <FaPenNib />
+                        </button>
+                      </Link>
                     </td>
                   </tr>
                 );

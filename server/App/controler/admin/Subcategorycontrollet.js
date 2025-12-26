@@ -67,7 +67,7 @@ let Subcategoryviwe = async (req, rec) => {
   rec.send({
     status: true,
     messages: "create api",
-    path: process.env.CATEGROYIMAGEPATH,
+    path: process.env.SUBCATEGROYIMAGEPATH,
     date,
   });
 };
@@ -160,11 +160,66 @@ let changeStatus = async (req, res) => {
   });
 };
 
+let getditelds = async (req, rec) => {
+  let { id } = req.params;
+
+  let data = await SubcategoryModel.findOne({ _id: id }).populate('Category','categoryName');;
+
+  console.log(data);
+
+  rec.send({
+    status: true,
+    messages: " color detles",
+    path: process.env.SUBCATEGROYIMAGEPATH,
+    data,
+  });
+};
+
+let SubcategoryUpdate = async (req, res) => {
+  let { id } = req.params;
+  let { SubcategoryName, Category, SubcategoryOder, Subcategoryimg } = req.body;
+
+  console.log(req.body);
+
+  let updateObj = {
+   SubcategoryName, Category, SubcategoryOder, Subcategoryimg
+  };
+
+  if (req.file) {
+    if (
+      req.file.filename != "" &&
+      req.file.filename != null &&
+      req.file.filename != undefined
+    ) {
+      updateObj["Subcategoryimg"] = req.file.filename;
+    }
+  }
+
+  let updateRes = await SubcategoryModel.updateOne(
+    { _id: id },
+    {
+      $set: updateObj,
+    }
+  );
+  res.send({
+    _status: true,
+    _message: "Color Updated",
+    updateRes,
+  });
+};
+
+
+
+
+
+
 module.exports = {
   Subcategorycreate,
   Subcategoryviwe,
   Subcategorydelete,
   multidelete,
   changeStatus,
-  parnetcategroy
+  parnetcategroy,
+  getditelds,
+  SubcategoryUpdate
 };
