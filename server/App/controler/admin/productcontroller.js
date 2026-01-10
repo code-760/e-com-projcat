@@ -237,6 +237,7 @@ let productUpdate = async (req, res) => {
 
     // 2️⃣ Body destructure
     let {
+    
       ProductName,
       Category,
       SubCategory,
