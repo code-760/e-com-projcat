@@ -18,22 +18,19 @@ export default function Add_Category() {
     categoryimg: "",
     categoryOder: "",
   });
+
   let categroysave = (e) => {
     e.preventDefault();
     let Form = e.target;
-
     let Formdata = new FormData(Form);
 
     if (id) {
       axios
         .put(`${apibaseurl}/category/update/${id}`, Formdata)
         .then((rec) => rec.data)
-
         .then((fainlrec) => {
-          // fainlrec ==ture to deta  save
-
           if (fainlrec._status) {
-            swal("Successfully", "updeted Successfully ", "success");
+            swal("Successfully", "Updated Successfully ", "success");
             setTimeout(() => {
               Navigate("/ViewCategory");
             }, 2000);
@@ -45,10 +42,7 @@ export default function Add_Category() {
       axios
         .post(`${apibaseurl}/category/create`, Formdata)
         .then((rec) => rec.data)
-
         .then((fainlrec) => {
-          // fainlrec ==ture to deta  save
-
           if (fainlrec.status) {
             swal("Successfully", "Your data is added!", "success");
             setTimeout(() => {
@@ -61,16 +55,11 @@ export default function Add_Category() {
     }
   };
 
-  // save item -->
-
   let getsetvalue = (e) => {
     let oldobj = { ...formvalue };
-
     let inputName = e.target.name;
     let inputvalue = e.target.value;
-
     oldobj[inputName] = inputvalue;
-
     setformvalue(oldobj);
   };
 
@@ -80,108 +69,143 @@ export default function Add_Category() {
         .get(`${apibaseurl}/category/get-deteils/${id}`)
         .then((rec) => rec.data)
         .then((finlRec) => {
-          // backend me fineone ka use
           let { categoryName, categoryimg, categoryOder } = finlRec.data;
-
           setformvalue({
             categoryName,
             categoryimg: "",
             categoryOder,
           });
-          console.log(finlRec.path + finlRec.data.categoryimg);
           setperview(finlRec.path + finlRec.data.categoryimg);
         });
     }
   }, [id]);
 
   return (
-    <div>
-      <ToastContainer/>
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        {id ? "update" : "Add Category"}
-      </h2>
+    <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center">
+      <ToastContainer />
+      
+      {/* Page Title */}
+      <div className="w-full max-w-4xl mb-6">
+        <h2 className="text-3xl font-bold text-gray-800 border-l-4 border-blue-600 pl-4">
+          {id ? "Update Category" : "Add New Category"}
+        </h2>
+      </div>
+
       <form
         onSubmit={categroysave}
-        className=" grid grid-cols-[40%_auto]  mx-auto bg-white rounded-lg shadow-lg p-8"
+        className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row"
       >
-        {/* Add Photo Section */}
-        <div className="w-full relative  h-full flex flex-col items-center  group justify-center border-r pr-8">
-          {id ? (
-            <MdDelete
+        {/* Left Side: Image Upload Section */}
+        <div className="w-full md:w-5/12 bg-gray-50 p-8 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col items-center justify-center relative">
+          
+          {/* Delete Icon */}
+          {id && perview && (
+            <button
+              type="button"
               onClick={() => setperview()}
-              className=" absolute right-2 top-0 text-[20px]"
-            />
-          ) : (
-            ""
+              className="absolute top-4 right-4 z-10 bg-white text-red-500 p-2 rounded-full shadow-md hover:bg-red-50 transition-colors"
+              title="Remove Image"
+            >
+              <MdDelete className="text-xl" />
+            </button>
           )}
 
-          <div className=" relative border-2 border-dashed overflow-hidden  group-hover:border-[rgba(62,53,53,0.66)]  w-full h-full bg-gray-100  flex items-center justify-center mb-4">
-            <div className=" top-0 left-0 absolute ">
+          <div className="relative w-full aspect-square max-w-[280px]">
+            <div className={`w-full h-full border-2 border-dashed rounded-xl overflow-hidden flex items-center justify-center transition-all duration-300 ${perview ? 'border-blue-500 bg-white' : 'border-gray-300 bg-gray-100 hover:bg-gray-200 hover:border-gray-400'}`}>
               
-                <img src={perview} alt="" className="" width={"100%"} />
+              {/* Image Preview */}
+              {perview ? (
+                <img
+                  src={perview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                // Upload Placeholder
+                <label
+                  htmlFor="photo-upload"
+                  className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-blue-600"
+                >
+                  <div className="bg-white p-4 rounded-full shadow-sm mb-3">
+                    <LuCloudUpload className="text-4xl" />
+                  </div>
+                  <p className="font-semibold">Click to upload</p>
+                  <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG</p>
+                </label>
+              )}
+
+              {/* Hidden Input */}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="photo-upload"
+                name="categoryimg"
+                onChange={(e) => {
+                  let file = e.target.files[0];
+                  if (file) {
+                    setperview(URL.createObjectURL(file));
+                    setformvalue({
+                      ...formvalue,
+                      categoryimg: file,
+                    });
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <p className="text-sm text-gray-500 mt-4 text-center">
+            Upload a category thumbnail
+          </p>
+        </div>
+
+        {/* Right Side: Form Inputs */}
+        <div className="w-full md:w-7/12 p-8 flex flex-col justify-between">
+          <div className="space-y-6">
+            
+            {/* Category Name Input */}
+            <div>
+              <label
+                className="block text-sm font-semibold text-gray-700 mb-2"
+                htmlFor="categoryName"
+              >
+                Category Name
+              </label>
+              <input
+                name="categoryName"
+                id="categoryName"
+                value={formvalue.categoryName}
+                onChange={getsetvalue}
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                placeholder="e.g. Electronics, Clothing..."
+              />
             </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="photo-upload"
-              name="categoryimg"
-              onChange={(e) => {
-                let file = e.target.files[0];
-                if (file) {
-                  setperview(URL.createObjectURL(file)); // 👈 image preview
-                  setformvalue({
-                    ...formvalue,
-                    categoryimg: file, // 👈 formdata ke liye
-                  });
-                }
-              }}
-            />
-            <label
-              htmlFor="photo-upload"
-              className=" text-black py-2 px-4 rounded-md cursor-pointer"
-            >
-              <div className="flex flex-col items-center justify-center text-center">
-                <LuCloudUpload className="text-3xl" />
-                <p>Add photo</p>
-              </div>
-            </label>
+            {/* Order Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="order">
+                Sort Order
+              </label>
+              <input
+                id="order"
+                type="number"
+                value={formvalue.categoryOder}
+                onChange={getsetvalue}
+                name="categoryOder"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                placeholder="e.g. 1, 2, 3..."
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-8">
+            <button className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-bold text-lg tracking-wide">
+              {id ? "Update Category" : "Save Category"}
+            </button>
           </div>
         </div>
-        {/* Form Section */}
-        <div className=" pl-8 flex flex-col justify-center">
-          <label
-            className="mb-2 text-gray-700 font-semibold"
-            htmlFor="categoryName"
-          >
-            Category Name
-          </label>
-          <input
-            name="categoryName"
-            id="categoryName"
-            value={formvalue.categoryName}
-            onChange={getsetvalue}
-            type="text"
-            className="mb-4 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
-            placeholder="Enter category name"
-          />
-          <label className="mb-2 text-gray-700 font-semibold" htmlFor="order">
-            Order
-          </label>
-          <input
-            id="order"
-            type="number"
-            value={formvalue.categoryOder}
-            onChange={getsetvalue}
-            name="categoryOder"
-            className="mb-6 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
-            placeholder="Enter order"
-          />
-        </div>
-        <button className="w-55 px-2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition font-semibold">
-          {id ? "update" : "Add Category"}
-        </button>
       </form>
     </div>
   );

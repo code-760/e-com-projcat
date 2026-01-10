@@ -1,13 +1,25 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FaFilter } from "react-icons/fa";
-import { FaPenNib } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaFilter, FaPenNib } from "react-icons/fa";
+import { Link } from "react-router-dom"; // Use correct router import
+import { ToastContainer, toast } from "react-toastify";
+import swal from "sweetalert"; // Ensure sweetalert is imported
+
+// Premium Icons
+import { 
+  RiLayoutTop2Line, 
+  RiDeleteBin6Line, 
+  RiToggleLine, 
+  RiSearchLine, 
+  RiCheckDoubleLine, 
+  RiCloseCircleLine 
+} from "react-icons/ri";
 
 export default function Viewslider() {
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState();
-   let [allids, setallids] = useState([]);
+  let [path, setpath] = useState("");
+  let [searchbox, setsearchbox] = useState(false);
+  let [allids, setallids] = useState([]);
 
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
 
@@ -16,19 +28,13 @@ export default function Viewslider() {
       .get(`${apibaseurl}/Slider/viwe`)
       .then((rec) => rec.data)
       .then((finlerec) => {
-        // console.log(finlerec.date);
         setpath(finlerec.path);
-
         setdate(finlerec.date);
       });
   };
-  // console.log(date);
-
- 
 
   let getChacdebox = (e) => {
     if (e.target.checked) {
-      // console.log(e.target.value);
       setallids([...allids, e.target.value]);
     } else {
       setallids(allids.filter((v) => v != e.target.value));
@@ -37,17 +43,31 @@ export default function Viewslider() {
 
   let deleterow = () => {
     if (allids.length >= 1) {
-      axios
-        .post(`${apibaseurl}/Slider/multidelete`, { ids: allids })
-        .then((rec) => rec.data)
-        .then((fainlrec) => {
-          if (fainlrec.status) {
-            getWhyChooseUs();
-            setallids([]);
-          }
-        });
+      swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover these sliders!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          axios
+            .post(`${apibaseurl}/Slider/multidelete`, { ids: allids })
+            .then((rec) => rec.data)
+            .then((fainlrec) => {
+              if (fainlrec.status) {
+                getSliders(); // Corrected function call
+                setallids([]);
+                swal("Poof! Your sliders have been deleted!", {
+                  icon: "success",
+                });
+              }
+            });
+        }
+      });
     } else {
-      toast.error("Please chack the box");
+      toast.error("Please check the box");
     }
   };
 
@@ -60,10 +80,11 @@ export default function Viewslider() {
           if (finalrec.status) {
             getSliders();
             setallids([]);
+            toast.success("Status updated successfully");
           }
         });
     } else {
-      toast.error("Please chack the box");
+      toast.error("Please check the box");
     }
   };
 
@@ -75,179 +96,158 @@ export default function Viewslider() {
     }
   };
 
+  let toteldata = date.length;
+  let activdata = date.filter((v) => v.Slidersstatus).length; // Fixed status key based on context
+  let dactivdeta = toteldata - activdata;
+
   useEffect(() => {
     getSliders();
   }, []);
-  let [searchbox, setsearchbox] = useState(false);
 
-  let toteldata = date.length;
-  let activdata = date.filter((v) => v.Subcategorystatus).length;
-  let dactivdeta = toteldata - activdata;
   return (
-    <div>
-      <div className="container mx-auto px-4 sm:px-8">
-        <div className="py-8">
-          <div className={`relative ${searchbox ? "block" : "hidden"}`}>
-            <input
-              type="search"
-              className="w-64 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search users..."
-            />
-            <button className="absolute left-[226px] top-2.5 text-gray-500">
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
+    <div className="min-h-screen bg-gray-50 p-6 font-sans">
+      <ToastContainer />
+      
+      {/* Header Section */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+          Slider Management
+          <span className="text-sm font-normal text-gray-500 bg-gray-200 px-2 py-1 rounded-full">{toteldata} Total</span>
+        </h2>
+        <p className="text-gray-500 mt-2">Manage homepage sliders and banners.</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Total Sliders</p>
+            <h3 className="text-3xl font-bold text-gray-800 mt-1">{toteldata}</h3>
           </div>
-          <div className=" flex justify-between">
-            <h2 className="text-2xl font-semibold leading-tight">
-              View slider
-            </h2>
-            <div className="my-2 flex sm:flex-row flex-col">
-              <div className="flex flex-row mb-1 sm:mb-0">
-                <div className="flex justify-between items-center mb-4 px-4">
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => setsearchbox((prev) => !prev)}
-                      className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-400 transition-colors"
-                    >
-                      <FaFilter />
-                    </button>
-                    <button  onClick={deleterow} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                      Delete
-                    </button>
-                    <button   onClick={changestatus} className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
-                      Change Status
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center space-x-4">
-                <div className="bg-gray-100 rounded-lg px-4 py-2">
-                  <span className="text-gray-600 font-medium">
-                    Total Emails:{" "}
-                  </span>
-                  <span className="text-gray-900">{toteldata}</span>
-                </div>
-                <div className="bg-green-100 rounded-lg px-4 py-2">
-                  <span className="text-green-600 font-medium">Active: </span>
-                  <span className="text-green-900">{activdata}</span>
-                </div>
-                <div className="bg-red-100 rounded-lg px-4 py-2">
-                  <span className="text-red-600 font-medium">Deactive: </span>
-                  <span className="text-red-900">{dactivdeta}</span>
-                </div>
-              </div>
-              <div className="flex space-x-2"></div>
-            </div>
-          </div>
-          <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
-            <table className="min-w-full leading-normal">
-              <thead>
-                <tr>
-                  <th className="px-10 py-3  border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    <input type="checkbox" checked={date.length == allids.length}
-                      onClick={getallchecked}  />
-                    Name
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"></th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {" "}
-                    Image
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Order
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              {
-                date.map((obj,index)=>{
-                    return(
-                        
-              <tr>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <div className="flex   items-center">
-                    <div className="ml-3">
-                      <p className="text-gray-900 whitespace-no-wrap">
-                        <input
-                              type="checkbox"
-                              onChange={getChacdebox}
-                              value={obj._id}
-                              checked={allids.includes(obj._id)}
-                            />
-                       {obj.Title}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className=" border-b border-gray-200 bg-white text-sm"></td>
-                <td className=" border-b border-gray-200 bg-white text-sm"></td>
-                <td className="px-5 py-5 border-b  border-gray-200 bg-white text-sm">
-                  <img
-                    src={path+obj.Slidersimg}
-                    alt=""
-                    className=" w-10 h-10"
-                  />
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <p className="text-gray-900 whitespace-no-wrap">{obj.Order}</p>
-                </td>
-
-
-                <td className=" border-b border-gray-200 bg-white text-sm">
-
-                  
-                {
-                  obj.Slidersstatus?
-                  <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                    Activate
-                  </button>
-                  :
-                  <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                    Dactivate
-                  </button>
-
-
-                }
-                  
-                </td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <Link to={`/sidebar-update/${obj._id}`}>
-                  <button className="px-5 py-5 rounded-full ml-2 bg-blue-500 text-white  hover:bg-blue-600 transition-colors">
-                    <FaPenNib />
-                  </button>
-                  </Link>
-                </td>
-              </tr>
-
-                    )
-                })
-              }
-            </table>
+          <div className="bg-blue-50 p-3 rounded-full text-blue-600">
+            <RiLayoutTop2Line size={24} />
           </div>
         </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Active</p>
+            <h3 className="text-3xl font-bold text-green-600 mt-1">{activdata}</h3>
+          </div>
+          <div className="bg-green-50 p-3 rounded-full text-green-600">
+            <RiCheckDoubleLine size={24} />
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Inactive</p>
+            <h3 className="text-3xl font-bold text-red-500 mt-1">{dactivdeta}</h3>
+          </div>
+          <div className="bg-red-50 p-3 rounded-full text-red-500">
+            <RiCloseCircleLine size={24} />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Card */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        
+        {/* Toolbar */}
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button 
+              onClick={() => setsearchbox(prev => !prev)} 
+              className={`px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all ${searchbox ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              <FaFilter /> <span className="hidden sm:inline">Filter</span>
+            </button>
+            <button onClick={deleterow} className="px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl flex items-center gap-2 transition-all">
+              <RiDeleteBin6Line /> <span className="hidden sm:inline">Delete</span>
+            </button>
+            <button onClick={changestatus} className="px-4 py-2.5 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-xl flex items-center gap-2 transition-all">
+              <RiToggleLine /> <span className="hidden sm:inline">Change Status</span>
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div className={`relative transition-all duration-300 ${searchbox ? 'w-full sm:w-72 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
+            <RiSearchLine className="absolute left-3 top-3.5 text-gray-400" />
+            <input
+              type="search"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+              placeholder="Search sliders..."
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full leading-normal">
+            <thead>
+              <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4">
+                  <input type="checkbox" onChange={getallchecked} checked={date.length > 0 && date.length === allids.length} className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                </th>
+                <th className="px-6 py-4">Title</th>
+                <th className="px-6 py-4">Image</th>
+                <th className="px-6 py-4">Order</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {date.length >= 1 ? (
+                date.map((obj, index) => (
+                  <tr key={index} className="hover:bg-gray-50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <input 
+                        type="checkbox" 
+                        onChange={getChacdebox} 
+                        value={obj._id} 
+                        checked={allids.includes(obj._id)}
+                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
+                      />
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{obj.Title}</td>
+                    <td className="px-6 py-4">
+                      <img 
+                        src={path + obj.Slidersimg} 
+                        alt={obj.Title} 
+                        className="h-12 w-24 rounded-lg object-cover border border-gray-200"
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">{obj.Order}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${obj.Slidersstatus ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {obj.Slidersstatus ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <Link to={`/sidebar-update/${obj._id}`}>
+                        <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit">
+                          <FaPenNib />
+                        </button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-10 text-center text-gray-500">
+                    No sliders found. Add a new slider to get started.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+          <p className="text-sm text-gray-500">Showing {date.length} entries</p>
+        </div>
+
       </div>
     </div>
   );

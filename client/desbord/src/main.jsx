@@ -33,6 +33,7 @@ import Add_Faq from "./comenpege/desbordpeage/Add_Faq.jsx";
 import Login from "./assets/login.jsx";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Add_Testimonial from "./comenpege/desbordpeage/Add_Testimonial.jsx";
+import TermsAndConditions from "./comenpege/desbordpeage/Terms_&_Conditions.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -73,6 +74,10 @@ createRoot(document.getElementById("root")).render(
           path="/Add_sub_sub_category"
           element={<Add_sub_sub_category />}
         />
+        <Route
+          path="/Update-Sub-sub-category/:id?"
+          element={<Add_sub_sub_category />}
+        />
         <Route path="/ViewSubSubCategory" element={<Viewsubsubcategory />} />
 
         <Route path="/Add_Why_Choose_Us" element={<Add_Why_Choose_Us />} />
@@ -92,9 +97,12 @@ createRoot(document.getElementById("root")).render(
 
         <Route path="/View_Product" element={<View_Product />} />
         <Route path="/Add_Product" element={<Add_product />} />
-      </Route>
-      <Route path="/Profile" element={<Profile />} />
+        <Route path="/Update-Product/:id?" element={<Add_product />} />
+         <Route path="/Profile" element={<Profile />} />
       <Route path="/Complitprofile" element={<Complitprofile />} />
+      <Route path="/Profile" element={<TermsAndConditions />} />
+      </Route>
+     
 
       {/* CATCH-ALL (IMPORTANT) */}
     </Routes>

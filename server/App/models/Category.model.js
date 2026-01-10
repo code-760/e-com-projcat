@@ -30,6 +30,6 @@ let categorySchema = mongoose.Schema({
   },
 });
 
-let categoryModel = mongoose.model("category", categorySchema);
+let categoryModel = mongoose.model("category",categorySchema);
 
 module.exports = { categoryModel };

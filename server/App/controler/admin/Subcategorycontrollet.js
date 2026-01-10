@@ -1,7 +1,7 @@
 
 // SubcategoryModel.syncIndexes();
 
-const { categoryModel } = require("../../models/Category.model ");
+const { categoryModel } = require("../../models/Category.model");
 const { SubcategoryModel } = require("../../models/Subcategory");
 
 let Subcategorycreate = async (req, rec) => {

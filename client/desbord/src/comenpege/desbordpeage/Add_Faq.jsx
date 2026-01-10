@@ -4,27 +4,29 @@ import { useNavigate, useParams } from "react-router";
 import swal from "sweetalert";
 import { ToastContainer, toast } from "react-toastify";
 
+// Icons for Premium Look
+import {
+  RiQuestionLine,
+  RiChatQuoteLine,
+  RiSortAsc,
+  RiAddCircleLine,
+  RiEditBoxLine,
+} from "react-icons/ri";
+
 export default function Add_Faq() {
-
-   let [formvalue, setformvalue] = useState({
-   FaqQuestion: "",
-   FaqAnswer: "",
-   FaqOder:""
-
+  let [formvalue, setformvalue] = useState({
+    FaqQuestion: "",
+    FaqAnswer: "",
+    FaqOder: "",
   });
 
   // updeta ka liye -->
-
   let { id } = useParams();
-
-      let apibaseurl = import.meta.env.VITE_APIBASEURL;
-
-  let Navigate=useNavigate()
+  let apibaseurl = import.meta.env.VITE_APIBASEURL;
+  let Navigate = useNavigate();
 
   let onsbmite = (e) => {
     e.preventDefault();
-
-   
 
     let obj = {
       FaqQuestion: e.target.FaqQuestion.value,
@@ -32,149 +34,174 @@ export default function Add_Faq() {
       FaqOder: e.target.FaqOder.value,
     };
 
-    if(id){
-        axios
-      .put(`${apibaseurl}/Faq/update/${id}`, obj)
-      .then((rec) => rec.data)
-
-      .then((fainlrec) => {
-        // fainlrec ==ture to deta  save
-
-        if (fainlrec._status) {
-          swal("Successfully", "updeted Successfully ", "success");
-          setTimeout(() => {
-            Navigate("/ViewFaq");
-          }, 2000);
-        } else {
-          toast.error(fainlrec.error.CountryName);
-        }
-      });
-
-
+    if (id) {
+      axios
+        .put(`${apibaseurl}/Faq/update/${id}`, obj)
+        .then((rec) => rec.data)
+        .then((fainlrec) => {
+          if (fainlrec._status) {
+            swal("Successfully", "updeted Successfully ", "success");
+            setTimeout(() => {
+              Navigate("/ViewFaq");
+            }, 2000);
+          } else {
+            toast.error(fainlrec.error.CountryName);
+          }
+        });
+    } else {
+      axios
+        .post(`${apibaseurl}/Faq/create`, obj)
+        .then((rec) => rec.data)
+        .then((fainlrec) => {
+          if (fainlrec.status) {
+            swal("Successfully", "Your data is added!", "success");
+            setTimeout(() => {
+              Navigate("/ViewFaq");
+            }, 2000);
+          } else {
+            toast.error(
+              fainlrec.error?.FaqQuestion || fainlrec.error?.FaqAnswer
+            );
+          }
+        });
     }
-    else{
-       axios
-      .post(`${apibaseurl}/Faq/create`, obj)
-      .then((rec) => rec.data)
-
-      .then((fainlrec) => {
-        // fainlrec ==ture to deta  save
-
-        if (fainlrec.status) {
-          swal("Successfully", "Your data is added!", "success");
-          setTimeout(()=>{
-            Navigate('/ViewFaq')
-          },2000)
-        }
-         else  {
-          toast.error(fainlrec.error?.FaqQuestion||fainlrec.error?.FaqAnswer
-          );
-        }
-      });
-
-    }
-
-   
   };
-   let getsetvalue = (e) => {
-    let oldobj = { ...formvalue };
 
+  let getsetvalue = (e) => {
+    let oldobj = { ...formvalue };
     let inputName = e.target.name;
     let inputvalue = e.target.value;
-
     oldobj[inputName] = inputvalue;
-
     setformvalue(oldobj);
   };
 
   useEffect(() => {
     setformvalue({
-     FaqQuestion: "",
-     FaqAnswer: "",
-     FaqOder:""
-     
+      FaqQuestion: "",
+      FaqAnswer: "",
+      FaqOder: "",
     });
     if (id) {
       axios
         .get(`${apibaseurl}/FAq/get-deteils/${id}`)
         .then((rec) => rec.data)
         .then((finlRec) => {
-          // backend me fineone ka use
-          let {FaqQuestion,FaqAnswer,FaqOder } = finlRec.data;
-          console.log(finlRec);
+          let { FaqQuestion, FaqAnswer, FaqOder } = finlRec.data;
+
+          // console.log(finlRec);
 
           setformvalue({
-           FaqQuestion,
-           FaqAnswer,
-           FaqOder
+            FaqQuestion,
+            FaqAnswer,
+            FaqOder,
           });
         });
     }
+
   }, [id]);
-  
+
 
   return (
-    <div>
-      <ToastContainer/>
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">{id? "update Faq":"Add Faq"}</h2>
-      <div className=" bg-gray-100 p-8">
-        <div className="  mx-auto bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">{id? "update Faq":"Add Faq"}</h2>
-          <form onSubmit={onsbmite} className="space-y-4 ">
-            <div className="mb-15">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-indigo-50 p-6">
+      <ToastContainer />
+
+      {/* Main Card */}
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-6">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            {id ? (
+              <RiEditBoxLine className="text-3xl" />
+            ) : (
+              <RiAddCircleLine className="text-3xl" />
+            )}
+            {id ? "Update FAQ" : "Add Frequently Asked Question"}
+          </h2>
+          <p className="text-indigo-100 text-sm mt-1">
+            Create meaningful questions and answers for your users.
+          </p>
+        </div>
+
+        {/* Form Section */}
+        <div className="p-8">
+          <form onSubmit={onsbmite} className="space-y-6">
+            {/* Question Input */}
+            <div className="group">
               <label
-                htmlFor="colorName"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="FaqQuestion"
+                className="block text-sm font-semibold text-gray-700 mb-2 pl-1"
               >
                 Question
               </label>
-              <input
-                type="text"
-                value={formvalue.FaqQuestion}
-                onChange={getsetvalue}
-                name="FaqQuestion"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter q name"
-              />
+              <div className="relative">
+                <div className="absolute top-3.5 left-3 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                  <RiQuestionLine size={20} />
+                </div>
+                <input
+                  type="text"
+                  name="FaqQuestion"
+                  id="FaqQuestion"
+                  value={formvalue.FaqQuestion}
+                  onChange={getsetvalue}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm bg-gray-50 focus:bg-white"
+                  placeholder="e.g. How do I track my order?"
+                />
+              </div>
             </div>
-            <div className="mb-15">
+
+            {/* Answer Input (Textarea) */}
+            <div className="group">
               <label
-                htmlFor=""
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="FaqAnswer"
+                className="block text-sm font-semibold text-gray-700 mb-2 pl-1"
               >
                 Answer
               </label>
-              <textarea
-                type="color"
-                name="FaqAnswer"
+              <div className="relative">
+                <div className="absolute top-3.5 left-3 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                  <RiChatQuoteLine size={20} />
+                </div>
+                <textarea
+                  name="FaqAnswer"
+                  id="FaqAnswer"
                   value={formvalue.FaqAnswer}
-                 onChange={getsetvalue}
-                id="colorPicker"
-                placeholder=" Answer"
-                className="w-full h-[200px] p-1 border resize-none border-gray-300 rounded-md cursor-pointer"
-              />
+                  onChange={getsetvalue}
+                  placeholder="Provide a detailed answer here..."
+                  className="w-full pl-10 pr-4 py-3 h-40 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm bg-gray-50 focus:bg-white resize-none"
+                />
+              </div>
             </div>
 
-            <div className="mb-15">
+            {/* Order Input */}
+            <div className="group">
               <label
-                htmlFor="colorName"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="FaqOder"
+                className="block text-sm font-semibold text-gray-700 mb-2 pl-1"
               >
-                other
+                Sort Order
               </label>
-              <input
-                type="text"
-                name="FaqOder"
-                 value={formvalue.FaqOder}
-                 onChange={getsetvalue}
-                id="colorName"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="other"
-              />
+              <div className="relative">
+                <div className="absolute top-3.5 left-3 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                  <RiSortAsc size={20} />
+                </div>
+                <input
+                  type="number"
+                  name="FaqOder"
+                  id="FaqOder"
+                  value={formvalue.FaqOder}
+                  onChange={getsetvalue}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm bg-gray-50 focus:bg-white"
+                  placeholder="e.g. 1, 2, 3"
+                />
+              </div>
             </div>
-            <button className="w-full mt-5 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-              Add Faq
-            </button>
+
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button className="w-full py-3.5 px-6 rounded-xl bg-gray-900 text-white font-bold text-lg hover:bg-indigo-600 shadow-lg hover:shadow-indigo-500/40 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0">
+                {id ? "Save Changes" : "Submit FAQ"}
+              </button>
+            </div>
           </form>
         </div>
       </div>

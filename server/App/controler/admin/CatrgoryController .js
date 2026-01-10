@@ -1,4 +1,4 @@
-const { categoryModel } = require("../../models/Category.model ");
+const { categoryModel } = require("../../models/Category.model");
 
 // categoryModel.syncIndexes();
 

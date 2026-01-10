@@ -36,6 +36,6 @@ let SubcategorySchema = mongoose.Schema({
   },
 });
 
-let SubcategoryModel = mongoose.model("Subcategory", SubcategorySchema);
+let SubcategoryModel = mongoose.model("SubCategory", SubcategorySchema);
 
 module.exports = { SubcategoryModel };

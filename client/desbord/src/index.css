@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 .bagraundimg{
     background-image: url(https://cdn.pixabay.com/photo/2025/10/09/14/14/muztagh-9883659_1280.jpg);
     background-repeat: no-repeat;
@@ -8,4 +9,13 @@
 }
 .formimg{
     background-image: url(https://cdn.pixabay.com/photo/2025/09/29/11/48/feather-9862263_1280.jpg);
+}
+.ql-container {
+  height: 85% !important;
+}
+
+.ql-editor {
+  min-height: 280px;
+  max-height: 280px;
+  overflow-y: auto;
 }

@@ -4,7 +4,7 @@ let materialSchema=mongoose.Schema(
     {
         materialName:{
             type:String,
-            match:[/^[a-zA-Z]{2,10}$/,"plesse file (a-z) (A-Z)"],
+            match:[/^[a-zA-Z ]{2,10}$/,"plesse file (a-z) (A-Z)"],
             required :[true,"color name is required"],
             minlength:2,
             maxlength:20,
@@ -28,7 +28,7 @@ let materialSchema=mongoose.Schema(
     }
 )
 
-let materialModel=mongoose.model("/material",materialSchema);
+let materialModel=mongoose.model("material",materialSchema);
 
 
 module.exports={materialModel}

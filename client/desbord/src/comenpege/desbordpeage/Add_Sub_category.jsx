@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { MdOutlineCloudDownload } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { useNavigate, useParams } from "react-router";
 import { LuCloudUpload } from "react-icons/lu";
 import axios from "axios";
 import swal from "sweetalert";
 import { ToastContainer, toast } from "react-toastify";
 
+// Premium Icons
+import { RiNodeTree, RiSortAsc, RiImageAddLine, RiSave3Line, RiLayoutGridFill } from "react-icons/ri";
+
 export default function Add_Sub_category() {
   let { id } = useParams();
+
   let [perview, setperview] = useState();
   let [parntcategroydeta, setparntcategroydeta] = useState([]);
+
   let [formvalue, setformvalue] = useState({
     SubcategoryName: "",
     Category: "",
@@ -35,13 +40,13 @@ export default function Add_Sub_category() {
         .then((fainlrec) => {
           // fainlrec ==ture to deta  save
 
-          if (fainlrec.status) {
+          if (fainlrec._status) {
             swal("Successfully", "Your data is added!", "success");
             setTimeout(() => {
               Navigate("/ViewSubCategory");
             }, 2000);
           } else {
-            toast.error(fainlrec.error?.Description || fainlrec.error?.Title);
+            toast.error(fainlrec.error?.SubcategoryName);
           }
         });
     } else {
@@ -85,6 +90,12 @@ export default function Add_Sub_category() {
   };
 
   let getdilels = () => {
+    setformvalue({
+      SubcategoryName: "",
+      Category: "",
+      SubcategoryOder: "",
+      Subcategoryimg: "",
+    });
     axios
       .get(`${apibaseurl}/Subcategory/get-deteils/${id}`)
       .then((rec) => rec.data)
@@ -115,96 +126,156 @@ export default function Add_Sub_category() {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center">
       <ToastContainer />
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        Add Sub category
-      </h2>
+      
+      {/* Page Title */}
+      <div className="w-full max-w-4xl mb-6">
+        <h2 className="text-3xl font-bold text-gray-800 border-l-4 border-indigo-600 pl-4 flex items-center gap-3">
+          <RiNodeTree className="text-indigo-600" />
+          {id ? "Update Sub Category" : "Add Sub Category"}
+        </h2>
+      </div>
+
       <form
         onSubmit={savesubcategroy}
-        className=" grid grid-cols-[40%_auto]  mx-auto bg-white rounded-lg shadow-lg p-8"
+        className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row"
       >
-        {/* Add Photo Section */}
-        <div className="flex flex-col items-center justify-center border-r pr-8">
-          <div className=" relative border-2 border-dashed overflow-hidden  group-hover:border-[rgba(62,53,53,0.66)]  w-full h-full bg-gray-100  flex items-center justify-center mb-4">
-            <div className=" top-0 left-0 absolute ">
-              <img src={perview} alt="" className="" />
+        {/* Left Side: Image Upload Section */}
+        <div className="w-full md:w-5/12 bg-gray-50 p-8 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col items-center justify-center relative">
+          
+          {/* Delete Icon */}
+          {perview && (
+            <button
+              type="button"
+              onClick={() => setperview()}
+              className="absolute top-4 right-4 z-10 bg-white text-red-500 p-2 rounded-full shadow-md hover:bg-red-50 transition-colors"
+              title="Remove Image"
+            >
+              <MdDelete className="text-xl" />
+            </button>
+          )}
+
+          <div className="relative w-full aspect-square max-w-[280px]">
+            <div className={`w-full h-full border-2 border-dashed rounded-xl overflow-hidden flex items-center justify-center transition-all duration-300 ${perview ? 'border-indigo-500 bg-white' : 'border-gray-300 bg-gray-100 hover:bg-gray-200 hover:border-gray-400'}`}>
+              
+              {/* Image Preview */}
+              {perview ? (
+                <img
+                  src={perview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                // Upload Placeholder
+                <label
+                  htmlFor="photo-upload"
+                  className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-500 hover:text-indigo-600"
+                >
+                  <div className="bg-white p-4 rounded-full shadow-sm mb-3">
+                    <LuCloudUpload className="text-4xl" />
+                  </div>
+                  <p className="font-semibold">Click to upload image</p>
+                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, SVG</p>
+                </label>
+              )}
+
+              {/* Hidden Input */}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="photo-upload"
+                name="Subcategoryimg"
+                onChange={(e) => {
+                  setperview(URL.createObjectURL(e.target.files[0]));
+                }}
+              />
+            </div>
+          </div>
+          <p className="text-sm text-gray-500 mt-4 text-center flex items-center gap-1">
+            <RiImageAddLine /> Upload sub-category thumbnail
+          </p>
+        </div>
+
+        {/* Right Side: Form Inputs */}
+        <div className="w-full md:w-7/12 p-8 flex flex-col justify-between">
+          <div className="space-y-6">
+            
+            {/* Parent Category Select */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="Category">
+                Parent Category
+              </label>
+              <div className="relative">
+                <select
+                  name="Category"
+                  id="Category"
+                  onChange={getsetvalue}
+                  value={formvalue.Category}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm appearance-none bg-white pl-10"
+                >
+                  <option value="">Select Category Name</option>
+                  {parntcategroydeta.map((obj, index) => (
+                    <option value={obj._id} key={index}>
+                      {obj.categoryName}
+                    </option>
+                  ))}
+                </select>
+                <RiLayoutGridFill className="absolute left-3 top-3.5 text-gray-400 pointer-events-none" size={18} />
+              </div>
             </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="photo-upload"
-              name="Subcategoryimg"
-              onChange={(e) => {
-                setperview(URL.createObjectURL(e.target.files[0]));
-              }}
-            />
-            <label
-              htmlFor="photo-upload"
-              className=" text-black py-2 px-4 rounded-md cursor-pointer"
-            >
-              <div className="flex flex-col items-center justify-center text-center">
-                <LuCloudUpload className="text-3xl" />
-                <p>Add photo</p>
+            {/* Sub Category Name Input */}
+            <div>
+              <label
+                className="block text-sm font-semibold text-gray-700 mb-2"
+                htmlFor="SubcategoryName"
+              >
+                Sub Category Name
+              </label>
+              <div className="relative">
+                <input
+                  id="SubcategoryName"
+                  type="text"
+                  onChange={getsetvalue}
+                  value={formvalue.SubcategoryName}
+                  name="SubcategoryName"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm pl-10"
+                  placeholder="e.g. Mobile Phones, T-Shirts..."
+                />
+                <RiNodeTree className="absolute left-3 top-3.5 text-gray-400" size={18} />
               </div>
-            </label>
+            </div>
+
+            {/* Order Input */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="order">
+                Sort Order
+              </label>
+              <div className="relative">
+                <input
+                  id="order"
+                  type="number"
+                  onChange={getsetvalue}
+                  value={formvalue.SubcategoryOder}
+                  name="SubcategoryOder"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all shadow-sm pl-10"
+                  placeholder="e.g. 1"
+                />
+                <RiSortAsc className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-8">
+            <button className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-bold text-lg tracking-wide flex items-center justify-center gap-2">
+              <RiSave3Line size={20} />
+              {id ? "Update Sub Category" : "Save Sub Category"}
+            </button>
           </div>
         </div>
-        {/* Form Section */}
-        <div className=" pl-8 flex flex-col justify-center">
-          <label className=" block text-gray-700  font-bold mb-2">
-            Category Name
-          </label>
-          <select
-            name="Category"
-            id=""
-            onChange={getsetvalue}
-            value={formvalue.Category}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value=""> select catgroy Name </option>
-            {parntcategroydeta.map((obj, index) => {
-              return (
-                <option value={obj._id} key={index}>
-                  {obj.categoryName}
-                </option>
-              );
-            })}
-          </select>
-
-          <label
-            className="mb-2 text-gray-700 font-semibold"
-            htmlFor="categoryName"
-          >
-            Category Name
-          </label>
-          <input
-            id="categoryName"
-            type="text"
-            onChange={getsetvalue}
-            value={formvalue.SubcategoryName}
-            name="SubcategoryName"
-            className="mb-4 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
-            placeholder="Enter category name"
-          />
-          <label className="mb-2 text-gray-700 font-semibold" htmlFor="order">
-            Order
-          </label>
-          <input
-            id="order"
-            type="number"
-            onChange={getsetvalue}
-            value={formvalue.SubcategoryOder}
-            name="SubcategoryOder"
-            className="mb-6 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
-            placeholder="Enter order"
-          />
-        </div>
-        <button className="w-55 px-2 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition font-semibold">
-          Add Category
-        </button>
       </form>
     </div>
   );
