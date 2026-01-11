@@ -35,11 +35,33 @@ let Faqcreate = async (req, rec) => {
 };
 
 let Faqview = async (req, rec) => {
-  let filtermarial = {
-    deletdat: null,
-  };
+ const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let data = await Faqmodele.find(filtermarial);
+  const orCondition = [];
+
+  if (req.query.FaqQuestion != undefined && req.query.FaqQuestion != "") {
+    orCondition.push({ FaqQuestion: new RegExp(req.query.FaqQuestion, "i") });
+  }
+
+  if (req.query.FaqOder != undefined && req.query.FaqOder != "") {
+    orCondition.push({ FaqOder: req.query.FaqOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let data = await Faqmodele.find(filter);
 
   rec.send({
     status: true,

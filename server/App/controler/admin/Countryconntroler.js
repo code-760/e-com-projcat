@@ -38,11 +38,33 @@ let Countrycreate = async (req, rec) => {
 };
 
 let Countryviwe = async (req, rec) => {
-  let filtermarial = {
-    deletdat: null,
-  };
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let data = await CountryModel.find(filtermarial);
+  const orCondition = [];
+
+  if (req.query.CountryName != undefined && req.query.CountryName != "") {
+    orCondition.push({ CountryName: new RegExp(req.query.CountryName, "i") });
+  }
+
+  if (req.query.CountryOder != undefined && req.query.CountryOder != "") {
+    orCondition.push({ CountryOder: req.query.CountryOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let data = await CountryModel.find(filter);
 
   rec.send({
     status: true,

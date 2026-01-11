@@ -62,11 +62,33 @@ let Sliderscreate = async (req, rec) => {
 };
 
 let Slidersviwe = async (req, rec) => {
-  let filterSliders = {
-    deletdat: null,
-  };
+ const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let date = await SlidersModel.find(filterSliders);
+  const orCondition = [];
+
+  if (req.query.Title != undefined && req.query.Title != "") {
+    orCondition.push({ Title: new RegExp(req.query.Title, "i") });
+  }
+
+  if (req.query.Order != undefined && req.query.Order != "") {
+    orCondition.push({ Order: req.query.Order });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let date = await SlidersModel.find(filter);
 
   rec.send({
     status: true,

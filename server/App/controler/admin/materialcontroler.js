@@ -40,11 +40,33 @@ let materialcreate = async (req, rec) => {
 };
 
 let materialviwe = async (req, rec) => {
-  let filtermarial = {
-    deletdat: null,
-  };
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let data = await materialModel.find(filtermarial);
+  const orCondition = [];
+
+  if (req.query.materialName != undefined && req.query.materialName != "") {
+    orCondition.push({ materialName: new RegExp(req.query.materialName, "i") });
+  }
+
+  if (req.query.materialOder != undefined && req.query.materialOder != "") {
+    orCondition.push({ materialOder: req.query.materialOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let data = await materialModel.find(filter);
 
   rec.send({
     status: true,

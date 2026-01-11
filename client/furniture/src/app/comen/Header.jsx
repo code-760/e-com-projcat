@@ -19,7 +19,7 @@ export default function Header() {
             <p className='text-[12px]'>Contact us 24/7 : +91-98745612330 / furnitureinfo@gmail.com</p>
           </div>
           <div>
-            <p className='text-[12px]'>Login / Register</p>
+         <Link href={"/Login-Register"}><p className='text-[12px]'>Login / Register</p></Link> 
           </div>
         </div>
       </div>

@@ -8,13 +8,10 @@ const { SubcategoryModel } = require("../../models/Subcategory");
 const { SubsubcategoryModel } = require("../../models/Subsubcategory");
 const { log } = require("console");
 
-
 let Productcreate = async (req, rec) => {
-
   let insertobj = { ...req.body };
 
   console.log(insertobj);
-  
 
   if (req.files) {
     if (req.files.ProductImage) {
@@ -35,10 +32,6 @@ let Productcreate = async (req, rec) => {
   try {
     let Product = await new ProductModel(insertobj);
     let ProductRec = await Product.save();
-
-  
-   
-    
 
     rec.send({
       status: true,
@@ -63,16 +56,37 @@ let Productcreate = async (req, rec) => {
     });
   }
 
-  console.log(req.body );
-  
+  console.log(req.body);
 };
 
 let Productviwe = async (req, rec) => {
-  let filterSubsubcategory = {
-    deletdat: null,
-  };
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let date = await ProductModel.find(filterSubsubcategory)
+  const orCondition = [];
+
+  if (req.query.ProductName != undefined && req.query.ProductName != "") {
+    orCondition.push({ ProductName: new RegExp(req.query.ProductName, "i") });
+  }
+
+  if (req.query.Order != undefined && req.query.Order != "") {
+    orCondition.push({ Order: req.query.Order });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let date = await ProductModel.find(filter)
     .populate("Category", "categoryName")
     .populate("SubCategory", "SubcategoryName")
     .populate("SubsubCategory", "SubsubcategoryName")
@@ -237,7 +251,6 @@ let productUpdate = async (req, res) => {
 
     // 2️⃣ Body destructure
     let {
-    
       ProductName,
       Category,
       SubCategory,
@@ -277,59 +290,44 @@ let productUpdate = async (req, res) => {
     };
 
     // 4️⃣ Upload path
-    const uploadPath = path.join(
-      __dirname,
-      "../uploads/products"
-    );
+    const uploadPath = path.join(__dirname, "../uploads/products");
 
-  console.log(uploadPath);
-  
+    console.log(uploadPath);
 
     // 5️⃣ Images
-   if (req.files) {
+    if (req.files) {
+      // 🔹 ProductImage
+      if (req.files.ProductImage) {
+        if (oldProduct.ProductImage) {
+          let oldPath = path.join(uploadPath, oldProduct.ProductImage);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
 
-  // 🔹 ProductImage
-  if (req.files.ProductImage) {
-    if (oldProduct.ProductImage) {
-      let oldPath = path.join(
-        uploadPath,
-        oldProduct.ProductImage
-      );
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        updateObj.ProductImage = req.files.ProductImage[0].filename;
+      }
+
+      // 🔹 BackImage
+      if (req.files.BackImage) {
+        if (oldProduct.BackImage) {
+          let oldPath = path.join(uploadPath, oldProduct.BackImage);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+
+        updateObj.BackImage = req.files.BackImage[0].filename;
+      }
+
+      // 🔹 GalleryImage
+      if (req.files.GalleryImage) {
+        if (oldProduct.GalleryImage?.length) {
+          oldProduct.GalleryImage.forEach((img) => {
+            let imgPath = path.join(uploadPath, img);
+            if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+          });
+        }
+
+        updateObj.GalleryImage = req.files.GalleryImage.map((f) => f.filename);
+      }
     }
-
-    updateObj.ProductImage =
-      req.files.ProductImage[0].filename;
-  }
-
-  // 🔹 BackImage
-  if (req.files.BackImage) {
-    if (oldProduct.BackImage) {
-      let oldPath = path.join(
-        uploadPath,
-        oldProduct.BackImage
-      );
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-
-    updateObj.BackImage =
-      req.files.BackImage[0].filename;
-  }
-
-  // 🔹 GalleryImage
-  if (req.files.GalleryImage) {
-    if (oldProduct.GalleryImage?.length) {
-      oldProduct.GalleryImage.forEach((img) => {
-        let imgPath = path.join(uploadPath, img);
-        if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
-      });
-    }
-
-    updateObj.GalleryImage =
-      req.files.GalleryImage.map((f) => f.filename);
-  }
-
-}
 
     // 6️⃣ Update DB
     let updateRes = await ProductModel.updateOne(
@@ -342,7 +340,6 @@ let productUpdate = async (req, res) => {
       _message: "Product Updated",
       updateRes,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -352,7 +349,6 @@ let productUpdate = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   parnetcategroy,

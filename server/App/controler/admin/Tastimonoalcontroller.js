@@ -60,11 +60,32 @@ let Tastimonialcreate = async (req, rec) => {
 };
 
 let Tastimonialviwe = async (req, rec) => {
-  let filterTastimonial = {
-    deletdat: null,
-  };
+ const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let date = await TastimonialModel.find(filterTastimonial);
+  const orCondition = [];
+
+  if (req.query.TastimonialName != undefined && req.query.TastimonialName != "") {
+    orCondition.push({ TastimonialName: new RegExp(req.query.TastimonialName, "i") });
+  }
+
+  if (req.query.Tastimonialstatus != undefined && req.query.Tastimonialstatus != "") {
+    orCondition.push({ Tastimonialstatus: req.query.Tastimonialstatus });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+  let date = await TastimonialModel.find(filter);
 
   rec.send({
     status: true,

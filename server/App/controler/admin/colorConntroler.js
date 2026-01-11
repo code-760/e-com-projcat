@@ -53,11 +53,32 @@ let colorcreate = async (req, rec) => {
 };
 
 let colorviwe = async (req, rec) => {
-  let filtercolor = {
-    deletdat: null,
-  };
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let date = await colorModel.find(filtercolor);
+  const orCondition = [];
+
+  if (req.query.colorName != undefined && req.query.colorName != "") {
+    orCondition.push({ colorName: new RegExp(req.query.colorName, "i") });
+  }
+
+  if (req.query.colorOder != undefined && req.query.colorOder != "") {
+    orCondition.push({ colorOder: req.query.colorOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+  let date = await colorModel.find(filter);
 
   rec.send({
     status: true,

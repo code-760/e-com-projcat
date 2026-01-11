@@ -66,7 +66,26 @@ export default function Add_product() {
     let Formdata = new FormData(Form);
     Formdata.append("Description", value);
 
-    axios
+
+    if(id){
+      axios
+        .put(`${apibaseurl}/Product/update/${id}`, Formdata)
+        .then((rec) => rec.data)
+
+        .then((fainlrec) => {
+          // fainlrec ==ture to deta  save
+
+          if (fainlrec._status) {
+            swal("Successfully", "Your data is added!", "success");
+            setTimeout(() => {
+              Navigate("/View_Product");
+            }, 2000);
+          } else {
+            toast.error(fainlrec.error?.SubcategoryName);
+          }
+        });
+    } else {
+      axios
       .post(`${apibaseurl}/Product/create`, Formdata)
       .then((rec) => rec.data)
 
@@ -80,6 +99,10 @@ export default function Add_product() {
           toast.error(fainlrec.error?.SubcategoryName);
         }
       });
+
+    }
+
+    
   };
 
   let getparentcategroy = () => {
@@ -187,11 +210,16 @@ export default function Add_product() {
           Description: data?.Description || "",
           Order: data?.Order || "",
           TotalInStocks: data?.TotalInStocks || "",
+          ProductType:data.ProductType,
         });
         setperview(finlerec.path + finlerec.data.ProductImage);
         setbackperview(finlerec.path + finlerec.data.BackImage);
+        setValue(data.Description)
       });
   };
+
+  console.log();
+  
 
   useEffect(() => {
     getMatriale();

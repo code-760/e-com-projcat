@@ -4,7 +4,7 @@ let colorSchema = mongoose.Schema({
     type: String,
     required: [true, "color name is required"],
     minlength: 2,
-    maxlength:10,
+    maxlength:50,
     validate: {
       validator: async function (v) {
         const color = await this.constructor.findOne({ colorName: v,deletdat:null });

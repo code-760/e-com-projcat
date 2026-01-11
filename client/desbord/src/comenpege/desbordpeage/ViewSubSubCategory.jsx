@@ -20,12 +20,20 @@ export default function Viewsubsubcategory() {
   let [date, setdate] = useState([]);
   let [path, setpath] = useState("");
   let [allids, setallids] = useState([]);
+  let [searchObj,setSearchObj]=useState(
+      {
+       SubsubcategoryName:'',
+       
+      }
+    )
 
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
 
-  let getsubcategory = () => {
+  let getSubsubcategory = () => {
     axios
-      .get(`${apibaseurl}/Subsubcategory/viwe`)
+      .get(`${apibaseurl}/Subsubcategory/viwe`,{
+          params:searchObj
+        })
       .then((rec) => rec.data)
       .then((finlerec) => {
         setpath(finlerec.path);
@@ -97,7 +105,7 @@ export default function Viewsubsubcategory() {
   };
 
   useEffect(() => {
-    getsubcategory();
+    getSubsubcategory();
   }, []);
 
   // Corrected filter key to match the data mapping (Subsubcategorystatus)
@@ -173,9 +181,15 @@ export default function Viewsubsubcategory() {
 
           {/* Search Box */}
           <div className={`relative transition-all duration-300 ${searchbox ? 'w-full sm:w-72 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
-            <RiSearchLine className="absolute left-3 top-3.5 text-gray-400" />
+            <RiSearchLine onClick={getSubsubcategory} className="absolute left-3 top-3.5 text-gray-400" />
             <input
               type="search"
+              onChange={(e)=>{
+                let obj={...searchObj}
+                 obj[e.target.name]=e.target.value
+                setSearchObj(obj)
+
+              }}
               className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
               placeholder="Search categories..."
             />

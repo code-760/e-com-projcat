@@ -57,11 +57,33 @@ let Subcategorycreate = async (req, rec) => {
 };
 
 let Subcategoryviwe = async (req, rec) => {
-  let filterSubcategory = {
-    deletdat: null,
-  };
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
 
-  let date = await SubcategoryModel.find(filterSubcategory).populate('Category','categoryName');
+  const orCondition = [];
+
+  if (req.query.SubcategoryName != undefined && req.query.SubcategoryName != "") {
+    orCondition.push({ SubcategoryName: new RegExp(req.query.SubcategoryName, "i") });
+  }
+
+  if (req.query.SubcategoryOder != undefined && req.query.SubcategoryOder != "") {
+    orCondition.push({ SubcategoryOder: req.query.SubcategoryOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let date = await SubcategoryModel.find(filter).populate('Category','categoryName');
 //  {poputale<-- ka kam hai ki vo pernet category ka deta dikhata hai ye un me se deta nikal kar lata hai  }
 
   rec.send({

@@ -55,11 +55,35 @@ let categorycreate = async (req, rec) => {
 };
 
 let categoryviwe = async (req, rec) => {
-  let filtercategory = {
-    deletdat: null,
-  };
 
-  let date = await categoryModel.find(filtercategory);
+
+  const addCondition = [
+    {
+      deleted_at: null,
+    },
+  ];
+
+  const orCondition = [];
+
+  if (req.query.categoryName != undefined && req.query.categoryName != "") {
+    orCondition.push({ categoryName: new RegExp(req.query.categoryName, "i") });
+  }
+
+  if (req.query.categoryOder != undefined && req.query.categoryOder != "") {
+    orCondition.push({ categoryOder: req.query.categoryOder });
+  }
+
+  if (addCondition.length > 0) {
+    var filter = { $and: addCondition };
+  } else {
+    var filter = {};
+  }
+
+  if (orCondition.length > 0) {
+    filter.$or = orCondition;
+  }
+
+  let date = await categoryModel.find(filter);
 
   rec.send({
     status: true,
