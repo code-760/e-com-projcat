@@ -30,16 +30,19 @@ import Add_Why_Choose_Us from "./comenpege/desbordpeage/Add_Why_Choose_Us.jsx";
 import Add_Country from "./comenpege/desbordpeage/Add Country.jsx";
 import Add_Faq from "./comenpege/desbordpeage/Add_Faq.jsx";
 
-import Login from "./assets/login.jsx";
+
 import { BrowserRouter, Route, Routes } from "react-router";
 import Add_Testimonial from "./comenpege/desbordpeage/Add_Testimonial.jsx";
 import TermsAndConditions from "./comenpege/desbordpeage/Terms_&_Conditions.jsx";
+import Login from "./assets/login.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>
+
+      <Route path="/" element={<Login/>} />
       <Route path="" element={<Layout />}>
-        <Route path="/" element={<Desbord />} />
+        <Route path="/Desbord" element={<Desbord />} />
 
         <Route path="/Viewuser" element={<Viewuser />} />
         {/* color */}

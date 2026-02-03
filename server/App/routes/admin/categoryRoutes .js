@@ -1,16 +1,9 @@
 let express = require("express");
-let {
-  categorycreate,
-  categoryviwe,
-  categorydelete,
-  multidelete,
-  changeStatus,
-  catUpdate,
-  getditelds,
-} = require("../../controler/admin/catrgoryController ");
+
 let CategoryRoutes = express.Router();
 let multer = require("multer");
 const { fileuplode } = require("../../middlewera/fileupdole");
+const { categorycreate, categoryviwe, categorydelete, multidelete, getditelds, catUpdate, changeStatus } = require("../../controler/admin/CatrgoryController ");
 
 // let uplodes = multer({ dest: "uploads/category" });
 

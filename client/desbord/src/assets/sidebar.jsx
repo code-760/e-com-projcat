@@ -24,7 +24,7 @@ export default function Sidebar() {
     {
       title: "Dashboard",
       icon: <RiDashboard3Line size={22} />,
-      path: "/",
+      path: "/Desbord",
       type: "link",
     },
     {
