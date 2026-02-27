@@ -29,6 +29,19 @@ let UserSchema = mongoose.Schema({
     enum: ["male", "female", "other"],
     
   },
+  state: {
+    type: String,
+    default: "",
+  },
+  
+  city: {
+    type: String,
+    default: "",
+  },
+  country: {
+    type: String,
+    default: "",
+  },
   isdeleted: {
     type: Boolean,
     default: false,

@@ -29,5 +29,6 @@ adminRoutes.use("/WhyChooseUs", WhyChooseUsRoutes);
 adminRoutes.use("/Slider", SliderRoutes);
 adminRoutes.use("/Tastimonial", TastimonialRoutes);
 adminRoutes.use("/Product",ProductRoutes);
+adminRoutes.use("/Product",ProductRoutes);
 
 module.exports = { adminRoutes };

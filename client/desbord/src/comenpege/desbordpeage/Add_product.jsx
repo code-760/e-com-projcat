@@ -8,9 +8,14 @@ import swal from "sweetalert";
 import { ToastContainer, toast } from "react-toastify";
 
 // Premium Icons
-import { 
-  RiProductHuntLine, RiPriceTag3Line, RiStockLine, RiFileList3Line, 
-  RiImageAddLine, RiSave3Line, RiArrowDownSLine
+import {
+  RiProductHuntLine,
+  RiPriceTag3Line,
+  RiStockLine,
+  RiFileList3Line,
+  RiImageAddLine,
+  RiSave3Line,
+  RiArrowDownSLine,
 } from "react-icons/ri";
 
 export default function Add_product() {
@@ -66,8 +71,7 @@ export default function Add_product() {
     let Formdata = new FormData(Form);
     Formdata.append("Description", value);
 
-
-    if(id){
+    if (id) {
       axios
         .put(`${apibaseurl}/Product/update/${id}`, Formdata)
         .then((rec) => rec.data)
@@ -86,23 +90,20 @@ export default function Add_product() {
         });
     } else {
       axios
-      .post(`${apibaseurl}/Product/create`, Formdata)
-      .then((rec) => rec.data)
+        .post(`${apibaseurl}/Product/create`, Formdata)
+        .then((rec) => rec.data)
 
-      .then((fainlrec) => {
-        if (fainlrec.status) {
-          swal("Successfully", "Your data is added!", "success");
-          setTimeout(() => {
-            Navigate("/View_Product");
-          }, 2000);
-        } else {
-          toast.error(fainlrec.error?.SubcategoryName);
-        }
-      });
-
+        .then((fainlrec) => {
+          if (fainlrec.status) {
+            swal("Successfully", "Your data is added!", "success");
+            setTimeout(() => {
+              Navigate("/View_Product");
+            }, 2000);
+          } else {
+            toast.error(fainlrec.error?.SubcategoryName);
+          }
+        });
     }
-
-    
   };
 
   let getparentcategroy = () => {
@@ -134,10 +135,9 @@ export default function Add_product() {
   };
 
   let getSubsubcategroy = (e) => {
-    let subparnetid = e.target.value;
-
+    let parnetid = e;
     axios
-      .get(`${apibaseurl}/Product/Sub-sub-categroy/${subparnetid}`)
+      .get(`${apibaseurl}/Product/Sub-sub-categroy/${parnetid}`)
       .then((rec) => rec.data)
       .then((finlrec) => {
         setSubsubcategroydeta(finlrec.date);
@@ -173,14 +173,19 @@ export default function Add_product() {
   };
 
   let getsetvalue = (e) => {
-    let oldobj = { ...formvalue };
+    // e.target se cheezein nikalo
+    let { name, value, multiple, selectedOptions } = e.target;
 
-    let inputName = e.target.name;
-    let inputvalue = e.target.value;
+    let finalValue = value;
 
-    oldobj[inputName] = inputvalue;
+    if (multiple) {
+      // Agar multiple hai toh array banao
+      finalValue = Array.from(selectedOptions, (option) => option.value);
+    }
 
-    setformvalue(oldobj);
+    // Name fix karo aur state update karo
+    let key = name.replace("[]", "");
+    setformvalue({ ...formvalue, [key]: finalValue });
   };
 
   let gatdiles = () => {
@@ -210,16 +215,13 @@ export default function Add_product() {
           Description: data?.Description || "",
           Order: data?.Order || "",
           TotalInStocks: data?.TotalInStocks || "",
-          ProductType:data.ProductType,
+          ProductType: data.ProductType,
         });
         setperview(finlerec.path + finlerec.data.ProductImage);
         setbackperview(finlerec.path + finlerec.data.BackImage);
-        setValue(data.Description)
+        setValue(data.Description);
       });
   };
-
-  console.log();
-  
 
   useEffect(() => {
     getMatriale();
@@ -237,14 +239,14 @@ export default function Add_product() {
     console.log("Category:", formvalue.SubCategory);
     console.log(
       "Options:",
-      subcategroydeta.map((o) => o._id)
+      subcategroydeta.map((o) => o._id),
     );
   }, [formvalue.SubCategory, subcategroydeta]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans">
       <ToastContainer />
-      
+
       {/* Page Header */}
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
@@ -253,20 +255,23 @@ export default function Add_product() {
         </h2>
       </div>
 
-      <form onSubmit={Product} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+      <form
+        onSubmit={Product}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+      >
         {/* LEFT COLUMN - Main Info */}
         <div className="lg:col-span-2 space-y-8">
-          
           {/* Basic Information Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2 border-b pb-2">
               <RiFileList3Line className="text-blue-500" /> Basic Information
             </h3>
-            
+
             <div className="space-y-4">
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Product Name</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Product Name
+                </label>
                 <input
                   type="text"
                   onChange={getsetvalue}
@@ -280,7 +285,9 @@ export default function Add_product() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Product Type */}
                 <div className="group relative">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Product Type</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Product Type
+                  </label>
                   <div className="relative">
                     <select
                       value={formvalue.ProductType}
@@ -299,7 +306,9 @@ export default function Add_product() {
 
                 {/* Sort Order */}
                 <div className="group">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Sort Order</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Sort Order
+                  </label>
                   <input
                     value={formvalue.Order}
                     onChange={getsetvalue}
@@ -314,7 +323,9 @@ export default function Add_product() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Best Selling */}
                 <div className="group relative">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Best Selling</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Best Selling
+                  </label>
                   <div className="relative">
                     <select
                       value={formvalue.BestSelling}
@@ -332,7 +343,9 @@ export default function Add_product() {
 
                 {/* Top Rated */}
                 <div className="group relative">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Top Rated</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Top Rated
+                  </label>
                   <div className="relative">
                     <select
                       value={formvalue.TopRated}
@@ -350,7 +363,9 @@ export default function Add_product() {
 
                 {/* Upsell */}
                 <div className="group relative">
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Upsell Product</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Upsell Product
+                  </label>
                   <div className="relative">
                     <select
                       value={formvalue.Upsell}
@@ -374,12 +389,16 @@ export default function Add_product() {
             <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2 border-b pb-2">
               <RiPriceTag3Line className="text-green-500" /> Pricing & Inventory
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Actual Price (MRP)</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Actual Price (MRP)
+                </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                    $
+                  </span>
                   <input
                     value={formvalue.ActualPrice}
                     onChange={getsetvalue}
@@ -392,9 +411,13 @@ export default function Add_product() {
               </div>
 
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Sale Price</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Sale Price
+                </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                    $
+                  </span>
                   <input
                     value={formvalue.SalePrice}
                     onChange={getsetvalue}
@@ -407,7 +430,9 @@ export default function Add_product() {
               </div>
 
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Total Stock</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Total Stock
+                </label>
                 <div className="relative">
                   <RiStockLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
@@ -425,7 +450,9 @@ export default function Add_product() {
 
           {/* Description Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Description</h3>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+              Description
+            </h3>
             <div className="h-80 mb-12">
               <ReactQuill
                 theme="snow"
@@ -435,20 +462,22 @@ export default function Add_product() {
               />
             </div>
           </div>
-
         </div>
 
         {/* RIGHT COLUMN - Categorization & Images */}
         <div className="space-y-8">
-          
           {/* Organization Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Organization</h3>
-            
+            <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">
+              Organization
+            </h3>
+
             <div className="space-y-4">
               {/* Category */}
               <div className="group relative">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Parent Category</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Parent Category
+                </label>
                 <div className="relative">
                   <select
                     name="Category"
@@ -461,7 +490,9 @@ export default function Add_product() {
                   >
                     <option value="">Select Category</option>
                     {parntcategroydeta.map((obj) => (
-                      <option key={obj._id} value={obj._id}>{obj.categoryName}</option>
+                      <option key={obj._id} value={obj._id}>
+                        {obj.categoryName}
+                      </option>
                     ))}
                   </select>
                   <RiArrowDownSLine className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -470,7 +501,9 @@ export default function Add_product() {
 
               {/* Sub Category */}
               <div className="group relative">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Sub Category</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Sub Category
+                </label>
                 <div className="relative">
                   <select
                     name="SubCategory"
@@ -483,7 +516,9 @@ export default function Add_product() {
                   >
                     <option>Select Sub-Category</option>
                     {subcategroydeta.map((obj, index) => (
-                      <option value={obj._id} key={index}>{obj.SubcategoryName}</option>
+                      <option value={obj._id} key={index}>
+                        {obj.SubcategoryName}
+                      </option>
                     ))}
                   </select>
                   <RiArrowDownSLine className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -492,7 +527,9 @@ export default function Add_product() {
 
               {/* Sub Sub Category */}
               <div className="group relative">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Sub-Sub Category</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Sub-Sub Category
+                </label>
                 <div className="relative">
                   <select
                     value={formvalue.SubsubCategory}
@@ -502,7 +539,9 @@ export default function Add_product() {
                   >
                     <option>Select Sub-Sub-Category</option>
                     {Subsubcategroydeta.map((obj, index) => (
-                      <option value={obj._id} key={index}>{obj.SubsubcategoryName}</option>
+                      <option value={obj._id} key={index}>
+                        {obj.SubsubcategoryName}
+                      </option>
                     ))}
                   </select>
                   <RiArrowDownSLine className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -511,7 +550,9 @@ export default function Add_product() {
 
               {/* Material */}
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Materials</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Materials
+                </label>
                 <select
                   value={formvalue.material}
                   onChange={getsetvalue}
@@ -520,15 +561,21 @@ export default function Add_product() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-gray-50 focus:bg-white h-32"
                 >
                   {Matriale.map((obj, index) => (
-                    <option value={obj._id} key={index} className="p-1">{obj.materialName}</option>
+                    <option value={obj._id} key={index} className="p-1">
+                      {obj.materialName}
+                    </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Hold Ctrl/Cmd to select multiple
+                </p>
               </div>
 
               {/* Color */}
               <div className="group">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Colors</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Colors
+                </label>
                 <select
                   name="color[]"
                   multiple
@@ -537,10 +584,14 @@ export default function Add_product() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-gray-50 focus:bg-white h-32"
                 >
                   {color.map((obj, index) => (
-                    <option value={obj._id} key={index} className="p-1">{obj.colorName}</option>
+                    <option value={obj._id} key={index} className="p-1">
+                      {obj.colorName}
+                    </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Hold Ctrl/Cmd to select multiple
+                </p>
               </div>
             </div>
           </div>
@@ -553,52 +604,114 @@ export default function Add_product() {
 
             {/* Product Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">Main Image</label>
-              <label htmlFor="Product-Image" className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50 transition-all ${perview ? 'border-blue-500' : 'border-gray-300'}`}>
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Main Image
+              </label>
+              <label
+                htmlFor="Product-Image"
+                className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50 transition-all ${perview ? "border-blue-500" : "border-gray-300"}`}
+              >
                 {perview ? (
-                  <img src={perview} alt="Preview" className="w-full h-full object-contain p-2" />
+                  <img
+                    src={perview}
+                    alt="Preview"
+                    className="w-full h-full object-contain p-2"
+                  />
                 ) : (
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <TiCloudStorage className="w-10 h-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 font-semibold">Click to upload main image</p>
+                    <p className="text-sm text-gray-500 font-semibold">
+                      Click to upload main image
+                    </p>
                   </div>
                 )}
-                <input type="file" id="Product-Image" name="ProductImage" accept="image/*" className="hidden" onChange={(e) => e.target.files[0] && setperview(URL.createObjectURL(e.target.files[0]))} />
+                <input
+                  type="file"
+                  id="Product-Image"
+                  name="ProductImage"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    e.target.files[0] &&
+                    setperview(URL.createObjectURL(e.target.files[0]))
+                  }
+                />
               </label>
             </div>
 
             {/* Back Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">Back View Image</label>
-              <label htmlFor="Back-Image" className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50 transition-all ${backperview ? 'border-blue-500' : 'border-gray-300'}`}>
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Back View Image
+              </label>
+              <label
+                htmlFor="Back-Image"
+                className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50 transition-all ${backperview ? "border-blue-500" : "border-gray-300"}`}
+              >
                 {backperview ? (
-                  <img src={backperview} alt="Preview" className="w-full h-full object-contain p-2" />
+                  <img
+                    src={backperview}
+                    alt="Preview"
+                    className="w-full h-full object-contain p-2"
+                  />
                 ) : (
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <TiCloudStorage className="w-10 h-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 font-semibold">Click to upload back view</p>
+                    <p className="text-sm text-gray-500 font-semibold">
+                      Click to upload back view
+                    </p>
                   </div>
                 )}
-                <input type="file" id="Back-Image" name="BackImage" accept="image/*" className="hidden" onChange={(e) => e.target.files[0] && setbackperview(URL.createObjectURL(e.target.files[0]))} />
+                <input
+                  type="file"
+                  id="Back-Image"
+                  name="BackImage"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    e.target.files[0] &&
+                    setbackperview(URL.createObjectURL(e.target.files[0]))
+                  }
+                />
               </label>
             </div>
 
             {/* Gallery Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">Gallery Images</label>
-              <label htmlFor="Gallery-Image" className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-all">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Gallery Images
+              </label>
+              <label
+                htmlFor="Gallery-Image"
+                className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition-all"
+              >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <TiCloudStorage className="w-8 h-8 text-gray-400 mb-1" />
                   <p className="text-xs text-gray-500">Add multiple images</p>
                 </div>
-                <input type="file" id="Gallery-Image" name="GalleryImage" accept="image/*" multiple className="hidden" onChange={handleGalleryChange} />
+                <input
+                  type="file"
+                  id="Gallery-Image"
+                  name="GalleryImage"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleGalleryChange}
+                />
               </label>
-              
+
               {galleryPreviews.length > 0 && (
                 <div className="grid grid-cols-4 gap-2 mt-4">
                   {galleryPreviews.map((src, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
-                      <img src={src} alt="Gallery" className="w-full h-full object-cover" />
+                    <div
+                      key={idx}
+                      className="relative aspect-square rounded-lg overflow-hidden border border-gray-200"
+                    >
+                      <img
+                        src={src}
+                        alt="Gallery"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   ))}
                 </div>
@@ -607,11 +720,13 @@ export default function Add_product() {
           </div>
 
           {/* Submit Action */}
-          <button type="submit" className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1">
+          <button
+            type="submit"
+            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1"
+          >
             <RiSave3Line size={20} />
             {id ? "Update Product" : "Save Product"}
           </button>
-
         </div>
       </form>
     </div>

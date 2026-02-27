@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
 import { CiSearch } from "react-icons/ci";
@@ -11,16 +11,50 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { removetokan } from "../redex/slice/userslice";
 import { redirect } from "next/navigation";
+import { fetchcart } from "../redex/slice/cartslice";
+import axios from "axios";
 
 export default function Header() {
+  let basurl = process.env.NEXT_PUBLIC_BASEURL;
   let dispatch = useDispatch();
-  let [opencart, setopencart] = useState(false);
   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
- let Logout=()=>{
-  dispatch(removetokan())
-  redirect("/Login-Register")
+  let [opencart, setopencart] = useState(false);
 
- }
+  let Logout = () => {
+    dispatch(removetokan());
+    redirect("/Login-Register");
+  };
+
+  useEffect(() => {
+    dispatch(fetchcart());
+  }, [tokan]);
+
+  let cart = useSelector((Allmystroy) => Allmystroy.cartstore.cart) || {};
+  let { cartdetails = [], path = "" } = cart;
+
+  // --- TOTAL CALCULATE KARNE KA LOGIC ---
+  const calculateSubtotal = () => {
+    if (!cartdetails || !Array.isArray(cartdetails)) return 0;
+    return cartdetails.reduce(
+      (acc, obj) => acc + obj.price * (obj.quantity || 1),
+      0,
+    );
+  };
+
+  const subtotal = calculateSubtotal();
+
+  const [sideCartData, setSideCartData] = useState([]);
+
+  // Jab Redux se data aaye, local state update karein
+  useEffect(() => {
+    setSideCartData(cartdetails);
+  }, [cartdetails]);
+
+  // Delete function jo UI se item hatayega
+  const handleSideDelete = (id) => {
+    const updated = sideCartData.filter((item) => item._id !== id);
+    setSideCartData(updated);
+  };
 
   return (
     <div className=" ">
@@ -34,7 +68,7 @@ export default function Header() {
           </div>
           <div>
             {tokan ? (
-              <button  onClick={Logout}>Log out</button>
+              <button onClick={Logout}>Log out</button>
             ) : (
               <Link href={"/Login-Register"}>
                 <p className="text-[12px]">Login / Register</p>
@@ -73,36 +107,130 @@ export default function Header() {
                   <MdShoppingCart />
                 </div>
                 <div>
-                  <p>Rs.4800</p>
+                  <p>Rs.{subtotal}</p>
                 </div>
                 <div>
                   <FaAngleDown />
                 </div>
                 <div className=" bg-[#C09578] w-5 h-5 absolute top-3.5 -left-2.5  rounded-2xl flex items-center text-center">
-                  <p className="text-black p-1.5 text-center">0</p>
+                  <p className="text-black p-1.5 text-center">
+                    {cartdetails?.length || 0}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
           {/* side cart */}
           <div
-            className={`w-[320px] z-10 bg-white shadow h-screen fixed top-0 right-0 transform transition-all duration-500 ${opencart ? "translate-x-0" : "translate-x-full"} `}
+            className={`w-[320px] z-50 bg-white shadow-2xl h-screen fixed top-0 right-0 transform transition-all duration-500 ${opencart ? "translate-x-0" : "translate-x-full"}`}
           >
-            <div className=" flex items-center justify-between p-5">
-              <div>
-                <h3 className="text-[20px] font-bold ">Cart</h3>
-              </div>
-              <div>
-                <RxCross2 onClick={() => setopencart(false)} />
+            {/* Header Section */}
+            <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
+              <Link href="/Cart">
+                <h3 className="text-[20px] font-bold">Cart</h3>
+              </Link>
+              <RxCross2
+                className="cursor-pointer text-2xl"
+                onClick={() => setopencart(false)}
+              />
+            </div>
+
+            {/* Scrollable Area: Yahan 'overflow-y-auto' aur 'custom-scrollbar' zaroori hai */}
+            <div className="h-[calc(100vh-190px)] overflow-y-auto custom-scrollbar px-4 py-6">
+              <div className="flex flex-col gap-6 text-center">
+                {tokan ? (
+                  <>
+                    {cartdetails && cartdetails.length > 0 ? (
+                      cartdetails.map((item, index) => (
+                        /* --- AAPKA PURANA CARD CODE START --- */
+                        <Link href={`/product/${item.productId}`} key={index}>
+                          <div className="w-full bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden group border border-gray-100">
+                            <div className="cursor-pointer">
+                              <div className="h-40 w-full overflow-hidden">
+                                <img
+                                  src={path + item.productImg}
+                                  alt="Product"
+                                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                              </div>
+                              <div className="px-4 py-5">
+                                <span className="text-gray-400 text-[11px] uppercase tracking-widest font-medium">
+                                  Nest Of Tables
+                                </span>
+                                <p className="text-[17px] font-bold text-black truncate block capitalize mt-1 hover:text-[#C09578]">
+                                  {item.productName}
+                                </p>
+                                <div className="border-t my-4 border-[#eeeeee]"></div>
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm text-gray-400 line-through">
+                                      {item.ActualPrice}
+                                    </p>
+                                    <p className="text-lg font-bold text-black">
+                                      {item.SalePrice}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 w-full px-2">
+                                    <div className="p-2 border border-[#ebebeb] bg-[#f9f9f9] hover:text-[#C09578] cursor-pointer">
+                                      <FaHeart />
+                                    </div>
+                                    <div className="flex-1 py-2 border border-[#ebebeb] bg-[#f9f9f9] hover:bg-[#C09578] hover:text-white cursor-pointer transition-all">
+                                      <h5
+                                        onClick={() => {
+                                          // 1. API call karein
+                                          axios
+                                            .delete(
+                                              `${basurl}cart/delete-cart/${item._id}`,
+                                            )
+                                            .then((res) => res.data)
+                                            .then((finalres) => {
+                                              if (finalres._status === true) {
+                                                // 1. Redux wala function call karo (Poori web app se item hatane ke liye)
+                                                dispatch(
+                                                  removeItemFromCart(item._id),
+                                                );
+
+                                                // 2. Agar aapne parent se koi function pass kiya hai toh use bhi call kar sakte ho
+                                                // cartdelete(id);
+                                              }
+                                            });
+                                        }}
+                                        className="text-[13px] font-bold uppercase"
+                                      >
+                                        Remove from Cart
+                                      </h5>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                        /* --- AAPKA PURANA CARD CODE END --- */
+                      ))
+                    ) : (
+                      <div className="py-10 text-gray-400 font-medium">
+                        Your cart is empty!
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="py-10 text-gray-400">
+                    Please login to see cart!
+                  </div>
+                )}
               </div>
             </div>
-            <div className="my-6">
-              <img src="/my-Order.jpg" alt="" className="" />
-              <div className="border-y p-6 border-[#ccc]">
-                <div className="text-center">
-                  <p className="text-[#a19e9e]">Your shopping cart is empty!</p>
-                </div>
+
+            {/* Total & Checkout (Bottom Fixed) */}
+            <div className="absolute bottom-0 left-0 w-full p-5 bg-white border-t">
+              <div className="flex justify-between items-center mb-4 text-xl font-bold">
+                <span>Total:</span>
+                <span className="text-[#C09578]">{subtotal}</span>
               </div>
+              <button className="w-full py-4 bg-black text-white font-bold hover:bg-[#C09578] transition-all">
+                CHECKOUT
+              </button>
             </div>
           </div>
         </div>

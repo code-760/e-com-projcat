@@ -15,8 +15,7 @@ export default function Login() {
         console.log(email);
         console.log(password);
 
-        log
-        
+ 
 
         if (email === "info@gmail.com" && password === "992600") {
             // Logic same hai, dashboard par bhej do
