@@ -6,6 +6,8 @@ import axios from "axios";
 import { redirect } from "next/navigation";
 import { fetchcart } from "@/app/redex/slice/cartslice";
 import parse from 'html-react-parser';
+import { ToastContainer, toast } from "react-toastify";
+
 
 export default function Singleproducte({ data, path }) {
   let [qutantity, setquantity] = useState(1);
@@ -52,8 +54,7 @@ export default function Singleproducte({ data, path }) {
         .then((res) => res.data)
         .then((finalres) => {
           dispatch(fetchcart());
-          console.log(finalres);
-          alert(finalres.message);
+          toast.success(finalres.message);
         });
     } else {
       redirect("/Login-Register");
@@ -62,6 +63,7 @@ export default function Singleproducte({ data, path }) {
 
   return (
     <div className="max-w-[1200px] mx-auto p-6 md:p-12 font-sans text-[#333] bg-white">
+       <ToastContainer />
       <div className="flex flex-col lg:flex-row gap-16">
         {/* --- Left Section: Image Gallery --- */}
         <div className="flex-1">

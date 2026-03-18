@@ -3,9 +3,7 @@ let UserSchema = mongoose.Schema({
   UserName: String,
   userphone: {
     type: String,
-    match: [/^\d{10}$/, "Please fill a valid 10 digit phone number"],
-    required: [true, "User phone number required"],
-    unique: true,
+    
   },
   useremail: {
     type: String,
@@ -18,11 +16,11 @@ let UserSchema = mongoose.Schema({
   },
   useraddress: {
     type: String,
-    default: "",
+   
   },
   userprofile: {
     type: String,   
-    default: "",
+    
   },
   userGender: {
     type: String,
@@ -31,16 +29,31 @@ let UserSchema = mongoose.Schema({
   },
   state: {
     type: String,
-    default: "",
+   
   },
   
   city: {
     type: String,
-    default: "",
+   
   },
   country: {
     type: String,
-    default: "",
+   
+  },
+  pincode: {
+    type: String,
+    
+  },
+  shippingAddress: {
+    type: Object,
+    shippingName: String,
+    shippingEmail: String,
+    shippingPhone: String,
+    address: String,
+    city: String,
+    state: String,
+    pincode: String,
+    country: String
   },
   isdeleted: {
     type: Boolean,

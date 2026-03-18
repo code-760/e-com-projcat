@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -6,29 +7,29 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { settokan } from "../redex/slice/userslice";
 import { ToastContainer, toast } from "react-toastify";
+import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import { app } from "../fairbase.config";
 
 export default function Page() {
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth(app);
   let pageName = "My Account";
-
   let dispatch = useDispatch();
-
   let Baseurl = process.env.NEXT_PUBLIC_BASEURL;
+
+  // ---------------- STATES ----------------
 
   // Login states
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  // *** Naya State: Login Loader ke liye ***
-  const [loginLoad, setLoginLoad] = useState(false);
+  const [loginLoad, setLoginLoad] = useState(false); // Naya State: Login Loader ke liye
 
   // Register states
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPhone, setRegisterPhone] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-
   const [load, setLoad] = useState(false); // Ye Register ka loader hai
-
   const [otp, setOtp] = useState("");
 
   // Forget password states
@@ -71,7 +72,7 @@ export default function Page() {
             redirect("/desbord");
           } else {
             setLoginLoad(false); // Fail hone par loader band
-            alert("Login failed. Please try again.");
+            toast.error("Login failed. Please try again.");
           }
         }, 2000); // <-- 2000ms = 2 Seconds ka time
       })
@@ -80,7 +81,7 @@ export default function Page() {
         setTimeout(() => {
           setLoginLoad(false);
           console.log(err);
-          alert("Something went wrong");
+          toast.error("Something went wrong");
         }, 2000);
       });
   };
@@ -119,16 +120,16 @@ export default function Page() {
       .then((finlerec) => {
         setLoad(false);
         if (finlerec._status) {
-          alert(finlerec.message);
+          toast.success(finlerec.message);
           setShowOtp(true);
         } else {
-          alert("Failed to send OTP. Please try again.");
+          toast.error("Failed to send OTP. Please try again.");
         }
       })
       .catch((err) => {
         setLoad(false);
         console.log(err);
-        alert("Something went wrong");
+        toast.error("this email is already registered");
       });
   };
 
@@ -153,15 +154,15 @@ export default function Page() {
       .then((rec) => rec.data)
       .then((finlerec) => {
         if (finlerec._status) {
-          alert(finlerec.message);
+          toast.success(finlerec.message);
           setShowOtp(false);
         } else {
-          alert("Registration failed. Please try again.");
+          toast.error("Registration failed. Please try again.");
         }
       })
       .catch((err) => {
         console.log(err);
-        alert("Something went wrong");
+        toast.error("Something went wrong");
       });
   };
 
@@ -207,29 +208,72 @@ export default function Page() {
             );
           } else {
             // Agar backend ne mana kar diya (e.g. email not found)
-            alert("❌ " + (finalrec.message || "Failed to send reset link."));
+            toast.error(
+              "❌ " + (finalrec.message || "Failed to send reset link."),
+            );
           }
         })
         .catch((err) => {
           // Network error ya server down ke liye
           console.error(err);
-          alert("Server error! Please try again later.");
+          toast.error("Server error! Please try again later.");
+          setForgetLoader(false);
         });
     } else {
       console.log("Validation failed, not sending API request.");
+      setForgetLoader(false);
     }
+  };
+
+  // ---------------- GOOGLE LOGIN HANDLER ----------------
+  let googeleLOgin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+
+        console.log(user);
+
+        let obj = {
+          useremail: user.email,
+          UserName: user.displayName,
+          userphone: user.phoneNumber || "N/A", // Agar phone number available nahi hai toh "N/A" set kar do
+          userprofile: user.photoURL || "N/A", // Agar photoURL available nahi hai toh "N/A" set kar do
+        };
+
+        axios
+          .post(`${Baseurl}user/google-login`, obj)
+          .then((rec) => rec.data)
+          .then((finalrec) => {
+            if (finalrec._status) {
+              toast.success("Google login successful!");
+              dispatch(settokan({ tokan: finalrec.tokan }));
+              redirect("/desbord");
+            } else {
+              toast.error("Google login failed. Please try again.");
+            }
+          });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+      });
   };
 
   return (
     <div className="bg-white min-h-screen relative">
       <ToastContainer />
+
       {/* ---------------- FULL SCREEN LOADER UI ---------------- */}
       {loginLoad && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-60 backdrop-blur-sm">
-          {/* <!-- From Uiverse.io by devAaus -->  */}
-          <div class="flex-col gap-4 w-full flex items-center justify-center">
-            <div class="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
-              <div class="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+          {/* */}
+          <div className="flex-col gap-4 w-full flex items-center justify-center">
+            <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
+              <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
             </div>
           </div>
         </div>
@@ -243,11 +287,12 @@ export default function Page() {
       </div>
 
       <section className="w-4/5 mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* LEFT SIDE - LOGIN */}
+        {/* ================= LEFT SIDE - LOGIN / FORGET PASSWORD ================= */}
         <div>
           <h1 className="text-2xl font-semibold mb-6 text-gray-800">Login</h1>
 
           {!showForget ? (
+            // LOGIN FORM
             <form
               onSubmit={handleLogin}
               className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"
@@ -296,26 +341,33 @@ export default function Page() {
                     Lost your password?
                   </a>
                 </p>
+
                 <a
                   href="/Deshbord"
-                  onClick={() => setShowForget(true)}
-                  className="text-gray-600 hover:text-[#b76e79] transition-colors duration-300"
+                  className="text-gray-600 hover:text-[#b76e79] transition-colors duration-300 mt-2 inline-block"
                 >
                   Deshbord
                 </a>
               </div>
 
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-6 gap-3">
                 <button
-                  disabled={loginLoad} // Disable button while loading
+                  disabled={loginLoad}
                   className="bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
                 >
                   Login
                 </button>
+                <button
+                  type="button"
+                  onClick={googeleLOgin}
+                  className="bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
+                >
+                  Google Login
+                </button>
               </div>
             </form>
           ) : (
-            // Forget Password
+            // FORGET PASSWORD FORM
             <form
               onSubmit={handleForgetSubmit}
               className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"
@@ -354,7 +406,7 @@ export default function Page() {
                 <button
                   type="submit"
                   disabled={forgetLoader}
-                  className="bg-gray-800 flex items-center gap-3 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300"
+                  className="bg-gray-800 flex items-center gap-3 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
                 >
                   Reset
                   {forgetLoader && (
@@ -366,17 +418,14 @@ export default function Page() {
           )}
         </div>
 
-        {/* RIGHT SIDE - REGISTER */}
+        {/* ================= RIGHT SIDE - REGISTER / OTP ================= */}
         <div>
-          <h1
-            onSubmit={handleRegister}
-            className="text-2xl font-semibold mb-6 text-gray-800"
-          >
+          <h1 className="text-2xl font-semibold mb-6 text-gray-800">
             Register
           </h1>
 
-          {/* RIGHT SIDE - REGISTER PART */}
           {!showOtp ? (
+            // REGISTER FORM
             <form
               onSubmit={handleRegister}
               className="border border-gray-300 rounded-xl p-8 shadow-sm h-auto flex flex-col gap-6"
@@ -393,7 +442,6 @@ export default function Page() {
                   placeholder="Enter your Name"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
                 />
-                {/* Name Error */}
                 {registerErrors.name && (
                   <p className="text-red-600 text-xs mb-2">
                     {registerErrors.name}
@@ -411,7 +459,6 @@ export default function Page() {
                   placeholder="Enter your Phone"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
                 />
-                {/* Phone Error */}
                 {registerErrors.phone && (
                   <p className="text-red-600 text-xs mb-2">
                     {registerErrors.phone}
@@ -457,7 +504,7 @@ export default function Page() {
                 <button
                   type="submit"
                   disabled={load}
-                  className="flex gap-2 items-center bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300"
+                  className="flex gap-2 items-center bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
                 >
                   Register
                   {load && (
@@ -467,7 +514,7 @@ export default function Page() {
               </div>
             </form>
           ) : (
-            // OTP
+            // OTP FORM
             <form
               onSubmit={handleOtpSubmit}
               className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"

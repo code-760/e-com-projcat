@@ -4,6 +4,8 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+
 
 function Ditelscart() {
   // 1. Redux se data nikalte waqt safety check (|| {} lagaya hai)
@@ -130,7 +132,7 @@ function Cartcard({ obj, path, cartdelete }) {
         .then((finalres) => {
           if (finalres._status === true) {
             dispatch(fetchcart()); // Redux store ko update karo taki UI bhi update ho jaye
-            alert("Quantity updated successfully!");
+            toast.success("Quantity updated successfully!");
           }
         });
     }
@@ -158,6 +160,7 @@ function Cartcard({ obj, path, cartdelete }) {
 
   return (
     <div key={obj._id} className="space-y-4 mb-8">
+       <ToastContainer />
       <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl bg-white shadow-sm">
         <div className="flex items-center gap-4">
           <img

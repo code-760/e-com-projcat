@@ -24,7 +24,7 @@ let Productcreate = async (req, rec) => {
 
     if (req.files.GalleryImage) {
       insertobj.GalleryImage = req.files.GalleryImage.map(
-        (file) => file.filename
+        (file) => file.filename,
       );
     }
   }
@@ -201,7 +201,7 @@ let multidelete = async (req, rec) => {
         isdeleted: true,
         deletdat: Date.now(),
       },
-    }
+    },
   );
 
   rec.send({
@@ -226,7 +226,7 @@ let changeStatus = async (req, res) => {
         },
       },
     ],
-    { updatePipeline: true }
+    { updatePipeline: true },
   );
   res.send({
     _status: true,
@@ -332,7 +332,7 @@ let productUpdate = async (req, res) => {
     // 6️⃣ Update DB
     let updateRes = await ProductModel.updateOne(
       { _id: id },
-      { $set: updateObj }
+      { $set: updateObj },
     );
 
     res.send({
@@ -349,6 +349,8 @@ let productUpdate = async (req, res) => {
     });
   }
 };
+
+
 
 module.exports = {
   parnetcategroy,

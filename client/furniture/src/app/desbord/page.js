@@ -3,13 +3,17 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { MdOutlineNavigateNext } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
+import Dashboard from "../desbordpages/Dashboard";
 
 export default function Decbord() {
+  let [oldPassword, setOldPassword] = useState("");
+  let [newPassword, setNewPassword] = useState("");
+  let [confirmNewPassword, setConfirmNewPassword] = useState("");
   let [preview, setPreview] = useState(null);
   let [user, setuser] = useState({
     UserName: "",
@@ -18,9 +22,23 @@ export default function Decbord() {
     useraddress: "",
     userGender: "",
     userprofile: "", // Profile photo ke liye state
+    shippingAddress: {
+      shippingName: "",
+      shippingEmail: "",
+      shippingPhone: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+    },
   });
 
   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
+   let dispatch = useDispatch();
+ 
+   
+  
+
   const router = useRouter();
 
   let [desboerdTab, setdesboerdTab] = useState("My Dasboard");
@@ -39,7 +57,21 @@ export default function Decbord() {
       )
       .then((response) => response.data)
       .then((finlerec) => {
+        let userData = finlerec.data;
+        if (!userData.shippingAddress || !userData.shippingAddress.address) {
+          userData.shippingAddress = {
+            shippingName: userData.UserName || "",
+            shippingEmail: userData.useremail || "",
+            shippingPhone: userData.userphone || "",
+            address: userData.useraddress || "",
+            city: userData.city || "",
+            state: userData.state || "",
+            pincode: userData.pincode || "",
+            country: userData.country || "",
+          };
+        }
         setuser(finlerec.data);
+
         setPreview(finlerec.path + finlerec.data.userprofile);
       });
   };
@@ -62,8 +94,20 @@ export default function Decbord() {
     }
   };
 
+  let handleShippingChange = (e) => {
+    let { name, value } = e.target;
+    setuser({
+      ...user,
+      shippingAddress: {
+        ...user.shippingAddress,
+        [name]: value,
+      },
+    });
+  };
+
   const handleLogout = () => {
-    console.log("Logout Logic Here");
+    dispatch(removetokan());
+      redirect("/Login-Register");
   };
 
   let userprofileupdate = (e) => {
@@ -77,13 +121,64 @@ export default function Decbord() {
       })
       .then((response) => response.data)
       .then((finlerec) => {
-         userditels();
-         console.log(finlerec);
-         console.log("Profile updated successfully");
-       
+        userditels();
+        console.log(finlerec);
+        console.log("Profile updated successfully");
       });
   };
 
+  const updateShippingInfo = (e) => {
+    e.preventDefault(); // Form reload hone se rokne ke liye
+
+    // Check karein ki shippingAddress khali to nahi hai
+    if (!user.shippingAddress.address || !user.shippingAddress.shippingPhone) {
+      toast.error("Please fill all shipping fields");
+      return;
+    }
+
+    axios
+      .post(`${basurl}user/update-shipping-address`, user.shippingAddress, {
+        headers: {
+          Authorization: `Bearer ${tokan}`,
+        },
+      })
+      .then((response) => {
+        toast.success("Shipping Address Updated Successfully!");
+        userditels(); // Naya data refresh karne ke liye call karein
+      })
+      .catch((err) => {
+        console.error("Update Error:", err);
+        toast.error("Failed to update shipping address");
+      });
+  };
+
+  let changePassword = (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+
+    axios
+      .post(
+        `${basurl}user/change-password`,
+        {
+          oldpassword: oldPassword,
+          newpassword: newPassword,
+          ConfirmPassword: confirmNewPassword,
+        },
+        { headers: { Authorization: `Bearer ${tokan}` } },
+      )
+      .then((response) => {
+        toast.success("Password changed successfully!");
+        setOldPassword(""); // Reset inputs
+        setNewPassword("");
+        setConfirmNewPassword("");
+      })
+      .catch((err) => {
+        toast.error(err.response?.data?.message || "Failed to change password");
+      });
+  };
   useEffect(() => {
     userditels();
   }, [tokan]);
@@ -145,16 +240,17 @@ export default function Decbord() {
           <div className="w-full">
             {/* Dashboard Tab */}
             {desboerdTab === "My Dasboard" && (
-              <div className="animate-fadeIn">
-                <h1 className="p-4 text-4xl font-semibold font-[cha]">
-                  My Dashboard
-                </h1>
-                <p className="mt-2 text-gray-600">
-                  From your account dashboard. you can easily check & view your
-                  recent orders, manage your shipping and billing addresses and
-                  Edit your password and account details.
-                </p>
-              </div>
+              <Dashboard />
+              // <div className="animate-fadeIn">
+              //   <h1 className="p-4 text-4xl font-semibold font-[cha]">
+              //     My Dashboard
+              //   </h1>
+              //   <p className="mt-2 text-gray-600">
+              //     From your account dashboard. you can easily check & view your
+              //     recent orders, manage your shipping and billing addresses and
+              //     Edit your password and account details.
+              //   </p>
+              // </div>
             )}
 
             {/* Orders Tab */}
@@ -214,13 +310,16 @@ export default function Decbord() {
                 <h3 className="text-xl font-semibold mb-4 font-[cha]">
                   Change Password
                 </h3>
-                <form className="space-y-4">
+                <form onSubmit={changePassword} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Current Password
+                      Old Password
                     </label>
                     <input
                       type="password"
+                      name="oldPassword"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
                       className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
                     />
                   </div>
@@ -230,6 +329,9 @@ export default function Decbord() {
                     </label>
                     <input
                       type="password"
+                      name="newPassword"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
                     />
                   </div>
@@ -239,6 +341,9 @@ export default function Decbord() {
                     </label>
                     <input
                       type="password"
+                      name="confirmNewPassword"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
                       className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
                     />
                   </div>
@@ -267,30 +372,108 @@ export default function Decbord() {
                     <h3 className="text-2xl font-[cha] font-medium mb-4 border-b pb-2">
                       Billing Address
                     </h3>
-                    <form className="space-y-3">
-                      {[
-                        "Billing Name",
-                        "Billing Email",
-                        "Billing Mobile Number",
-                        "Billing Address",
-                        "Country",
-                        "State",
-                        "City",
-                      ].map((label) => (
-                        <div key={label}>
-                          <label className="block text-sm font-medium text-[15px] text-gray-700 hover:text-[#C09578]">
-                            {label}*
+                    <form className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Billing Name*
+                        </label>
+                        <input
+                          type="text"
+                          onChange={gatdata}
+                          value={user.UserName}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="Full Name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Billing Email*
+                        </label>
+                        <input
+                          type="email"
+                          value={user.useremail}
+                          readOnly
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="Email Address"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Billing Mobile Number*
+                        </label>
+
+                        <PhoneInput
+                          country={"in"}
+                          enableSearch={true}
+                          value={user.userphone}
+                          onChange={handlePhoneChange}
+                          inputStyle={{
+                            width: "100%",
+                            height: "50px",
+                            borderRadius: "0.5rem",
+                            border: "1px solid #e5e7eb",
+                            fontSize: "16px",
+                            paddingLeft: "48px",
+                          }}
+                          buttonStyle={{
+                            borderRadius: "0.5rem 0 0 0.5rem",
+                            border: "1px solid #e5e7eb",
+                            backgroundColor: "white",
+                          }}
+                          containerClass="w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Billing Address*
+                        </label>
+                        <input
+                          type="text"
+                          value={user.useraddress}
+                          onChange={gatdata}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="House No, Street, Area"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Country*
                           </label>
                           <input
                             type="text"
-                            className="mt-1 block w-full py-1 px-2 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                            value={user.country || ""}
+                            onChange={gatdata}
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
                           />
                         </div>
-                      ))}
-                      <div className="flex justify-end mt-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            State*
+                          </label>
+                          <input
+                            value={user.state || ""}
+                            onChange={gatdata}
+                            type="text"
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          City*
+                        </label>
+                        <input
+                          type="text"
+                          value={user.city || ""}
+                          onChange={gatdata}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                        />
+                      </div>
+                      <div className="flex justify-end pt-2">
                         <button
                           type="submit"
-                          className="bg-[#c09578] text-white py-2 px-6 rounded-3xl hover:bg-[#a88264]"
+                          className="bg-[#c09578] text-white py-2 px-8 rounded-3xl hover:bg-[#a88264] transition"
                         >
                           Update
                         </button>
@@ -303,30 +486,100 @@ export default function Decbord() {
                     <h3 className="text-2xl font-[cha] font-medium mb-4 border-b pb-2">
                       Shipping Address
                     </h3>
-                    <form className="space-y-3">
-                      {[
-                        "Shipping Name",
-                        "Shipping Email",
-                        "Shipping Mobile Number",
-                        "Shipping Address",
-                        "Country",
-                        "State",
-                        "City",
-                      ].map((label) => (
-                        <div key={label}>
-                          <label className="block text-sm font-medium text-[15px] text-gray-700 hover:text-[#C09578]">
-                            {label}*
+
+                    <form onSubmit={updateShippingInfo} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Shipping Name*
+                        </label>
+                        <input
+                          type="text"
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="Full Name"
+                          value={user.shippingAddress?.shippingName || ""}
+                          onChange={handleShippingChange}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Shipping Email*
+                        </label>
+                        <input
+                          type="email"
+                          value={user.shippingAddress?.shippingEmail || ""}
+                          readOnly
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="Email Address"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Shipping Mobile Number*
+                        </label>
+                        <input
+                          type="text"
+                          name="shippingPhone"
+                          value={user.shippingAddress?.shippingPhone || ""}
+                          onChange={handleShippingChange}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="Phone Number"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Shipping Address*
+                        </label>
+                        <input
+                          type="text"
+                          name="address"
+                          value={user.shippingAddress?.address || ""}
+                          onChange={handleShippingChange}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          placeholder="House No, Street, Area"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Country*
                           </label>
                           <input
                             type="text"
-                            className="mt-1 block w-full py-1 px-2 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                            name="country"
+                            value={user.shippingAddress?.country || ""}
+                            onChange={handleShippingChange}
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
                           />
                         </div>
-                      ))}
-                      <div className="flex justify-end mt-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            State*
+                          </label>
+                          <input
+                            type="text"
+                            name="state"
+                            value={user.shippingAddress?.state || ""}
+                            onChange={handleShippingChange}
+                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          City*
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={user.shippingAddress?.city || ""}
+                          onChange={handleShippingChange}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                        />
+                      </div>
+                      <div className="flex justify-end pt-2">
                         <button
                           type="submit"
-                          className="bg-[#c09578] text-white py-2 px-6 rounded-3xl hover:bg-[#a88264]"
+                          className="bg-[#c09578] text-white py-2 px-8 rounded-3xl hover:bg-[#a88264] transition"
                         >
                           Update
                         </button>
@@ -345,7 +598,7 @@ export default function Decbord() {
                   <h1 className="text-2xl font-semibold mb-6 text-gray-800 font-[cha] border-b pb-2">
                     Update Profile
                   </h1>
-                  <form onSubmit={userprofileupdate}  className="space-y-4">
+                  <form onSubmit={userprofileupdate} className="space-y-4">
                     {/* ✅ PROFILE PHOTO SECTION START */}
                     <div className="flex flex-col items-center mb-6">
                       <div className="relative group">

@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { UserModel } = require("../../models/User.model");
 let jwt = require("jsonwebtoken");
 const e = require("cors");
+const crypto = require("crypto"); //
 
 const saltRounds = 10;
 let mosntaotp = new Map();
@@ -155,33 +156,70 @@ let loginuser = async (req, res) => {
   }
 };
 
+let googlelogin = async (req, res) => {
+  let { useremail, UserName, userphone, userprofile } = { ...req.body };
+
+  let user = await UserModel.findOne({ useremail });
+  if (user) {
+    let tokan = jwt.sign({ UserID: user._id }, process.env.TOKEN);
+    return res.send({
+      _status: "success",
+      message: "login successful",
+      tokan,
+    });
+  } else {
+    // 1. Ek 16-character ka random strong password generate karo
+    let randomPassword = crypto.randomBytes(8).toString("hex");
+
+    // 2. Us random password ko bcrypt se encrypt (hash) karo
+    const salt = await bcrypt.genSalt(10);
+    let encryptedPassword = await bcrypt.hash(randomPassword, salt);
+
+    let userobj = {
+      UserName,
+      useremail,
+      userphone,
+      userprofile,
+      Password: encryptedPassword,
+    };
+
+    let user = await new UserModel(userobj);
+    let userres = await user.save();
+    let tokan = jwt.sign({ UserID: userres._id }, process.env.TOKEN);
+    res.send({
+      _status: "success",
+      message: "user created and login successful",
+      tokan,
+    });
+  }
+
+  // Implementation for Google login
+};
+
 let changepassword = async (req, res) => {
-  let { oldpassword, newpassword ,ConfirmPassword } = req.body;
+  let { oldpassword, newpassword, ConfirmPassword } = req.body;
   let token = req.headers.authorization.split(" ")[1];
   let decoded = jwt.verify(token, process.env.TOKEN);
   let userid = decoded.UserID;
   let user = await UserModel.findOne({ _id: userid });
   let bdpassswor = user.Password;
   if (bcrypt.compareSync(oldpassword, bdpassswor)) {
-    if ( newpassword=== ConfirmPassword) {
+    if (newpassword === ConfirmPassword) {
       const hash = bcrypt.hashSync(newpassword, saltRounds);
       await UserModel.updateOne({ _id: userid }, { Password: hash });
-      return  res.send({
-        _status: "success",  
+      return res.send({
+        _status: "success",
         message: "password changed successfully",
       });
-
-    }
-    else {
+    } else {
       return res.send({
-        _status: "failed",  
+        _status: "failed",
         message: "new password and confirm password do not match",
       });
     }
-  }
-  else {
+  } else {
     return res.send({
-      _status: "failed",  
+      _status: "failed",
       message: "invalid old password",
     });
   }
@@ -286,6 +324,23 @@ let resetpassword = async (req, res) => {
   }
 };
 
+let updateShipping = async (req, res) => {
+  try {
+    let token = req.headers.authorization.split(" ")[1];
+    let decoded = jwt.verify(token, process.env.TOKEN);
+    let userid = decoded.UserID;
+
+    // Sirf shippingAddress field ko update karo
+    await UserModel.findByIdAndUpdate(userid, {
+      $set: { shippingAddress: req.body } 
+    });
+
+    res.send({ _status: "success", message: "Shipping Address Updated" });
+  } catch (error) {
+    res.status(500).send({ _status: "error", message: error.message });
+  }
+};
+
 module.exports = {
   sendOTP,
   createuser,
@@ -294,6 +349,7 @@ module.exports = {
   userdetail,
   forgetpassword,
   resetpassword,
-  changepassword
-  
+  changepassword,
+  googlelogin,
+  updateShipping
 };
