@@ -6,8 +6,11 @@ import {
   RiLayoutGridFill, 
   RiPieChartLine 
 } from "react-icons/ri";
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 export default function Dashboard() {
+  
 
   // Configuration for the cards
   const statsData = [
@@ -49,6 +52,7 @@ export default function Dashboard() {
     }
   ];
 
+ 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans">
       

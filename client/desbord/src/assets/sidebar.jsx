@@ -33,15 +33,15 @@ export default function Sidebar() {
       type: "dropdown",
       items: [{ title: "View User", path: "/Viewuser" }],
     },
-    {
-      title: "Enquiries",
-      icon: <RiFileList3Line size={22} />,
-      type: "dropdown",
-      items: [
-        { title: "Contact Enquirys", path: "/ContactEnquirys" },
-        { title: "Newsletters", path: "/Newsletters" },
-      ],
-    },
+    // {
+    //   title: "Enquiries",
+    //   icon: <RiFileList3Line size={22} />,
+    //   type: "dropdown",
+    //   items: [
+    //     { title: "Contact Enquirys", path: "/ContactEnquirys" },
+    //     { title: "Newsletters", path: "/Newsletters" },
+    //   ],
+    // },
     {
       title: "Colors",
       icon: <RiPaletteLine size={22} />,
@@ -100,7 +100,7 @@ export default function Sidebar() {
       title: "Orders",
       icon: <RiShoppingBag3Line size={22} />,
       type: "dropdown",
-      items: [{ title: "Orders", path: "/Viewuser" }],
+      items: [{ title: "Oderviwe", path: "/Viwe-Oders" }],
     },
     {
       title: "Sliders",

@@ -1,110 +1,216 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { use, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import { app } from "../Firebase.config";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { removetokan, settokan } from "../reduc/slice/adminslice";
 
 export default function Login() {
+  let dispatch = useDispatch();
+  
+  let apibaseurl = import.meta.env.VITE_APIBASEURL;
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth(app);
+  //   let [email, setemail] = useState("");
+  //   let [password, setpassword] = useState("");
 
-    let [email, setemail] = useState("")
-    let [password, setpassword] = useState("")
+  let navigate = useNavigate();
 
-    let navigate = useNavigate()
+  //   let hadelLogin = (e) => {
+  //     e.preventDefault();
 
-    let hadelLogin = (e) => {
-        e.preventDefault()
+  // console.log(email);
+  // console.log(password);
+
+  //     if (email === "info@gmail.com" && password === "992600") {
+  //       // Logic same hai, dashboard par bhej do
+  //       navigate("/Desbord");
+  //     } else {
+  //       alert("Wrong email or password");
+  //     }
+  //   };
+
+  let googeleLOgin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const tokan = credential.accessToken;
+        const user = result.user;
+
+        console.log(user);
+
+        let obj = {
+          Adminemail: user.email,
+          AdminName: user.displayName,
+          Adminphone: user.phoneNumber || "N/A", // Agar phone number available nahi hai toh "N/A" set kar do
+          Adminprofile: user.photoURL || "N/A", // Agar photoURL available nahi hai toh "N/A" set kar do
+        };
+
+        axios
+          .post(`${apibaseurl}/Admin/Admin-google-login`, obj)
+          .then((rec) => rec.data)
+          .then((finalrec) => {
+            if (finalrec._status) {
+              toast.success("Google login successful!");
+              dispatch(settokan({ tokan: finalrec.tokan }));
+              navigate("/Desbord");
+            } else {
+              toast.error("Google login failed. Please try again.");
+            }
+          });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+      });
+  };
 
 
-        console.log(email);
-        console.log(password);
-
- 
-
-        if (email === "info@gmail.com" && password === "992600") {
-            // Logic same hai, dashboard par bhej do
-            navigate('/Desbord');
-        } else {
-            alert("Wrong email or password");
-        }
-    }
-
-    return (
-        // Background: Dark slate color (Aankhon ko sukoon dene wala dark color)
-        <div className="flex items-center justify-center min-h-screen bg-[#0f172a]">
-            
-            {/* Main Card: Thoda sa lighter dark card taaki background se alag dikhe */}
-            <div className="w-full max-w-md p-8 bg-[#1e293b] rounded-2xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] border border-gray-800">
-                
-                {/* Header Section */}
-                <div className="text-center mb-8">
-                    {/* Optional: Aap yahan apna logo bhi laga sakte hain */}
-                    {/* <img src="/logo.png" alt="Admin Logo" className="h-12 mx-auto mb-4"/> */}
-                    <h2 className="text-3xl font-extrabold text-white">Monsta panle</h2>
-                    <p className="text-gray-400 text-sm mt-2">Secure access to dashboard</p>
-                </div>
-
-                <form onSubmit={hadelLogin} className="space-y-6">
-                    
-                    {/* Email Input */}
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                            Email Address
-                        </label>
-                        <div className="relative group">
-                            {/* SVG Icon */}
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                </svg>
-                            </div>
-                            {/* Dark Input Field */}
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                onChange={(e) => setemail(e.target.value)}
-                                placeholder="name@company.com"
-                                className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 transition-all"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Password Input */}
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                            Password
-                        </label>
-                        <div className="relative group">
-                            {/* SVG Icon */}
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                            {/* Dark Input Field */}
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                onChange={(e) => setpassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 transition-all"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Submit Button (Thoda चमकदार taaki focus jaye) */}
-                    <button
-                        type="submit"
-                        className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:-translate-y-0.5"
-                    >
-                        Secure Login
-                    </button>
-
-                </form>
-                 <p className="mt-8 text-center text-xs text-gray-500">
-                    Restricted Area. Authorized Personnel Only.
-                </p>
-            </div>
+  return (
+    // Background: Dark slate color (Aankhon ko sukoon dene wala dark color)
+    <div className="flex items-center justify-center min-h-screen bg-[#0f172a]">
+      <ToastContainer />
+      {/* Main Card: Thoda sa lighter dark card taaki background se alag dikhe */}
+      <div className="w-full max-w-md p-8 bg-[#1e293b] rounded-2xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] border border-gray-800">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          {/* Optional: Aap yahan apna logo bhi laga sakte hain */}
+          {/* <img src="/logo.png" alt="Admin Logo" className="h-12 mx-auto mb-4"/> */}
+          <h2 className="text-3xl font-extrabold text-white">Monsta panle</h2>
+          <p className="text-gray-400 text-sm mt-2">
+            Secure access to dashboard
+          </p>
         </div>
-    )
+        <form className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
+              Email Address
+            </label>
+            <div className="relative group">
+              {/* SVG Icon */}
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg
+                  className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                  />
+                </svg>
+              </div>
+              {/* Dark Input Field */}
+              <input
+                type="email"
+                id="email"
+                name="email"
+                // onChange={(e) => setemail(e.target.value)}
+                placeholder="name@company.com"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 transition-all"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Password Input */}
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
+              Password
+            </label>
+            <div className="relative group">
+              {/* SVG Icon */}
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg
+                  className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              {/* Dark Input Field */}
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 transition-all"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Submit Button (Thoda चमकदार taaki focus jaye) */}
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:-translate-y-0.5"
+          >
+            Secure Login
+          </button>
+        </form>{" "}
+        {/* <--- Yahan aapka form close ho raha hai */}
+        {/* --- Divider --- */}
+        <div className="flex items-center my-6">
+          <div className="flex-grow border-t border-gray-700"></div>
+          <span className="px-3 text-sm text-gray-500 font-medium">OR</span>
+          <div className="flex-grow border-t border-gray-700"></div>
+        </div>
+        {/* 2. Google Login Button */}
+        <button
+          type="button" // Isko 'button' hi rakhna hai, 'submit' nahi
+          onClick={googeleLOgin} // Aapka function call yahan hoga
+          className="w-full flex items-center justify-center py-3 px-4 bg-[#f8fafc] text-gray-900 font-bold rounded-lg shadow-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 transform hover:-translate-y-0.5"
+        >
+          {/* Google Icon (SVG format for better quality) */}
+          <svg
+            className="w-5 h-5 mr-3"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              fill="#4285F4"
+            />
+            <path
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              fill="#34A853"
+            />
+            <path
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              fill="#FBBC05"
+            />
+            <path
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              fill="#EA4335"
+            />
+          </svg>
+          Continue with Google
+        </button>
+        <p className="mt-8 text-center text-xs text-gray-500">
+          Restricted Area. Authorized Personnel Only.
+        </p>
+      </div>
+    </div>
+  );
 }

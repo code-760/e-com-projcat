@@ -10,12 +10,19 @@ import { ToastContainer, toast } from "react-toastify";
 
 
 export default function Singleproducte({ data, path }) {
+
   let [qutantity, setquantity] = useState(1);
+
   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
   let dispatch = useDispatch();
   let basurl = process.env.NEXT_PUBLIC_BASEURL;
 
   let product = data;
+
+  console.log(product);
+  
+
+  
 
   let pathe = path;
 

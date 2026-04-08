@@ -37,7 +37,7 @@ let Faqcreate = async (req, rec) => {
 let Faqview = async (req, rec) => {
  const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

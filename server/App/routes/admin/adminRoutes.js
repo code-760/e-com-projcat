@@ -13,6 +13,9 @@ const { TastimonialRoutes } = require("./TastimonialRoutes");
 const { SubsubcategoryRoutes } = require("./SubsubcategoryRoutes");
 
 const { ProductRoutes } = require("./productRoutes");
+const userRoutes = require("./userRoutes");
+const oderRoutes = require("./oderroutes");
+const AdminRoutes = require("./AdminuserRoutes");
 
 let adminRoutes = express.Router();
 
@@ -30,5 +33,8 @@ adminRoutes.use("/Slider", SliderRoutes);
 adminRoutes.use("/Tastimonial", TastimonialRoutes);
 adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/Product",ProductRoutes);
+adminRoutes.use("/user",userRoutes);
+adminRoutes.use("/oder-viwe",oderRoutes);
+adminRoutes.use("/Admin",AdminRoutes);
 
 module.exports = { adminRoutes };

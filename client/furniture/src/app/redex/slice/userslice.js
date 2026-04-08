@@ -4,7 +4,9 @@ import Cookies from "js-cookie";
 export let userslice=createSlice({ 
     name:"user",
     initialState:{
-        tokan:Cookies.get("tokan") || null
+        tokan:Cookies.get("tokan") || null,
+        userData: null, 
+        userpath: null, 
     },
     reducers:{
         settokan:(state,action)=>{
@@ -16,11 +18,20 @@ export let userslice=createSlice({
         removetokan:(state)=>{
             state.tokan=null
             Cookies.remove("tokan")
-        }   
+        },
+        
+        setUserData: (state, action) => {
+            state.userData = action.payload; 
+        }, 
+         
+        setUserpath: (state, action) => {
+            state.userpath = action.payload; 
+        } 
+
         
     }
 })
 
-export const { settokan, removetokan } = userslice.actions
+export const {setUserData, settokan, removetokan,setUserpath } = userslice.actions
 
 export default userslice.reducer

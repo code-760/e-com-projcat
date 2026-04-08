@@ -364,4 +364,5 @@ module.exports = {
   multidelete,
   changeStatus,
   productUpdate,
+
 };

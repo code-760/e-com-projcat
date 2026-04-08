@@ -1,27 +1,37 @@
 
-import Image from "next/image";
+
 import Banner from "./component/home/banner";
+
 import Collection from "./component/home/Collection-com";
 import Featured_produte from "./component/home/Featured-produte";
 import New_banner from "./component/home/New_banner";
 import Bestselling_Products from "./component/home/Bestselling_Products";
 import Over_sprort from "./component/home/Over_sprort";
-import { produtitems } from "./api-servis/homeservis";
+import { bannerData, bastslerdata, produtitems } from "./api-servis/homeservis";
 
 export default async function Home() {
+  let produtedata = await produtitems();
+  let banner = await bannerData();
 
-  let produtedata=await produtitems();
+  let bastsleling = await bastslerdata();
 
- 
+  let { data, path } = banner;
+  
+  let { productsata, bpath } = bastsleling;
+
+  
+  
+
+
 
   return (
-   <div className=" bg-white">
-    <Banner   />
-    <Collection/>
-    <Featured_produte produtedata={produtedata}/>
-    <New_banner/>
-    <Bestselling_Products/>
-    <Over_sprort/> 
-   </div>
+    <div className=" bg-white">
+      <Banner bannerdata={data} path={path} />
+      <Collection />
+      <Featured_produte produtedata={produtedata} />
+      <New_banner />
+      <Bestselling_Products bdata={productsata} bpath={bpath} />
+      <Over_sprort />
+    </div>
   );
 }

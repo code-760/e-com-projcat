@@ -4,7 +4,7 @@ let CountrySchema = mongoose.Schema({
     type: String,
     required: [true, "color name is required"],
     minlength: 2,
-    maxlength: 5,
+    maxlength: 50,
     unique: true,
   },
 

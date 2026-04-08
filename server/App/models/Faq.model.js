@@ -4,14 +4,14 @@ let Faqschama = mongoose.Schema({
     type: String,
     required: [true, " Faq Question  is required"],
     minlength: 3,
-    maxlength: 150,
+    maxlength: 500,
     unique: true,
   },
   FaqAnswer: {
     type: String,
     required: [true, "Faq Answer is required"],
     minlength: 3,
-    maxlength: 150,
+    maxlength: 500,
     unique: true,
   },
   isdeleted: {

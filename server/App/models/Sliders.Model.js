@@ -4,7 +4,7 @@ let SlidersSchema = mongoose.Schema({
     type: String,
     required: [true, "Why Choose Us name is required"],
     minlength: 2,
-    maxlength: 10,
+    maxlength: 100,
     validate: {
       validator: async function (v) {
         const Title = await this.constructor.findOne({

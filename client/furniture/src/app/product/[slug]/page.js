@@ -6,9 +6,17 @@ import Singleproducte from "@/app/component/home/producte/Singleproducte";
 export default async function productditles({ params }) {
   let productadata = await params;
 
+  console.log(productadata);
+  
+
   let id = productadata.slug;
 
+
+
   let ditles = await produtesdata(id);
+
+  console.log(ditles);
+  
 
   let { path } = ditles;
 

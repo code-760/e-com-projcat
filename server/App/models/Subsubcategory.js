@@ -4,7 +4,7 @@ let SubsubcategorySchema = mongoose.Schema({
     type: String,
     required: [true, "Subcategory name is required"],
     minlength: 2,
-    maxlength:10,
+    maxlength:100,
     validate: {
       validator: async function (v) {
         const Subsubcategory = await this.constructor.findOne({ SubsubcategoryName: v,deletdat:null });

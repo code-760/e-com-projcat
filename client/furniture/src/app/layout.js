@@ -20,6 +20,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  
   return (
     <html lang="en">
       <body
@@ -27,7 +28,8 @@ export default function RootLayout({ children }) {
       >
         <ProviderLayout>
           <Header />
-          {children}
+{/* yeha per home page ka content aayega */}
+          {children} 
           <Footer />
         </ProviderLayout>
       </body>

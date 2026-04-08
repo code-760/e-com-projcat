@@ -4,11 +4,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams  } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
 import Dashboard from "../desbordpages/Dashboard";
+
 
 export default function Decbord() {
   let [oldPassword, setOldPassword] = useState("");
@@ -43,6 +44,8 @@ export default function Decbord() {
 
   let [desboerdTab, setdesboerdTab] = useState("My Dasboard");
   let basurl = process.env.NEXT_PUBLIC_BASEURL;
+  const searchParams = useSearchParams();
+  const tabQuery = searchParams.get("tab");
 
   let userditels = () => {
     axios
@@ -182,6 +185,14 @@ export default function Decbord() {
   useEffect(() => {
     userditels();
   }, [tokan]);
+
+  useEffect(() => {
+    if (tabQuery === "profile") {
+      setdesboerdTab("My Profile");
+    } else if (tabQuery === "dashboard") {
+      setdesboerdTab("My Dasboard"); // Spelled exactly like your state
+    }
+  }, [tabQuery]);
 
   return (
     <div className="bg-white text-gray-800">

@@ -53,5 +53,6 @@ let uploads = fileuplode("uploads/productimgs");
         maxCount:10   
     }
   ]),productUpdate)
+  
 
 module.exports = { ProductRoutes };

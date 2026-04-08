@@ -7,7 +7,7 @@ let materialSchema=mongoose.Schema(
             match:[/^[a-zA-Z ]{2,10}$/,"plesse file (a-z) (A-Z)"],
             required :[true,"color name is required"],
             minlength:2,
-            maxlength:20,
+            maxlength:70,
             unique:true   
         },
          isdeleted:{

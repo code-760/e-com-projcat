@@ -4,7 +4,7 @@ let categorySchema = mongoose.Schema({
     type: String,
     required: [true, "category name is required"],
     minlength: 2,
-    maxlength:10,
+    maxlength:100,
     validate: {
       validator: async function (v) {
         const category = await this.constructor.findOne({ categoryName: v,deletdat:null });

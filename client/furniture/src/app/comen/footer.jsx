@@ -61,18 +61,18 @@ export default function Footer() {
                 </div>
                 <div className=' grid grid-cols-2'>
                     <div>
-                        <div><h2 className='font-[cha] pb-6 text-[20px]'  >My Account</h2></div>
+                        <div><Link href={`/Decbord`} className='font-[cha] pb-6 text-[20px]'  >My Account</Link></div>
                         <div><Link href={"/desbord"} className='pb-1 hover:text-[#D2A278] cursor-pointer'>My Dashboard</Link></div>
                         <div><Link href={"/Wishlist"} className='pb-1 hover:text-[#D2A278] cursor-pointer'>Wishlist</Link></div>
                         <div><Link href={"/Cart"} className='pb-1 hover:text-[#D2A278] cursor-pointer'>Cart</Link></div>
-                        <div><h6 className='pb-1 hover:text-[#D2A278] cursor-pointer'>Checkout</h6></div>
+                        <div><Link href={`/Chakout`} className='pb-1 hover:text-[#D2A278] cursor-pointer'>Checkout</Link></div>
                     </div>
                     <div>
                         <div>
                             <div><h2 className='font-[cha] pb-6 text-[20px] '  >Information</h2></div>
-                            <div><h6 className='pb-1 hover:text-[#D2A278] cursor-pointer'>About Us</h6></div>
+                            <div><Link href={`/About-us`} className='pb-1 hover:text-[#D2A278] cursor-pointer'>About Us</Link></div>
                             <div><Link href={"/contect"} className='pb-1 hover:text-[#D2A278] text-black cursor-pointer'>Contact Us</Link></div>
-                            <div><h6 className='pb-1 hover:text-[#D2A278] cursor-pointer'>Frequently Questions</h6></div>
+                            <div><Link href={"/FAQ"}  className='pb-1 hover:text-[#D2A278] cursor-pointer'>Frequently Questions</Link></div>
                         </div>
                     </div>
 
@@ -118,9 +118,9 @@ export default function Footer() {
             <div className=' border-y border-[#ccc] mt-14 flex justify-center gap-6 p-6 font-medium '>
 
                 <div><Link href={"/"} className='hover:text-[#D2A278]  text-[#ccc]  cursor-pointer '>Home</Link></div>
-                <div><h3 className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'> Online Store</h3></div>
-                <div><h3 className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'>Privacy Policy</h3></div>
-                <div><h3 className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'> Terms Of Use</h3></div>
+                <div><Link href={`/Product-Listing`} className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'> Online Store</Link></div>
+                <div><Link href={`/Privacy-Policy`} className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'>Privacy Policy</Link></div>
+                <div><Link href={`/Terms-Of-Use`} className='hover:text-[#D2A278]  text-[#ccc] cursor-pointer'> Terms Of Use</Link></div>
                
 
 

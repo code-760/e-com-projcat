@@ -30,18 +30,20 @@ import Add_Why_Choose_Us from "./comenpege/desbordpeage/Add_Why_Choose_Us.jsx";
 import Add_Country from "./comenpege/desbordpeage/Add Country.jsx";
 import Add_Faq from "./comenpege/desbordpeage/Add_Faq.jsx";
 
-
 import { BrowserRouter, Route, Routes } from "react-router";
 import Add_Testimonial from "./comenpege/desbordpeage/Add_Testimonial.jsx";
 import TermsAndConditions from "./comenpege/desbordpeage/Terms_&_Conditions.jsx";
 import Login from "./assets/login.jsx";
+import Oderviwe from "./comenpege/desbordpeage/Oderviwe.jsx";
+import { Provider } from "react-redux";
+import { store } from "./reduc/store/stroe.js";
 
 createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <Provider store={store}>
+     <BrowserRouter>
     <Routes>
-
-      <Route path="/" element={<Login/>} />
-      <Route path="" element={<Layout />}>
+      <Route path="/" element={<Login />} />
+      <Route element={<Layout />}>
         <Route path="/Desbord" element={<Desbord />} />
 
         <Route path="/Viewuser" element={<Viewuser />} />
@@ -101,13 +103,16 @@ createRoot(document.getElementById("root")).render(
         <Route path="/View_Product" element={<View_Product />} />
         <Route path="/Add_Product" element={<Add_product />} />
         <Route path="/Update-Product/:id?" element={<Add_product />} />
-         <Route path="/Profile" element={<Profile />} />
-      <Route path="/Complitprofile" element={<Complitprofile />} />
-      <Route path="/Profile" element={<TermsAndConditions />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/Complitprofile" element={<Complitprofile />} />
+        <Route path="/Profile" element={<TermsAndConditions />} />
+        <Route path="/Viwe-Oders" element={<Oderviwe />} />
       </Route>
-     
 
       {/* CATCH-ALL (IMPORTANT) */}
     </Routes>
-  </BrowserRouter>
+  </BrowserRouter>,
+
+  </Provider>
+ 
 );
