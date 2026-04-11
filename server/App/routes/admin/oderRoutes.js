@@ -1,8 +1,8 @@
-let express = require("express");
-const { Oderviwe } = require("../../controler/admin/Odercontoller");
-let oderroutes = express.Router();
+const express = require("express");
+const { OrderView } = require("../../controller/admin/orderController");
 
-oderroutes.get('/oder',Oderviwe)
+const orderRoutes = express.Router();
 
+orderRoutes.get('/order', OrderView);
 
-module.exports = oderroutes;
+module.exports = {orderRoutes};

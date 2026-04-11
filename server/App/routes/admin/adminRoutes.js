@@ -15,9 +15,11 @@ const { SubsubcategoryRoutes } = require("./SubsubcategoryRoutes");
 const { ProductRoutes } = require("./productRoutes");
 const userRoutes = require("./userRoutes");
 
-// const oderRoutes = require("./orderRoutes");
+
 const AdminRoutes = require("./AdminuserRoutes");
-const oderroutes = require("./oderroutes");
+const { orderRoutes } = require("./oderRoutes");
+
+
 
 
 
@@ -38,7 +40,7 @@ adminRoutes.use("/Tastimonial", TastimonialRoutes);
 adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/user",userRoutes);
-adminRoutes.use("/oder-viwe",oderroutes);
+adminRoutes.use("/oder-viwe",orderRoutes);
 adminRoutes.use("/Admin",AdminRoutes);
 
 module.exports = { adminRoutes };
