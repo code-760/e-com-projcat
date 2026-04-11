@@ -14,7 +14,7 @@ const { SubsubcategoryRoutes } = require("./SubsubcategoryRoutes");
 
 const { ProductRoutes } = require("./productRoutes");
 const userRoutes = require("./userRoutes");
-const oderRoutes = require("./oderroutes");
+const oderRoutes = require("./orderRoutes");
 const AdminRoutes = require("./AdminuserRoutes");
 
 let adminRoutes = express.Router();
