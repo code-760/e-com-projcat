@@ -21,7 +21,13 @@ export default function Wishlist() {
   const path = wishlist?.path;
   const product = wishlist?.wishlistdetails || [];
 
-  
+  const uniqueProducts = product.filter(
+  (item, index, self) =>
+    index === self.findIndex((p) => p._id === item._id)
+);
+
+console.log(uniqueProducts,"uniqueProducts");
+
 
   return (
     <>
@@ -43,12 +49,12 @@ export default function Wishlist() {
         <div className="w-[1370px] mx-auto border-b border-[#ccc] pb-7">
           {product.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-7">
-              {product.map((item, index) => (
+              {uniqueProducts.map((item, index) => (
                 <div className="w-72 bg-white shadow-md hover:shadow-xl">
                   {/* Note: If you want this to be clickable, change this <div> to an <a> tag */}
                   <div href="#">
                     <img
-                      src="https://images.unsplash.com/photo-1532372320572-cda25653a26d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60"
+                      src={path+item.ProductImage}
                       alt="Modern Wooden Nesting Tables"
                       className="h-40 w-72 object-cover object-center rounded-t-xl"
                     />
@@ -57,16 +63,16 @@ export default function Wishlist() {
                         Nest Of Tables
                       </span>
                       <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">
-                        Modern Wooden Nesting Tables
+                        {item.ProductName}
                       </p>
                       <div className="border my-4 border-[#ccc]"></div>
                       <div className="flex flex-col justify-center items-center">
                         <div className="flex items-center">
                           <p className="text-sm text-gray-600 cursor-auto line-through">
-                            $150.00
+                           ${item.SalePrice}
                           </p>
                           <p className="text-lg font-semibold text-black ml-2">
-                            $119.99
+                            ${item.ActualPrice}
                           </p>
                         </div>
                         <div className="text-center flex gap-1 mt-2">

@@ -4,12 +4,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter,useSearchParams  } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
 import Dashboard from "../desbordpages/Dashboard";
-
 
 export default function Decbord() {
   let [oldPassword, setOldPassword] = useState("");
@@ -35,10 +34,7 @@ export default function Decbord() {
   });
 
   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
-   let dispatch = useDispatch();
- 
-   
-  
+  let dispatch = useDispatch();
 
   const router = useRouter();
 
@@ -61,7 +57,8 @@ export default function Decbord() {
       .then((response) => response.data)
       .then((finlerec) => {
         let userData = finlerec.data;
-        if (!userData.shippingAddress || !userData.shippingAddress.address) {
+
+        if (!userData.shippingAddress || !userData.shippingAddress?.address) {
           userData.shippingAddress = {
             shippingName: userData.UserName || "",
             shippingEmail: userData.useremail || "",
@@ -73,7 +70,8 @@ export default function Decbord() {
             country: userData.country || "",
           };
         }
-        setuser(finlerec.data);
+
+        setuser(userData); // ✅ FIXED
 
         setPreview(finlerec.path + finlerec.data.userprofile);
       });
@@ -110,7 +108,7 @@ export default function Decbord() {
 
   const handleLogout = () => {
     dispatch(removetokan());
-      redirect("/Login-Register");
+    redirect("/Login-Register");
   };
 
   let userprofileupdate = (e) => {

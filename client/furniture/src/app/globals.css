@@ -48,3 +48,40 @@
 .secroll-side-bar::-webkit-scrollbar-thumb:hover {
   background: #a67855;      /* hover color */
 }
+
+.menu-items {
+  position: relative;
+  display: flex;
+  align-items:center;
+  gap: 6px;
+  cursor: pointer
+}
+
+/* Dropdown (closed state) */
+.menu-items .dropdown {
+  position: absolute;
+ width: 750px;
+  padding: 30px 25px 35px;
+  background: #fff;
+  border: 1px solid #ebebeb;
+
+  top: 100%;
+  left: 0;
+  z-index: 999;
+
+  /* 🔥 3D fold effect */
+  transform: perspective(600px) rotateX(-90deg);
+  transform-origin: 0 0;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: all 0.5s ease;
+}
+
+/* Hover par open */
+.menu-items:hover .dropdown {
+  transform: perspective(600px) rotateX(0deg);
+  opacity: 1;
+  visibility: visible;
+}

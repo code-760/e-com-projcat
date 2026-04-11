@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 
 import { removetokan } from "../redex/slice/userslice";
-import { redirect, } from "next/navigation";
+import { redirect } from "next/navigation";
 import { fetchcart, removeItemFromCart } from "../redex/slice/cartslice";
 import axios from "axios";
 import {
@@ -27,17 +27,16 @@ import {
   RiLogoutCircleRLine,
   RiArrowDownSLine,
 } from "react-icons/ri";
+import { magamanu } from "../api-servis/megamanu";
 
 export default function Header() {
+  let [menu, setMenu] = useState([]);
   const dispatch = useDispatch(); // Action bhejne ke liye
 
   let basurl = process.env.NEXT_PUBLIC_BASEURL;
 
- 
-
   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
 
-  
   let [opencart, setopencart] = useState(false);
 
   let Logout = () => {
@@ -52,7 +51,8 @@ export default function Header() {
   let cart = useSelector((Allmystroy) => Allmystroy.cartstore.cart) || {};
   let { cartdetails = [], path = "" } = cart;
 
-  const wishlist = useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
+  const wishlist =
+    useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
 
   const product = wishlist?.wishlistdetails || [];
 
@@ -60,18 +60,7 @@ export default function Header() {
 
   let userpath = useSelector((Allmystroy) => Allmystroy.userstore.userpath);
 
-  console.log(userData);
-  
- 
-  
-
-
-
-
- 
-
-
-  
+  // console.log(userData);
 
   // --- TOTAL CALCULATE KARNE KA LOGIC ---
   const calculateSubtotal = () => {
@@ -110,10 +99,14 @@ export default function Header() {
       dispatch(aadwishlist(product._id));
     }
   };
-//  UserName,
-//             useremail,
-//             userprofile,
-//             path,
+
+  useEffect(() => {
+    magamanu().then((manu) => {
+      setMenu(manu);
+    });
+  }, []);
+
+  console.log(menu);
 
   return (
     <div className=" ">
@@ -130,8 +123,7 @@ export default function Header() {
               <div className="flex items-center gap-3 cursor-pointer">
                 {/* Avatar with Ring */}
                 <img
-                  src={userpath+userData?.userprofile}
-                 
+                  src={userpath + userData?.userprofile}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100 group-hover:ring-purple-500 transition-all duration-300"
                 />
@@ -168,7 +160,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Link
-                       href="/desbord?tab=profile"
+                      href="/desbord?tab=profile"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
                     >
                       <RiSettings4Line className="mr-3 text-lg" />
@@ -188,7 +180,9 @@ export default function Header() {
                       </button>
                     ) : (
                       <Link href={"/Login-Register"}>
-                        <p  className="w-full flex items-center px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">Login / Register</p>
+                        <p className="w-full flex items-center px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                          Login / Register
+                        </p>
                       </Link>
                     )}
                   </li>
@@ -402,121 +396,49 @@ export default function Header() {
               >
                 Home
               </Link>
-              <li className=" z-10 relative  uppercase cursor-pointer group  hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium gap-2">
-                living
-                <FaAngleDown />
-                <div className=" absolute  bg-white  top-full w-[700px] hidden group-hover:flex   border border-[#CCC] shadow-[#ccc] ">
-                  <div className=" grid grid-cols-3 p-3 ">
-                    <div>
-                      <ul className=" p-6 text-[#ccc] text-left">
-                        <h3 className="pb-4 text-black font-bold  hover:text-[#D2A278]">
-                          Tables
-                        </h3>
-                        <Link
-                          href={"/Product-Listing"}
-                          className="pb-3 hover:text-black"
-                        >
-                          Side and End Tables
-                        </Link>
-                        <li className="pb-3 hover:text-black">
-                          Nest Of Tables
-                        </li>
-                        <li className="pb-3 hover:text-black">
-                          Coffee Table Sets
-                        </li>
-                        <li className="pb-3 hover:text-black">Coffee Tables</li>
-                      </ul>
+
+              {menu?.map((item, index) => {
+                return (
+                  <li
+                    key={index}
+                    className=" menu-items"
+                  >
+                    {item?.categoryName}
+                    <FaAngleDown />
+
+                    <div className=" dropdown">
+                      <div className="grid grid-cols-3 p-3 ">
+                        {item?.subcategories?.map((subItem, subIndex) => {
+                          return (
+                            <div key={subIndex}>
+                              <ul className="p-6 text-[#ccc] text-left">
+                                <h3 className="pb-4 text-black font-bold hover:text-[#D2A278]">
+                                  {subItem?.SubcategoryName}
+                                </h3>
+
+                                {subItem?.Subsubcategories?.map(
+                                  (subsubItem, subsubIndex) => {
+                                    return (
+                                      <Link
+                                        key={subsubIndex}
+                                        href={"/Product-Listing"}
+                                        className="block pb-3 hover:text-black"
+                                      >
+                                        {subsubItem?.SubsubcategoryName}
+                                      </Link>
+                                    );
+                                  },
+                                )}
+                              </ul>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div>
-                      <ul className=" p-6 text-[#ccc]  text-left">
-                        <h3 className="pb-4 text-black font-bold  hover:text-[#D2A278] ">
-                          Mirror
-                        </h3>
-                        <li className="pb-3 hover:text-black">
-                          Wooden Mirrors
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <ul className=" p-6  text-left text-[#ccc]">
-                        <h3 className="pb-4 text-black font-bold text-left  hover:text-[#D2A278] ">
-                          Living Storage/collections
-                        </h3>
-                        <li className="pb-3 hover:text-black">Prayer Units</li>
-                        <li className="pb-3 hover:text-black">Display Unit</li>
-                        <li className="pb-3 hover:text-black">Shoe Racks</li>
-                        <li className="pb-3 hover:text-black">
-                          Chest Of Drawers
-                        </li>
-                        <li className="pb-3 hover:text-black">
-                          Cabinets and Sideboard
-                        </li>
-                        <li className="pb-3 hover:text-black">Bookshelves</li>
-                        <li className="pb-3 hover:text-black">Tv Units</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li className=" z-10 relative  uppercase cursor-pointer group  hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium  gap-2">
-                sofa
-                <FaAngleDown />
-                <div className=" absolute bg-white top-full w-[700px] border border-[#ccc] shadow-[#ccc] hidden group-hover:flex  ">
-                  <div className=" grid grid-cols-3 p-3 ">
-                    <div>
-                      <ul className=" p-6 text-[#ccc] text-left">
-                        <h3 className="pb-4 text-black font-bold  hover:text-[#D2A278]">
-                          Sofa Cum Bed
-                        </h3>
-                        <li className="pb-3 hover:text-black">
-                          Wooden Sofa Cum Bed
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <ul className=" p-6 text-[#ccc]  text-left">
-                        <h3 className="pb-4 text-black font-bold   hover:text-[#D2A278] ">
-                          Sofa Sets
-                        </h3>
-                        <Link
-                          href={"/Product-Listing"}
-                          className="pb-3 hover:text-black font-medium"
-                        >
-                          {" "}
-                          L Shape Sofa
-                        </Link>
-                        <li className="pb-3 hover:text-black font-medium">
-                          1 Seater Sofa
-                        </li>
-                        <li className="pb-3 hover:text-black font-medium">
-                          {" "}
-                          2 Seater Sofa
-                        </li>
-                        <li className="pb-3 hover:text-black font-medium">
-                          {" "}
-                          3 Seater Sofa
-                        </li>
-                        <li className="pb-3 hover:text-black font-medium">
-                          Wooden Sofa Sets
-                        </li>
-                        <li className="pb-3 hover:text-black font-medium">
-                          Normal{" "}
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <ul className=" p-6  text-left text-[#ccc]">
-                        <h3 className="pb-4 text-black font-medium text-left  hover:text-[#D2A278] ">
-                          Swing Jhula
-                        </h3>
-                        <li className="pb-3 hover:text-black font-medium">
-                          Wooden Jhula
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </li>
+                  </li>
+                );
+              })}
+
               <li className=" relative z-10  uppercase cursor-pointer group  hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium  gap-2">
                 pages
                 <FaAngleDown />

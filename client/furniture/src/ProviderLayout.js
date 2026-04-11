@@ -9,7 +9,9 @@ import { setUserData, setUserpath } from "./app/redex/slice/userslice";
 // Ek chota wrapper component jo Redux use kar sake
 function AuthWrapper({ children }) {
   const dispatch = useDispatch();
-  let tokan = useSelector((state) => state.adminstore.tokan);
+   let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
+  console.log(tokan);
+  
   let basurl = process.env.NEXT_PUBLIC_BASEURL;
 
   useEffect(() => {
