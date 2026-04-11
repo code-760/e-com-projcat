@@ -62,7 +62,7 @@ let WhyChooseUscreate = async (req, rec) => {
 let WhyChooseUsviwe = async (req, rec) => {
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

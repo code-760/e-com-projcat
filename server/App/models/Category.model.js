@@ -30,6 +30,15 @@ let categorySchema = mongoose.Schema({
   },
 });
 
+categorySchema.virtual("subcategories", {
+  ref: "SubCategory",
+  localField: "_id",
+  foreignField: "Category",
+});
+
+
+categorySchema.set('toJSON', { virtuals: true });
+
 let categoryModel = mongoose.model("category",categorySchema);
 
 module.exports = { categoryModel };

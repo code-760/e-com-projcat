@@ -4,22 +4,24 @@ let SubcategorySchema = mongoose.Schema({
     type: String,
     required: [true, "Subcategory name is required"],
     minlength: 2,
-    maxlength:100,
+    maxlength: 100,
     validate: {
       validator: async function (v) {
-        const Subcategory = await this.constructor.findOne({ SubcategoryName: v,deletdat:null });
+        const Subcategory = await this.constructor.findOne({
+          SubcategoryName: v,
+          deletdat: null,
+        });
         return !Subcategory;
       },
       message: (props) => `The specified Subcategory is already in use.`,
     },
   },
 
-   Category:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"category"
-
+  Category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "category",
   },
-  Subcategoryimg:String,
+  Subcategoryimg: String,
   isdeleted: {
     type: Boolean,
     default: false,
@@ -28,13 +30,20 @@ let SubcategorySchema = mongoose.Schema({
     type: Date,
     default: null,
   },
- 
-  SubcategoryOder:Number,
-  Subcategorystatus:{
-    type:Boolean,
-    default:true
+
+  SubcategoryOder: Number,
+  Subcategorystatus: {
+    type: Boolean,
+    default: true,
   },
 });
+
+SubcategorySchema.virtual("Subsubcategories", {
+  ref: "Subsubcategory",
+  localField: "_id",
+  foreignField: "SubCategory",
+});
+SubcategorySchema.set("toJSON", { virtuals: true });
 
 let SubcategoryModel = mongoose.model("SubCategory", SubcategorySchema);
 

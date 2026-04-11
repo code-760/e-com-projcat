@@ -55,7 +55,7 @@ let colorcreate = async (req, rec) => {
 let colorviwe = async (req, rec) => {
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

@@ -1,3 +1,4 @@
+const { categoryModel } = require("../../models/Category.model");
 const { Faqmodele } = require("../../models/Faq.model");
 const { ProductModel } = require("../../models/perodect.model");
 const { SlidersModel } = require("../../models/Sliders.Model");
@@ -70,12 +71,39 @@ let faqviwe = async (req, res) => {
     _status: "success",
     message: "faq data fetch successfully",
     data: faqdata,
-  }); 
+  });
+};
+
+let megamenu = async (req, res) => {
+  try {
+    let categoryData = await categoryModel
+      .find({ deletdat: null, categorystatus: true  })
+      .select("categoryName")
+      .populate({
+        path: "subcategories",
+        select: "SubcategoryName",
+        populate: {
+          path: "Subsubcategories", // ✅ correct name
+          select: "SubsubcategoryName",
+        },
+      });
+
+    res.send({
+      status: 1,
+      categoryData,
+    });
+  } catch (error) {
+    res.send({
+      status: 0,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
   prodectebs,
   bannerData,
   bastsellers,
-  faqviwe
+  faqviwe,
+  megamenu
 };

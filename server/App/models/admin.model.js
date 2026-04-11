@@ -5,9 +5,9 @@ let AdminSchema = mongoose.Schema({
     type: String,
     
   },
-  Adminemail: {
+   Adminemail: {
     type: String,
-    required: [true, "Admin email required"],
+    required: [true, "Admin email required"]
   },
 
   Password: {
@@ -22,29 +22,18 @@ let AdminSchema = mongoose.Schema({
     type: String,   
     
   },
-  AdminGender: {
-    type: String,
-    enum: ["male", "female", "other"],
-    
-  },
-  state: {
-    type: String,
-   
-  },
-  
-  city: {
-    type: String,
-   
-  },
   country: {
     type: String,
    
   },
-  pincode: {
+  Bio:{
     type: String,
-    
+   
   },
+
   shippingcharges: {
+    type: Number,
+    default: 0
     
   },
   isdeleted: {
@@ -56,7 +45,7 @@ let AdminSchema = mongoose.Schema({
     default: null,
   },
 
-  Userstatus: {
+  adminstatus: {
     type: Boolean,
     default: true,
   },

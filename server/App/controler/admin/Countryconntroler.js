@@ -40,7 +40,7 @@ let Countrycreate = async (req, rec) => {
 let Countryviwe = async (req, rec) => {
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

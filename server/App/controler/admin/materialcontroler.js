@@ -42,7 +42,7 @@ let materialcreate = async (req, rec) => {
 let materialviwe = async (req, rec) => {
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

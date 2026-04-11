@@ -59,10 +59,10 @@ let Productcreate = async (req, rec) => {
   console.log(req.body);
 };
 
-let Productviwe = async (req, rec) => {
+let Productviwe = async (req, rec) => {   
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

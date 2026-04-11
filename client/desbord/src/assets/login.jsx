@@ -52,9 +52,10 @@ export default function Login() {
           .post(`${apibaseurl}/Admin/Admin-google-login`, obj)
           .then((rec) => rec.data)
           .then((finalrec) => {
-            if (finalrec._status) {
+            if (finalrec. _status) {
+              console.log(finalrec);
               toast.success("Google login successful!");
-              dispatch(settokan({ tokan: finalrec.tokan }));
+              dispatch(settokan({ tokan: finalrec.token}));
               navigate("/Desbord");
             } else {
               toast.error("Google login failed. Please try again.");

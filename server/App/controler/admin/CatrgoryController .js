@@ -13,7 +13,6 @@ let categorycreate = async (req, rec) => {
     ) {
       insertobj["categoryimg"] = req.file.filename;
     }
-    
   }
 
   console.log(insertobj);
@@ -55,11 +54,9 @@ let categorycreate = async (req, rec) => {
 };
 
 let categoryviwe = async (req, rec) => {
-
-
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 
@@ -106,7 +103,7 @@ let categorydelete = async (req, rec) => {
         isdeleted: true,
         deletdat: Date.now(),
       },
-    }
+    },
   );
 
   rec.send({
@@ -128,7 +125,7 @@ let multidelete = async (req, rec) => {
         isdeleted: true,
         deletdat: Date.now(),
       },
-    }
+    },
   );
 
   rec.send({
@@ -152,7 +149,7 @@ let changeStatus = async (req, res) => {
         },
       },
     ],
-    { updatePipeline: true }
+    { updatePipeline: true },
   );
 
   res.send({
@@ -203,7 +200,7 @@ let catUpdate = async (req, res) => {
     { _id: id },
     {
       $set: updateObj,
-    }
+    },
   );
   res.send({
     _status: true,

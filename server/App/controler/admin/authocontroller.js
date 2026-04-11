@@ -104,13 +104,13 @@ let loginuser = async (req, res) => {
 
   if (user) {
     let bdpassswor = user.Password;
-    let tokan = jwt.sign({ UserID: user._id }, process.env.TOKEN);
+    let admintokan = jwt.sign({ UserID: user._id }, process.env.TOKEN);
 
     if (bcrypt.compareSync(Password, bdpassswor)) {
       return res.send({
         _status: "success",
         message: "login successful",
-        tokan,
+       admintokan,
       });
     } else {
       return res.send({
@@ -181,80 +181,145 @@ let Admingooglelogin = async (req, res) => {
   }
 };
 
+
+
+
 let changepassword = async (req, res) => {
-  let { oldpassword, newpassword, ConfirmPassword } = req.body;
-  let token = req.headers.authorization.split(" ")[1];
-  let decoded = jwt.verify(token, process.env.TOKEN);
-  let userid = decoded.UserID;
-  let user = await UserModel.findOne({ _id: userid });
-  let bdpassswor = user.Password;
-  if (bcrypt.compareSync(oldpassword, bdpassswor)) {
-    if (newpassword === ConfirmPassword) {
-      const hash = bcrypt.hashSync(newpassword, saltRounds);
-      await UserModel.updateOne({ _id: userid }, { Password: hash });
-      return res.send({
-        _status: "success",
-        message: "password changed successfully",
-      });
-    } else {
+  try {
+    let { oldpassword, newpassword, ConfirmPassword } = req.body;
+    
+    // Token verify karna aur user nikalna
+    let token = req.headers.authorization.split(" ")[1];
+    let decoded = jwt.verify(token, process.env.TOKEN);
+    let userid = decoded.UserID;
+    
+    let user = await UserModel.findOne({ _id: userid });
+
+    // Dono cases ke liye pehle check kar lo ki naya password match ho raha hai ya nahi
+    if (newpassword !== ConfirmPassword) {
       return res.send({
         _status: "failed",
         message: "new password and confirm password do not match",
       });
     }
-  } else {
-    return res.send({
+
+    const saltRounds = 10;
+    const hash = bcrypt.hashSync(newpassword, saltRounds);
+
+    // Yahan se aapka IF-ELSE logic start hota hai
+    if (!oldpassword) {
+      // IF BLOCK: Google User ke liye (jab oldpassword blank ya undefined aaye)
+      await UserModel.updateOne({ _id: userid }, { Password: hash });
+      
+      return res.send({
+        _status: "success",
+        message: "Password set successfully for Google user",
+      });
+
+    } else {
+      // ELSE BLOCK: Normal User ke liye (jab oldpassword frontend se aaye)
+      let bdpassswor = user.Password;
+      
+      if (bcrypt.compareSync(oldpassword, bdpassswor)) {
+        // Agar purana password sahi hai, toh update kar do
+        await UserModel.updateOne({ _id: userid }, { Password: hash });
+        
+        return res.send({
+          _status: "success",
+          message: "Password changed successfully",
+        });
+      } else {
+        // Agar purana password galat hai
+        return res.send({
+          _status: "failed",
+          message: "Invalid current password",
+        });
+      }
+    }
+
+  } catch (error) {
+    return res.status(500).send({
       _status: "failed",
-      message: "invalid old password",
+      message: "Something went wrong",
+      error: error.message
     });
   }
+}
 
-  // Implementation for change password
-};
+const updateadmin = async (req, res) => {
+  try {
+    // 1. req.body से सारा डेटा निकाल लें
+    let updateData = { ...req.body };
 
-let updateuser = async (req, res) => {
-  let updateData = { ...req.body };
+    // 2. Token से Admin/User की ID निकालें (सुरक्षा के लिए)
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.TOKEN);
+    const adminId = decoded.UserID;
 
-  let token = req.headers.authorization.split(" ")[1];
-  let decoded = jwt.verify(token, process.env.TOKEN);
-  let userid = decoded.UserID;
-
-  if (req.file) {
-    if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
-    ) {
-      updateData["userprofile"] = req.file.filename;
+    // 3. अगर कोई नई प्रोफाइल इमेज अपलोड हुई है, तो उसे updateData में जोड़ें
+    if (req.file && req.file.filename) {
+      updateData["Adminprofile"] = req.file.filename; // Slidersimg या userprofile की जगह Adminprofile का इस्तेमाल
     }
-  }
 
-  await UserModel.updateOne(
-    { _id: userid },
-    {
-      $set: updateData,
-    },
-  );
-  res.send({
-    _status: "success",
-    message: "user updated successfully",
-    data: updateData,
-  });
+    // 4. डेटाबेस में अपडेट करें (AdminModel या UserModel जो भी आप इस्तेमाल कर रहे हैं)
+    const updateRes = await AdminModel.updateOne(
+      { _id: adminId },
+      {
+        $set: updateData,
+      },
+    );
+
+    // 5. सफलता का रिस्पॉन्स भेजें
+    res.send({
+      _status: true,
+      message: "Admin profile updated successfully",
+      data: updateData,
+      updateRes,
+    });
+  } catch (error) {
+    // अगर कोई एरर आती है (जैसे token expire होना), तो सर्वर क्रैश नहीं होगा
+    console.error("Update Admin Error:", error);
+    res.status(500).send({
+      _status: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
 };
 
 let admindetail = async (req, res) => {
-  let token = req.headers.authorization.split(" ")[1];
-  let decoded = jwt.verify(token,process.env.TOKEN);
+  try {
+    // 1. Check karein ki headers mein authorization aya hai ya nahi
+    if (!req.headers.authorization) {
+      return res.status(401).send({ message: "Token is missing" });
+    }
 
-  let userid = decoded.UserID;
-  let data = await AdminModel.findOne({ _id: userid });
+    let token = req.headers.authorization.split(" ")[1];
 
-  res.send({
-    _status: "success",
-    message: "admin details fetched successfully",
-    path: process.env.PROFILEIMAGEPATH,
-    data,
-  });
+    // 2. Token verify karein
+    let decoded = jwt.verify(token, process.env.TOKEN);
+
+    // 3. Ye confirm karein ki token sign karte waqt aapne 'UserID' hi likha tha ya 'userId'
+    let userid = decoded.UserID;
+
+    let data = await AdminModel.findOne({ _id: userid });
+
+    if (!data) {
+      return res.status(404).send({ message: "Admin nahi mila" });
+    }
+
+    res.send({
+      _status: "success",
+      message: "admin details fetched successfully",
+      path: process.env.PROFILEIMAGEPATH,
+      data, // Ye data aapke frontend ke res.data.data mein jayega
+    });
+  } catch (error) {
+    console.error("Token verification ya DB error:", error);
+    res
+      .status(500)
+      .send({ message: "Invalid token ya server error", error: error.message });
+  }
 };
 
 let forgetpassword = async (req, res) => {
@@ -329,7 +394,7 @@ let updateShipping = async (req, res) => {
 
 module.exports = {
   loginuser,
-  updateuser,
+  updateadmin,
   admindetail,
   forgetpassword,
   resetpassword,

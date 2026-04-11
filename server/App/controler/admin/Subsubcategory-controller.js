@@ -58,7 +58,7 @@ let Subsubcategorycreate = async (req, rec) => {
 let Subsubcategoryviwe = async (req, rec) => {
  const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

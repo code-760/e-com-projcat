@@ -64,7 +64,7 @@ let Sliderscreate = async (req, rec) => {
 let Slidersviwe = async (req, rec) => {
  const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 

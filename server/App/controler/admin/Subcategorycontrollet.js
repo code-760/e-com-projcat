@@ -1,4 +1,3 @@
-
 // SubcategoryModel.syncIndexes();
 
 const { categoryModel } = require("../../models/Category.model");
@@ -6,7 +5,6 @@ const { SubcategoryModel } = require("../../models/Subcategory");
 
 let Subcategorycreate = async (req, rec) => {
   let insertobj = { ...req.body };
-  
 
   if (req.file) {
     if (
@@ -18,7 +16,7 @@ let Subcategorycreate = async (req, rec) => {
     }
   }
 
-//   console.log(insertobj);
+  //   console.log(insertobj);
 
   try {
     let Subcategory = await new SubcategoryModel(insertobj);
@@ -59,17 +57,25 @@ let Subcategorycreate = async (req, rec) => {
 let Subcategoryviwe = async (req, rec) => {
   const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 
   const orCondition = [];
 
-  if (req.query.SubcategoryName != undefined && req.query.SubcategoryName != "") {
-    orCondition.push({ SubcategoryName: new RegExp(req.query.SubcategoryName, "i") });
+  if (
+    req.query.SubcategoryName != undefined &&
+    req.query.SubcategoryName != ""
+  ) {
+    orCondition.push({
+      SubcategoryName: new RegExp(req.query.SubcategoryName, "i"),
+    });
   }
 
-  if (req.query.SubcategoryOder != undefined && req.query.SubcategoryOder != "") {
+  if (
+    req.query.SubcategoryOder != undefined &&
+    req.query.SubcategoryOder != ""
+  ) {
     orCondition.push({ SubcategoryOder: req.query.SubcategoryOder });
   }
 
@@ -83,8 +89,11 @@ let Subcategoryviwe = async (req, rec) => {
     filter.$or = orCondition;
   }
 
-  let date = await SubcategoryModel.find(filter).populate('Category','categoryName');
-//  {poputale<-- ka kam hai ki vo pernet category ka deta dikhata hai ye un me se deta nikal kar lata hai  }
+  let date = await SubcategoryModel.find(filter).populate(
+    "Category",
+    "categoryName",
+  );
+  //  {poputale<-- ka kam hai ki vo pernet category ka deta dikhata hai ye un me se deta nikal kar lata hai  }
 
   rec.send({
     status: true,
@@ -94,23 +103,23 @@ let Subcategoryviwe = async (req, rec) => {
   });
 };
 
-
-let parnetcategroy=async (req, rec) => {
+let parnetcategroy = async (req, rec) => {
   let filterSubcategory = {
     deletdat: null,
   };
 
-  let date = await categoryModel.find({categorystatus:true}&&filterSubcategory).select('categoryName')
-// //  {poputale<-- ka kam hai ki vo pernet category ka deta dikhata hai ye un me se deta nikal kar lata hai  }
+  let date = await categoryModel
+    .find({ categorystatus: true } && filterSubcategory)
+    .select("categoryName");
+  // //  {poputale<-- ka kam hai ki vo pernet category ka deta dikhata hai ye un me se deta nikal kar lata hai  }
 
   rec.send({
     status: true,
     messages: "create api",
-  
+
     date,
   });
 };
-
 
 let Subcategorydelete = async (req, rec) => {
   //  singal delete
@@ -125,7 +134,7 @@ let Subcategorydelete = async (req, rec) => {
         isdeleted: true,
         deletdat: Date.now(),
       },
-    }
+    },
   );
 
   rec.send({
@@ -147,7 +156,7 @@ let multidelete = async (req, rec) => {
         isdeleted: true,
         deletdat: Date.now(),
       },
-    }
+    },
   );
 
   rec.send({
@@ -172,7 +181,7 @@ let changeStatus = async (req, res) => {
         },
       },
     ],
-    { updatePipeline: true }
+    { updatePipeline: true },
   );
 
   res.send({
@@ -185,7 +194,10 @@ let changeStatus = async (req, res) => {
 let getditelds = async (req, rec) => {
   let { id } = req.params;
 
-  let data = await SubcategoryModel.findOne({ _id: id }).populate('Category','categoryName');;
+  let data = await SubcategoryModel.findOne({ _id: id }).populate(
+    "Category",
+    "categoryName",
+  );
 
   console.log(data);
 
@@ -204,7 +216,10 @@ let SubcategoryUpdate = async (req, res) => {
   console.log(req.body);
 
   let updateObj = {
-   SubcategoryName, Category, SubcategoryOder, Subcategoryimg
+    SubcategoryName,
+    Category,
+    SubcategoryOder,
+    Subcategoryimg,
   };
 
   if (req.file) {
@@ -221,7 +236,7 @@ let SubcategoryUpdate = async (req, res) => {
     { _id: id },
     {
       $set: updateObj,
-    }
+    },
   );
   res.send({
     _status: true,
@@ -229,11 +244,6 @@ let SubcategoryUpdate = async (req, res) => {
     updateRes,
   });
 };
-
-
-
-
-
 
 module.exports = {
   Subcategorycreate,
@@ -243,5 +253,5 @@ module.exports = {
   changeStatus,
   parnetcategroy,
   getditelds,
-  SubcategoryUpdate
+  SubcategoryUpdate,
 };

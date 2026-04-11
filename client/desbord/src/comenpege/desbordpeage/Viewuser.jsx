@@ -37,9 +37,13 @@ export default function Viewuser() {
         console.log(finlerec.data);
 
         setpath(finlerec.path);
+
         setdata(finlerec.data);
+        
       });
   };
+
+
   let getChacdebox = (e) => {
     if (e.target.checked) {
       setallids([...allids, e.target.value]);

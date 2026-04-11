@@ -3,15 +3,9 @@ const { userviwe, usermultidelete, userchangeStatus } = require("../../controler
 
 let userRoutes = express.Router();
 
-userRoutes.get('/viwe-user',userviwe)
+userRoutes.get("/viwe-user", userviwe);
 
-userRoutes.post('/user-multidelete',usermultidelete)
-userRoutes.post('/user-changestatus',userchangeStatus)
-
-
-
-
-
-
+userRoutes.post("/user-multidelete", usermultidelete);
+userRoutes.post("/user-changestatus", userchangeStatus);
 
 module.exports = userRoutes;

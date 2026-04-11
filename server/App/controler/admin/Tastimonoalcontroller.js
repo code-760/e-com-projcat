@@ -62,7 +62,7 @@ let Tastimonialcreate = async (req, rec) => {
 let Tastimonialviwe = async (req, rec) => {
  const addCondition = [
     {
-      deleted_at: null,
+      deletdat: null,
     },
   ];
 
