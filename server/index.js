@@ -24,12 +24,12 @@ App.use('/web',webRoutes)
 
 
 
-mongoose.connect(`mongodb://127.0.0.1:27017/${process.env.DBNAME}`)
-.then(()=>{
-    App.listen(process.env.PORT,()=>{
-    console.log("server start" , process.env.PORT);
-    
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+  App.listen(process.env.PORT, () => {
+    console.log("server start", process.env.PORT);
+  });
 })
 
 
-});
+
