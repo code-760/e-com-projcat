@@ -1,8 +1,8 @@
 let express = require("express");
 const { Oderviwe } = require("../../controler/admin/Odercontoller");
-let oderRoutes = express.Router();
+let oderroutes = express.Router();
 
-oderRoutes.get('/oder',Oderviwe)
+oderroutes.get('/oder',Oderviwe)
 
 
-module.exports = oderRoutes;
+module.exports = oderroutes;
