@@ -1,8 +1,9 @@
 const express = require("express");
-const { OrderView } = require("../../controller/admin/orderController");
+const { Oderviwe } = require("../../controler/admin/Odercontoller");
+
 
 const orderRoutes = express.Router();
 
-orderRoutes.get('/order', OrderView);
+orderRoutes.get('/order',Oderviwe );
 
 module.exports = {orderRoutes};
