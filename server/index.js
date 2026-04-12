@@ -5,7 +5,18 @@ let App=express();
 let cous=require("cors");
 const { webRoutes } = require("./App/routes/web/wedRoutes");
 require("dotenv").config()
- App.use(cous())
+app.use(cors({
+  origin: [
+    "https://e-com-projcat.vercel.app",        // Tumhari Furniture site
+    "https://e-com-projcat-ew3h.vercel.app",   // Tumhara Admin Panel
+    "http://localhost:5173",                   // Local development ke liye
+    "http://localhost:3000"
+  ],
+  credentials: true, // Agar tum cookies ya headers use kar rahe ho
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 App.use(express.json())
 
 App.get('/', (req, res) => {
