@@ -8,8 +8,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
-import Dashboard from "../desbordpages/Dashboard";
+
 import { Suspense } from 'react';
+import Dashboard from "../desbordpages/Dashboard";
 
  function DashboardContent() {
   let [oldPassword, setOldPassword] = useState("");
@@ -771,7 +772,7 @@ import { Suspense } from 'react';
   );
 }
 
-export default function Dashboard() {
+export default function dashboard() {
   return (
     // Yeh Suspense tab tak "Loading..." dikhayega jab tak URL parameters read nahi ho jate
     <Suspense fallback={<div className="p-4 text-center">Loading Dashboard...</div>}>
