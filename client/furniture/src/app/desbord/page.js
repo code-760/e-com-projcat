@@ -9,8 +9,9 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
 import Dashboard from "../desbordpages/Dashboard";
+import { Suspense } from 'react';
 
-export default function Decbord() {
+ function DashboardContent() {
   let [oldPassword, setOldPassword] = useState("");
   let [newPassword, setNewPassword] = useState("");
   let [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -107,8 +108,8 @@ export default function Decbord() {
   };
 
   const handleLogout = () => {
-    dispatch(removetokan());
-    redirect("/Login-Register");
+    dispatch(removetokan()); // Ensure 'removetokan' is imported
+    router.push("/Login-Register"); // redirect ki jagah router.push
   };
 
   let userprofileupdate = (e) => {
@@ -767,5 +768,14 @@ export default function Decbord() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    // Yeh Suspense tab tak "Loading..." dikhayega jab tak URL parameters read nahi ho jate
+    <Suspense fallback={<div className="p-4 text-center">Loading Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
