@@ -138,7 +138,7 @@ function Chakout() {
 
           let { fainlrezorpayOrder } = data;
           const options = {
-            key: "rzp_test_SPPTOU3xnWuDL3",
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             amount: fainlrezorpayOrder.amount_due,
             currency: "INR",
             name: "E-Furniture Web",
