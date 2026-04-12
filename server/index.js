@@ -5,7 +5,7 @@ let App=express();
 let cous=require("cors");
 const { webRoutes } = require("./App/routes/web/wedRoutes");
 require("dotenv").config()
-app.use(cors({
+App.use(cous({
   origin: [
     "https://e-com-projcat.vercel.app",        // Tumhari Furniture site
     "https://e-com-projcat-ew3h.vercel.app",   // Tumhara Admin Panel
