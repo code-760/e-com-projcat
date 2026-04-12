@@ -5,8 +5,9 @@ import Link from "next/link";
 import axios from "axios";
 import { redirect, useSearchParams } from "next/navigation";
  import { ToastContainer, toast } from 'react-toastify';
+ import { Suspense } from "react";
 
-export default function NewPassword() {
+ function NewPassword() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   let userperam = useSearchParams();
@@ -131,5 +132,13 @@ export default function NewPassword() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewPassword />
+    </Suspense>
   );
 }
