@@ -8,6 +8,10 @@ require("dotenv").config()
  App.use(cous())
 App.use(express.json())
 
+App.get('/', (req, res) => {
+    res.send("E-Furniture Backend is Live and Running Perfectly! 🚀");
+});
+
 
 App.use('/admin',adminRoutes)
 App.use('/uploads/category',express.static("uploads/category"))
