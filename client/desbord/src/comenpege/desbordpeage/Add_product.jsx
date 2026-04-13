@@ -217,8 +217,8 @@ export default function Add_product() {
           TotalInStocks: data?.TotalInStocks || "",
           ProductType: data.ProductType,
         });
-        setperview(finlerec.path + finlerec.data.ProductImage);
-        setbackperview(finlerec.path + finlerec.data.BackImage);
+        setperview(finlerec.data.ProductImage);
+        setbackperview( finlerec.data.BackImage);
         setValue(data.Description);
       });
   };

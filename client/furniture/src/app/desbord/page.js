@@ -75,7 +75,7 @@ import Dashboard from "../desbordpages/Dashboard";
 
         setuser(userData); // ✅ FIXED
 
-        setPreview(finlerec.path + finlerec.data.userprofile);
+        setPreview(finlerec.data.userprofile);
       });
   };
 

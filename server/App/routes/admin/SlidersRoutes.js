@@ -8,7 +8,7 @@ const { fileuplode } = require("../../middlewera/fileupdole");
 
 // let uplodes = multer({ dest: "uploads/category" });
 
-let uploads=fileuplode("uploads/Sliders")
+let uploads=fileuplode("Sliders")
 
 
  SliderRoutes.post("/create", uploads.single("Slidersimg"),Sliderscreate);

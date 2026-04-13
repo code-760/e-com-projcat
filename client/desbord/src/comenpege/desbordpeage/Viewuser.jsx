@@ -17,7 +17,7 @@ export default function Viewuser() {
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
   let [searchbox, setsearchbox] = useState(false);
   let [data, setdata] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [allids, setallids] = useState([]);
    let [searchObj,setSearchObj]=useState(
         {
@@ -36,7 +36,7 @@ export default function Viewuser() {
       .then((finlerec) => {
         console.log(finlerec.data);
 
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
 
         setdata(finlerec.data);
         
@@ -258,7 +258,7 @@ export default function Viewuser() {
                     </td>
                     <td className="px-6 py-4">
                       <img
-                        src={path + obj.userprofile}
+                        src={obj.userprofile}
                         alt="Product"
                         className="h-12 w-12 rounded-lg object-cover border border-gray-200 shadow-sm"
                       />

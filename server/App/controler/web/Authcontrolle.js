@@ -236,11 +236,11 @@ let updateuser = async (req, res) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      updateData["userprofile"] = req.file.filename;
+      updateData["userprofile"] = req.file.path;
     }
   }
 

@@ -15,7 +15,7 @@ const {
 
 // let uplodes = multer({ dest: "uploads/category" });
 
-let uploads = fileuplode("uploads/WhyChooseUs");
+let uploads = fileuplode("WhyChooseUs");
 
 WhyChooseUsRoutes.post(
   "/create",

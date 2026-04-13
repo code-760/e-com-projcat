@@ -10,14 +10,16 @@ import Over_sprort from "./component/home/Over_sprort";
 import { bannerData, bastslerdata, produtitems } from "./api-servis/homeservis";
 
 export default async function Home() {
+  
   let produtedata = await produtitems();
+
   let banner = await bannerData();
 
   let bastsleling = await bastslerdata();
 
-  let { data, path } = banner;
+  let { data} = banner;
   
-  let { productsata, bpath } = bastsleling;
+  let { productsata} = bastsleling;
 
   
   
@@ -26,11 +28,11 @@ export default async function Home() {
 
   return (
     <div className=" bg-white">
-      <Banner bannerdata={data} path={path} />
+      <Banner bannerdata={data}  />
       <Collection />
       <Featured_produte produtedata={produtedata} />
       <New_banner />
-      <Bestselling_Products bdata={productsata} bpath={bpath} />
+      <Bestselling_Products bdata={productsata} />
       <Over_sprort />
     </div>
   );

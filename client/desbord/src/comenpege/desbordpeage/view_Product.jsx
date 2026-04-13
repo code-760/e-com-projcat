@@ -23,7 +23,7 @@ export default function View_Product() {
   let [searchbox, setsearchbox] = useState(false);
   let [read, setread] = useState(false);
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [detail, setdetail] = useState();
   let [allids, setallids] = useState([]);
 
@@ -44,7 +44,7 @@ export default function View_Product() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdate(finlerec.date);
       });
   };
@@ -116,7 +116,7 @@ export default function View_Product() {
       .get(`${apibaseurl}/Product/get-deteils/${id}`)
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdetail(finlerec.data);
         setread(true);
       });
@@ -260,7 +260,7 @@ export default function View_Product() {
                   </td>
                   <td className="px-6 py-4">
                     <img
-                      src={path + obj.ProductImage}
+                      src={ obj.ProductImage}
                       alt="Product"
                       className="h-12 w-12 rounded-lg object-cover border border-gray-200 shadow-sm"
                     />
@@ -340,7 +340,7 @@ export default function View_Product() {
                   {/* Main Image */}
                   <div className="aspect-square w-full border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
                     <img
-                      src={path + detail.ProductImage}
+                      src={ detail.ProductImage}
                       alt="Main"
                       className="w-full h-full object-contain mix-blend-multiply"
                     />
@@ -354,7 +354,7 @@ export default function View_Product() {
                         className="aspect-square border border-gray-200 rounded-lg overflow-hidden bg-gray-50 cursor-pointer hover:border-indigo-500 transition-all"
                       >
                         <img
-                          src={path + img}
+                          src={ detail.GalleryImage[idx]}
                           alt={`Gallery ${idx}`}
                           className="w-full h-full object-cover"
                         />

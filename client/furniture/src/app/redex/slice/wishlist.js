@@ -18,10 +18,10 @@ export let fetchwishlist = createAsyncThunk(
     );
 
     let dataditals = await wishlistdata.data;
-    let path = dataditals.path;
+    // let path = dataditals.path;
     let wishlistdetails = dataditals.data;
 
-    return { wishlistdetails, path };
+    return { wishlistdetails};
   },
 );
 
@@ -61,7 +61,7 @@ export let removewishlist = createAsyncThunk("wishlist/remove", async (productId
 export let wishlistslice = createSlice({
   name: "wishlist",
   initialState: {
-    wishlist: { wishlistdetails: [], path: "" },
+    wishlist: { wishlistdetails: [] },
   },
   reducers: {
     // UI me turant DIL LAL (Red) karne ke liye

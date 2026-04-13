@@ -15,16 +15,16 @@ let Productcreate = async (req, rec) => {
 
   if (req.files) {
     if (req.files.ProductImage) {
-      insertobj.ProductImage = req.files.ProductImage[0].filename;
+      insertobj.ProductImage = req.files.ProductImage[0].path;
     }
 
     if (req.files.BackImage) {
-      insertobj.BackImage = req.files.BackImage[0].filename;
+      insertobj.BackImage = req.files.BackImage[0].path;
     }
 
     if (req.files.GalleryImage) {
       insertobj.GalleryImage = req.files.GalleryImage.map(
-        (file) => file.filename,
+        (file) => file.path,
       );
     }
   }
@@ -303,7 +303,7 @@ let productUpdate = async (req, res) => {
           if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
         }
 
-        updateObj.ProductImage = req.files.ProductImage[0].filename;
+        updateObj.ProductImage = req.files.ProductImage[0].path;
       }
 
       // 🔹 BackImage
@@ -313,7 +313,7 @@ let productUpdate = async (req, res) => {
           if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
         }
 
-        updateObj.BackImage = req.files.BackImage[0].filename;
+        updateObj.BackImage = req.files.BackImage[0].path;
       }
 
       // 🔹 GalleryImage
@@ -325,7 +325,7 @@ let productUpdate = async (req, res) => {
           });
         }
 
-        updateObj.GalleryImage = req.files.GalleryImage.map((f) => f.filename);
+        updateObj.GalleryImage = req.files.GalleryImage.map((f) => f.path);
       }
     }
 

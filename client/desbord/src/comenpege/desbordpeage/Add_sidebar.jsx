@@ -77,7 +77,7 @@ export default function Add_sidebar() {
             Slidersimg,
             Order,
           });
-          setperview(finlRec.path + finlRec.data.Slidersimg);
+          setperview( finlRec.data.Slidersimg);
         });
     }
   }, [id]);

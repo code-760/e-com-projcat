@@ -13,9 +13,9 @@ import {
   removewishlist,
 } from "@/app/redex/slice/wishlist";
 
-export default function Bestselling_Products({ bdata, bpath }) {
+export default function Bestselling_Products({ bdata}) {
   let [bestsellerdata] = useState(bdata || []);
-  let [basePath] = useState(bpath || "");
+  // let [basePath] = useState(bpath || "");
 
   const filteredProducts = bestsellerdata.filter(
     (item) => item.BestSelling === true || item.BestSelling === 1,
@@ -75,7 +75,7 @@ export default function Bestselling_Products({ bdata, bpath }) {
                   <Link href={`/product/${product._id}`}>
                     <div>
                       <img
-                        src={`${basePath}${product.ProductImage}`}
+                        src={product.ProductImage}
                         alt={product.ProductName}
                         className="h-40 w-72 object-center rounded-t-xl"
                       />

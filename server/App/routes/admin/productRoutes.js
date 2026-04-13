@@ -9,7 +9,7 @@ const { parnetcategroy, subcategroy, Subsubcategroy, Material, color, Productcre
 // let uplodes = multer({ dest: "uploads/category" });
 
 ProductRoutes.get("/parnt-categroy",parnetcategroy)
-let uploads = fileuplode("uploads/productimgs");
+let uploads = fileuplode("productimgs");
  ProductRoutes.post(
   "/create",
   uploads.fields([

@@ -19,7 +19,7 @@ export default function Vieworder() {
   let apibaseurl = import.meta.env.VITE_APIBASEURL;
   let [searchbox, setsearchbox] = useState(false);
   let [data, setdata] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [allids, setallids] = useState([]);
   let [searchObj, setSearchObj] = useState({
     UserName: "",
@@ -34,7 +34,7 @@ export default function Vieworder() {
       .then((rec) => rec.data)
       .then((falinlrec) => {
         setdata(falinlrec.data);
-        setpath(falinlrec.path);
+        // setpath(falinlrec.path);
       });
   };
 

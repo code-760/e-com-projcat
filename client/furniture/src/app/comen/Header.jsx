@@ -49,7 +49,7 @@ export default function Header() {
   }, [tokan]);
 
   let cart = useSelector((Allmystroy) => Allmystroy.cartstore.cart) || {};
-  let { cartdetails = [], path = "" } = cart;
+  let { cartdetails = []} = cart;
 
   const wishlist =
     useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
@@ -58,7 +58,7 @@ export default function Header() {
 
   let userData = useSelector((Allmystroy) => Allmystroy.userstore.userData);
 
-  let userpath = useSelector((Allmystroy) => Allmystroy.userstore.userpath);
+  
 
   // console.log(userData);
 
@@ -123,7 +123,7 @@ export default function Header() {
               <div className="flex items-center gap-3 cursor-pointer">
                 {/* Avatar with Ring */}
                 <img
-                  src={userpath + userData?.userprofile}
+                  src={userData?.userprofile}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100 group-hover:ring-purple-500 transition-all duration-300"
                 />
@@ -278,7 +278,7 @@ export default function Header() {
                             <div className="w-72 bg-white shadow-md hover:shadow-xl">
                               <div>
                                 <img
-                                  src={path + item.productImg}
+                                  src={item.productImg}
                                   alt={item.ProductName}
                                   className="h-40 w-72 object-center rounded-t-xl"
                                 />

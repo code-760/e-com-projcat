@@ -3,7 +3,7 @@ const { sendOTP, createuser, loginuser, updateuser, userdetail, forgetpassword, 
 const { fileuplode } = require("../../middlewera/fileupdole")
 
 
-let uploads = fileuplode("uploads/users");
+let uploads = fileuplode("users");
 let userRoutes=express.Router()
 
 

@@ -91,8 +91,8 @@ export default function Add_Why_Choose_Us() {
             Order,
             Description
           });
-          console.log(finlRec.path + finlRec.data.WhyChooseUsimg);
-          setperview(finlRec.path + finlRec.data.WhyChooseUsimg);
+          // console.log(finlRec.path + finlRec.data.WhyChooseUsimg);
+          setperview(finlRec.data.WhyChooseUsimg);
         });
     }
   }, [id]);

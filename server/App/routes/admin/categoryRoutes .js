@@ -7,7 +7,7 @@ const { categorycreate, categoryviwe, categorydelete, multidelete, getditelds, c
 
 // let uplodes = multer({ dest: "uploads/category" });
 
-let uploads = fileuplode("uploads/category");
+let uploads = fileuplode("categoryimg");
 
 CategoryRoutes.post("/create", uploads.single("categoryimg"), categorycreate);
 CategoryRoutes.get("/viwe", categoryviwe);

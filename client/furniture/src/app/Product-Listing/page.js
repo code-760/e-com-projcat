@@ -12,7 +12,7 @@ export default function ProductListing() {
     materials: [],
     colors: [],
   });
-  const [imgPath, setImgPath] = useState("");
+  // const [imgPath, setImgPath] = useState("");
 
   // Filter States
   const [selectedCats, setSelectedCats] = useState([]);
@@ -58,7 +58,7 @@ export default function ProductListing() {
         },
       });
       setProducts(response.data.data);
-      setImgPath(response.data.path);
+      // setImgPath(response.data.path);
     } catch (err) {
       console.error("Fetch Error", err);
     }
@@ -173,7 +173,7 @@ export default function ProductListing() {
               <div key={item._id} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300">
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={imgPath + item.ProductImage}
+                    src={item.ProductImage}
                     alt={item.ProductName}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />

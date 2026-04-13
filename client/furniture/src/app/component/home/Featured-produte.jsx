@@ -21,10 +21,10 @@ export default function Featured_produte({ produtedata }) {
   const wishlistItems = wishlist?.wishlistdetails || [];
 
   let [activeTab, setactiveTab] = useState("Featured");
-  let [path] = useState(produtedata.path);
+  // let [path] = useState(produtedata.path);
   let [perodutedata] = useState(produtedata.data);
 
-  console.log(path);
+  // console.log(path);
   
 
   let produtefuatures = {
@@ -89,7 +89,7 @@ export default function Featured_produte({ produtedata }) {
                 <div className="w-72 bg-white shadow-md hover:shadow-xl">
                   <div>
                     <img
-                      src={path + product.ProductImage}
+                      src={product.ProductImage}
                       alt={product.ProductName}
                       className="h-40 w-72 object-center rounded-t-xl"
                     />

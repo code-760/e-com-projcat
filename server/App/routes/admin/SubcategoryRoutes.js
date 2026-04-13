@@ -15,7 +15,7 @@ const {
 } = require("../../controler/admin/Subcategorycontrollet");
 
 // let uplodes = multer({ dest: "uploads/category" });
-let uploads = fileuplode("uploads/Subcategory");
+let uploads = fileuplode("Subcategory");
 SubcategoryRoutes.post(
   "/create",
   uploads.single("Subcategoryimg"),

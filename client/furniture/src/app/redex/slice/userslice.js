@@ -6,7 +6,7 @@ export let userslice=createSlice({
     initialState:{
         tokan:Cookies.get("tokan") || null,
         userData: null, 
-        userpath: null, 
+     
     },
     reducers:{
         settokan:(state,action)=>{
@@ -24,14 +24,11 @@ export let userslice=createSlice({
             state.userData = action.payload; 
         }, 
          
-        setUserpath: (state, action) => {
-            state.userpath = action.payload; 
-        } 
-
+        
         
     }
 })
 
-export const {setUserData, settokan, removetokan,setUserpath } = userslice.actions
+export const {setUserData, settokan, removetokan } = userslice.actions
 
 export default userslice.reducer

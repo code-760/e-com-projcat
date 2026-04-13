@@ -12,13 +12,13 @@ let Sliderscreate = async (req, rec) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      // console.log(req.file.filename);
+      // console.log(req.file.path);
 
-      insertobj["Slidersimg"] = req.file.filename;
+      insertobj["Slidersimg"] = req.file.path;
     }
   }
 
@@ -198,11 +198,11 @@ let SlidersUpdate = async (req, res) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      updateObj["Slidersimg"] = req.file.filename;
+      updateObj["Slidersimg"] = req.file.path;
     }
   }
 

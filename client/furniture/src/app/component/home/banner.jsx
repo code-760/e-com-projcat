@@ -4,10 +4,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 
-export default function Banner({ bannerdata, path }) {
+export default function Banner({ bannerdata }) {
   // Safe check agar bannerdata ya data undefined ho
   const [banner] = useState(bannerdata || []);
-  let [basePath] = useState(path || "") // Base path for images
+  // let [basePath] = useState(path || "") // Base path for images
 
 // console.log(banner,basePath);
 
@@ -30,7 +30,7 @@ export default function Banner({ bannerdata, path }) {
         {banner.map((item) => (
           <div key={item._id} className="w-full h-[550px] "> 
             <img
-              src={basePath+item.Slidersimg} // Console ke mutabik 'Slidersimg' use karein
+              src={item.Slidersimg} // Console ke mutabik 'Slidersimg' use karein
               className="w-full h-full object-cover object-center "
               alt={item.Title}
             />

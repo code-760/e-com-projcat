@@ -26,12 +26,12 @@ const fileuplode = (folderName) => {
 module.exports = { fileuplode };
 
 
-// let fileuplode=(filename)=>{
+// let fileuplode=(path)=>{
 //     let storage = multer.diskStorage({
 //   destination: (req, file, cd) => {
-//     cd(null,filename );
+//     cd(null,path );
 //   },
-//   filename(req, file, cd) {
+//   path(req, file, cd) {
 //     cd(null, Date.now() + file.originalname);
 //   },
 // });

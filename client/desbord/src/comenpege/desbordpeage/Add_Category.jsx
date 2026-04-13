@@ -75,7 +75,7 @@ export default function Add_Category() {
             categoryimg: "",
             categoryOder,
           });
-          setperview(finlRec.path + finlRec.data.categoryimg);
+          setperview(finlRec.data.categoryimg);
         });
     }
   }, [id]);

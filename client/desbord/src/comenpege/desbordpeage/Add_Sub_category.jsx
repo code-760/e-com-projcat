@@ -113,8 +113,8 @@ export default function Add_Sub_category() {
           SubcategoryOder,
           Subcategoryimg,
         });
-        console.log(finlRec.path + finlRec.data.Subcategoryimg);
-        setperview(finlRec.path + finlRec.data.Subcategoryimg);
+        console.log( finlRec.data.Subcategoryimg);
+        setperview(finlRec.data.Subcategoryimg);
       });
   };
 

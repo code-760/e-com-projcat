@@ -1,9 +1,10 @@
 let express = require("express");
 const { Admingooglelogin, admindetail, updateadmin } = require("../../controler/admin/authocontroller");
 const { fileuplode } = require("../../middlewera/fileupdole");
+;
 let AdminRoutes = express.Router();
 
-let uploads=fileuplode("uploads/Adminprofile")
+let uploads = fileuplode("AdminProfiles")
 
 AdminRoutes.post('/Admin-google-login', Admingooglelogin);
 AdminRoutes.post('/user-detail',admindetail);

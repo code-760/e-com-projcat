@@ -12,7 +12,7 @@ function Ditelscart() {
   const cart = useSelector((Allmystroy) => Allmystroy.cartstore.cart) || {};
 
   // 2. Destructuring mein default values set ki hain
-  const { cartdetails = [], path = "" } = cart;
+  const { cartdetails = []} = cart;
 
   // 3. State ko initialize kiya
   const [cartdeta, setcartdeta] = useState(cartdetails);
@@ -57,7 +57,6 @@ function Ditelscart() {
             <Cartcard
               key={index}
               obj={obj}
-              path={path}
               cartdelete={cartdelete}
             />
           ))

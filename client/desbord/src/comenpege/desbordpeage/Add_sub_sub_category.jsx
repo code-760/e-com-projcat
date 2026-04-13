@@ -129,7 +129,7 @@ export default function Add_sub_sub_category() {
           Subsubcategoryimg,
         });
         getsubcategroy(Category._id);
-        setperview(finlRec.path + finlRec.data.Subsubcategoryimg);
+        setperview( finlRec.data.Subsubcategoryimg);
       });
   };
 

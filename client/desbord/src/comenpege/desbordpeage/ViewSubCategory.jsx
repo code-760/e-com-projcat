@@ -18,7 +18,7 @@ import {
 export default function Viewsubcategory() {
   let [searchbox, setsearchbox] = useState(false);
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [allids, setallids] = useState([]);
   let [searchObj,setSearchObj]=useState(
       {
@@ -36,7 +36,7 @@ export default function Viewsubcategory() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdate(finlerec.date);
       });
   };
@@ -228,7 +228,7 @@ export default function Viewsubcategory() {
                     <td className="px-6 py-4 font-semibold text-gray-900">{obj.SubcategoryName}</td>
                     <td className="px-6 py-4">
                       <img 
-                        src={path + obj.Subcategoryimg} 
+                        src={obj.Subcategoryimg} 
                         alt={obj.SubcategoryName} 
                         className="h-10 w-10 rounded-lg object-cover border border-gray-200 shadow-sm"
                       />

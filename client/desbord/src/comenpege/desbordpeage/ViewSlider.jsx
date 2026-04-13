@@ -17,7 +17,7 @@ import {
 
 export default function Viewslider() {
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [searchbox, setsearchbox] = useState(false);
   let [allids, setallids] = useState([]);
   let [searchObj,setSearchObj]=useState(
@@ -36,7 +36,7 @@ export default function Viewslider() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdate(finlerec.date);
       });
   };
@@ -226,7 +226,7 @@ export default function Viewslider() {
                     <td className="px-6 py-4 font-medium text-gray-900">{obj.Title}</td>
                     <td className="px-6 py-4">
                       <img 
-                        src={path + obj.Slidersimg} 
+                        src={obj.Slidersimg} 
                         alt={obj.Title} 
                         className="h-12 w-24 rounded-lg object-cover border border-gray-200"
                       />

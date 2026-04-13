@@ -18,18 +18,18 @@ export let fetchcart = createAsyncThunk("cart/fetchcart", async (thunkAPI) => {
 
   let dataditals = data.data;
 
-  let path = dataditals.path;
+ 
 
   let cartdetails = dataditals.data;
 
-  return { cartdetails, path };
+  return { cartdetails};
 });
 
 export let cartslice = createSlice({
   name: "cart",
   initialState: {
     // Initial state ko object rakho kyunki aapka data {cartdetails: [], path: ""} aata hai
-    cart: { cartdetails: [], path: "" }, 
+    cart: { cartdetails: [] }, 
   },
   reducers: {
     removeItemFromCart: (state, action) => {

@@ -9,7 +9,7 @@ export default function Thankyou({ params }) {
 
   console.log("Order ID from URL:", OderiD); // Debugging line to check if OderiD is being received correctly
   let [orderDetails, setOrderDetails] = useState(null);
-  let [path, setpath] = useState();
+  // let [path, setpath] = useState();
   let basurl = process.env.NEXT_PUBLIC_BASEURL;
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function Thankyou({ params }) {
         .get(`${basurl}order/view/${OderiD}?t=${Date.now()}`)
         .then((res) => res.data)
         .then((data) => {
-          setpath(data.path);
+          // setpath(data.path);
 
           setOrderDetails(data.data);
         })
@@ -104,7 +104,7 @@ export default function Thankyou({ params }) {
                 >
                   <div className="flex items-center gap-4">
                     <img
-                      src={path + item.productimg}
+                      src={item.productimg}
                       alt={item.productName}
                       className="w-16 h-16 object-cover rounded-lg bg-white shadow-sm"
                     />

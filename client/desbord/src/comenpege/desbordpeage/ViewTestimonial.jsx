@@ -17,7 +17,7 @@ import {
 
 export default function View_testimonial() {
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [searchbox, setsearchbox] = useState(false);
   let [allids, setallids] = useState([]);
   let [searchObj,setSearchObj]=useState(
@@ -36,7 +36,7 @@ export default function View_testimonial() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdate(finlerec.date);
       });
   };
@@ -230,7 +230,7 @@ export default function View_testimonial() {
                     <td className="px-6 py-4 font-medium text-gray-900">{obj.TastimonialName}</td>
                     <td className="px-6 py-4">
                       <img 
-                        src={path + obj.Tastimonialimg} 
+                        src={obj.Tastimonialimg} 
                         alt={obj.TastimonialName} 
                         className="h-10 w-10 rounded-full object-cover border border-gray-200"
                       />

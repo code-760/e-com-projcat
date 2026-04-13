@@ -17,7 +17,7 @@ import {
 
 export default function Viewcategory() {
   let [date, setdate] = useState([]);
-  let [path, setpath] = useState("");
+  // let [path, setpath] = useState("");
   let [searchbox, setsearchbox] = useState(false);
   let [allids, setallids] = useState([]);
   let [searchObj,setSearchObj]=useState(
@@ -35,7 +35,7 @@ export default function Viewcategory() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        setpath(finlerec.path);
+        // setpath(finlerec.path);
         setdate(finlerec.date);
       });
   };
@@ -226,7 +226,7 @@ export default function Viewcategory() {
                     <td className="px-6 py-4 font-medium text-gray-900">{obj.categoryName}</td>
                     <td className="px-6 py-4">
                       <img 
-                        src={path + obj.categoryimg} 
+                        src={ obj.categoryimg} 
                         alt={obj.categoryName} 
                         className="h-10 w-10 rounded-lg object-cover border border-gray-200"
                       />

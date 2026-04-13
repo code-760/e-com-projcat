@@ -8,7 +8,7 @@ const { Tastimonialviwe, Tastimonialcreate, Tastimonialdelete, multidelete, getd
 
 // let uplodes = multer({ dest: "uploads/category" });
 
-let uploads = fileuplode("uploads/Tastimonial");
+let uploads = fileuplode("Tastimonial");
 
 TastimonialRoutes.post(
   "/create",

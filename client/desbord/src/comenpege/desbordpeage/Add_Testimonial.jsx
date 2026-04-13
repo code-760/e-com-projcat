@@ -107,7 +107,7 @@ export default function Add_Testimonial() {
             Message,
             Designation
           });
-          setperview(finlRec.path + finlRec.data.Tastimonialimg);
+          setperview(finlRec.data.Tastimonialimg);
         });
     }
   }, [id]);

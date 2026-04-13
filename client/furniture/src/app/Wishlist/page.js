@@ -18,7 +18,7 @@ export default function Wishlist() {
   const wishlist =
     useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
 
-  const path = wishlist?.path;
+  // const path = wishlist?.path;
   const product = wishlist?.wishlistdetails || [];
 
   const uniqueProducts = product.filter(
@@ -54,7 +54,7 @@ console.log(uniqueProducts,"uniqueProducts");
                   {/* Note: If you want this to be clickable, change this <div> to an <a> tag */}
                   <div href="#">
                     <img
-                      src={path+item.ProductImage}
+                      src={item.ProductImage}
                       alt="Modern Wooden Nesting Tables"
                       className="h-40 w-72 object-cover object-center rounded-t-xl"
                     />

@@ -7,11 +7,11 @@ let categorycreate = async (req, rec) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      insertobj["categoryimg"] = req.file.filename;
+      insertobj["categoryimg"] = req.file.path;
     }
   }
 
@@ -188,11 +188,11 @@ let catUpdate = async (req, res) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      updateObj["categoryimg"] = req.file.filename;
+      updateObj["categoryimg"] = req.file.path;
     }
   }
 

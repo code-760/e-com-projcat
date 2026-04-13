@@ -9,11 +9,11 @@ let Subsubcategorycreate = async (req, rec) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      insertobj["Subsubcategoryimg"] = req.file.filename;
+      insertobj["Subsubcategoryimg"] = req.file.path;
     }
   }
 
@@ -237,11 +237,11 @@ let SubsubcategoryUpdate = async (req, res) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      updateObj["Subsubcategoryimg"] = req.file.filename;
+      updateObj["Subsubcategoryimg"] = req.file.path;
     }
   }
 

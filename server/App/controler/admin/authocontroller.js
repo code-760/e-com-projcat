@@ -257,8 +257,8 @@ const updateadmin = async (req, res) => {
     const adminId = decoded.UserID;
 
     // 3. अगर कोई नई प्रोफाइल इमेज अपलोड हुई है, तो उसे updateData में जोड़ें
-    if (req.file && req.file.filename) {
-      updateData["Adminprofile"] = req.file.filename; // Slidersimg या userprofile की जगह Adminprofile का इस्तेमाल
+    if (req.file && req.file.path) {
+      updateData["Adminprofile"] = req.file.path; // Slidersimg या userprofile की जगह Adminprofile का इस्तेमाल
     }
 
     // 4. डेटाबेस में अपडेट करें (AdminModel या UserModel जो भी आप इस्तेमाल कर रहे हैं)

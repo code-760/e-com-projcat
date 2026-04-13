@@ -7,7 +7,7 @@ const { Subsubcategorycreate, Subsubcategoryviwe, parnetcategroy, Subsubcategory
 
 
 // let uplodes = multer({ dest: "uploads/category" });
-let uploads = fileuplode("uploads/Subsubcategory");
+let uploads = fileuplode("Subsubcategory");
 SubsubcategoryRoutes.post(
   "/create",
   uploads.single("Subsubcategoryimg"),

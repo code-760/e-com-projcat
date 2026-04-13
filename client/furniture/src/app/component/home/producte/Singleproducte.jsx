@@ -9,7 +9,7 @@ import parse from 'html-react-parser';
 import { ToastContainer, toast } from "react-toastify";
 
 
-export default function Singleproducte({ data, path }) {
+export default function Singleproducte({ data}) {
 
   let [qutantity, setquantity] = useState(1);
 
@@ -24,7 +24,7 @@ export default function Singleproducte({ data, path }) {
 
   
 
-  let pathe = path;
+ 
 
   // ⭐ Data ko directly product variable me rakh lo
 

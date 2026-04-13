@@ -11,13 +11,13 @@ let WhyChooseUscreate = async (req, rec) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      // console.log(req.file.filename);
+      // console.log(req.file.path);
 
-      insertobj["WhyChooseUsimg"] = req.file.filename;
+      insertobj["WhyChooseUsimg"] = req.file.path;
     }
   }
 
@@ -195,11 +195,11 @@ let WhyChooseUsUpdate = async (req, res) => {
 
   if (req.file) {
     if (
-      req.file.filename != "" &&
-      req.file.filename != null &&
-      req.file.filename != undefined
+      req.file.path != "" &&
+      req.file.path != null &&
+      req.file.path != undefined
     ) {
-      updateObj["WhyChooseUsimg"] = req.file.filename;
+      updateObj["WhyChooseUsimg"] = req.file.path;
     }
   }
 
