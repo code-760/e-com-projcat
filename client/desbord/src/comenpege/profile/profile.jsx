@@ -94,7 +94,7 @@ export default function Profile() {
       // LocalStorage या Cookies से Token निकालें (अपने हिसाब से बदल लें)
 
       let response = await axios.put(
-        `${apibaseurl}/Admin/admin-update`, // यहाँ अपना सही API Route डालें
+        `${apibaseurl}/admin-update`, // यहाँ अपना सही API Route डालें
         formData,
         {
           headers: {

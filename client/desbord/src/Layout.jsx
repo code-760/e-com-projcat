@@ -22,7 +22,7 @@ export default function Layout() {
 
       axios
         .post(
-          `${apibaseurl}/Admin/user-detail`,
+          `${apibaseurl}/user-detail`,
           {},
           {
             headers: {

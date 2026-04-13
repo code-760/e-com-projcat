@@ -41,6 +41,6 @@ adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/user",userRoutes);
 adminRoutes.use("/oder-viwe",orderRoutes);
-adminRoutes.use("/Admin",AdminRoutes);
+adminRoutes.use("/",AdminRoutes);
 
 module.exports = { adminRoutes };

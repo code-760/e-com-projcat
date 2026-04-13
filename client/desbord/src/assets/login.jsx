@@ -49,7 +49,7 @@ export default function Login() {
         };
 
         axios
-          .post(`${apibaseurl}/Admin/Admin-google-login`, obj)
+          .post(`${apibaseurl}/Admin-google-login`, obj)
           .then((rec) => rec.data)
           .then((finalrec) => {
             if (finalrec. _status) {
