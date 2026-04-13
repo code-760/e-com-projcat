@@ -4,7 +4,7 @@ import { Provider, useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
 import { store } from "./app/redex/store/store";
-import { setUserData, setUserpath } from "./app/redex/slice/userslice";
+
 
 // Ek chota wrapper component jo Redux use kar sake
 function AuthWrapper({ children }) {
@@ -30,7 +30,7 @@ function AuthWrapper({ children }) {
         .then((res) =>res.data)
         .then((finalrec)=>{
           let { UserName, useremail, userprofile } = finalrec.data;
-          let { path } = finalrec
+          
 
 
           let safeUserData = {
@@ -40,14 +40,14 @@ function AuthWrapper({ children }) {
             
           };
 
-          let userpath=path 
+         
          
           
           
 
           // 3. Ab Redux mein sirf yeh safe data bhejo
           dispatch(setUserData(safeUserData));
-           dispatch(setUserpath(userpath));
+           
           
         })
         .catch((err) => {
