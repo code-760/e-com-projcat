@@ -7,8 +7,8 @@ let crypto = require("crypto");
 const { log } = require("console");
 
 var instance = new Razorpay({
-  key_id: "rzp_test_SPPTOU3xnWuDL3",
-  key_secret: "iLWbe77IHZOus0638iJ6A2jS",
+ key_id: process.env.RAZORPAY_KEY_ID,
+key_secret: process.env.RAZORPAY_SECRET
 });
 
 let Odercreate = async (req, res) => {
