@@ -24,6 +24,9 @@ export default function Featured_produte({ produtedata }) {
   let [path] = useState(produtedata.path);
   let [perodutedata] = useState(produtedata.data);
 
+  console.log(path);
+  
+
   let produtefuatures = {
     Featured: 1,
     "New Arrivals": 2,

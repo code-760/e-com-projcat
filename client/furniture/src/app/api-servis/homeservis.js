@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-let basurl = process.env.NEXT_PUBLIC_BASEURL;
+let basurl = process.env.NEXT_PUBLIC_BASEURL|| "https://e-com-projcat.onrender.com/web/";
 
 let produtitems = async () => {
   return axios
@@ -9,6 +9,7 @@ let produtitems = async () => {
       return filedata;
     });
 };
+
 
 let bannerData = () => {
   return axios
