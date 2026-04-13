@@ -39,12 +39,25 @@ App.use('/web',webRoutes)
 
 
 
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-  App.listen(process.env.PORT, () => {
-    console.log("server start", process.env.PORT);
+// 1. Ek variable banao jo pehle Live DB dhoondega, agar nahi mila toh Local DB uthayega
+const DB_URL = process.env.MONGO_URI || `mongodb://127.0.0.1:27017/${process.env.DBNAME}`;
+
+// 2. Mongoose ko connect karo
+mongoose.connect(DB_URL)
+  .then(() => {
+    // 3. Server start karo
+    App.listen(process.env.PORT || 8000, () => {
+      console.log(`🚀 Server start on port: ${process.env.PORT || 8000}`);
+      
+      // Ye line tumhe console mein bata degi ki kaunsa DB connect hua hai
+      if(process.env.MONGO_URI) {
+          console.log("🌐 Database: LIVE (MongoDB Atlas) Connect ho gaya!");
+      } else {
+          console.log("💻 Database: LOCAL (127.0.0.1) Connect ho gaya!");
+      }
+    });
+  })
+  .catch((err) => {
+    console.log("❌ Database Connection Error: ", err);
   });
-})
-
-
 
