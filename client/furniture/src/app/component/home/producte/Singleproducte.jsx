@@ -77,7 +77,7 @@ export default function Singleproducte({ data}) {
           {/* Main Product Image */}
           <div className="border border-gray-100 rounded-sm overflow-hidden bg-[#f9f9f9] shadow-sm">
             <img
-              src={pathe + ProductImage}
+              src={ProductImage}
               alt={ProductName}
               className="w-full h-auto object-cover"
             />
@@ -91,7 +91,7 @@ export default function Singleproducte({ data}) {
                 className="w-24 h-20 border border-gray-200 cursor-pointer hover:border-[#C09578] transition-all"
               >
                 <img
-                  src={pathe + item}
+                  src={item}
                   alt="thumbnail"
                   className="w-full h-full object-cover opacity-80 hover:opacity-100"
                 />

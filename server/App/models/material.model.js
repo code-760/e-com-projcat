@@ -4,8 +4,7 @@ let materialSchema=mongoose.Schema(
     {
         materialName:{
             type:String,
-            match:[/^[a-zA-Z ]{2,10}$/,"plesse file (a-z) (A-Z)"],
-            required :[true,"color name is required"],
+            required :[true,"Material name is required"],
             minlength:2,
             maxlength:70,
             unique:true   
