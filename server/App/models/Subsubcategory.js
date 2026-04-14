@@ -2,7 +2,7 @@ let mongoose = require("mongoose");
 let SubsubcategorySchema = mongoose.Schema({
   SubsubcategoryName: {
     type: String,
-    required: [true, "Subcategory name is required"],
+    required: [true, "Subsubcategory name is required"],
     minlength: 2,
     maxlength:100,
     validate: {

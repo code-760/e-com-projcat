@@ -2,7 +2,7 @@ let mongoose = require("mongoose");
 let ProductSchema = mongoose.Schema({
   ProductName: {
     type: String,
-    required: [true, "Subcategory name is required"],
+    required: [true, "product name is required"],
     minlength: 2,
     maxlength: 100,
     validate: {

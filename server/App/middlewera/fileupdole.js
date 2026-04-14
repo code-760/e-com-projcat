@@ -2,6 +2,7 @@
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
+require('dotenv').config();
 
 // 1. Cloudinary ko apne account ki keys do (Render/Laptop ke .env se lega)
 cloudinary.config({
@@ -10,13 +11,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+
+
+
 // 2. Tumhara Reusable Function
 const fileuplode = (folderName) => {
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
       folder: folderName, // Cloudinary ke andar is naam ka folder ban jayega
-      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'], // Sirf image aane dega
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp','avif'], // Sirf image aane dega
     },
   });
 

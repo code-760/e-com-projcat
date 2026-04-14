@@ -84,7 +84,7 @@ export default function Complitprofile() {
 
     try {
       let response = await axios.put(
-        `${apibaseurl}/admin-update`,
+        `${apibaseurl}/portal/admin-update`,
         formData,
         {
           headers: {

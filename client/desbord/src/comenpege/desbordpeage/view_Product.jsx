@@ -44,7 +44,9 @@ export default function View_Product() {
         })
       .then((rec) => rec.data)
       .then((finlerec) => {
-        // setpath(finlerec.path);
+        // setpath(finlerec.path);\\
+        console.log(finlerec);
+        
         setdate(finlerec.date);
       });
   };
@@ -184,7 +186,7 @@ export default function View_Product() {
                 : "w-0 opacity-0 overflow-hidden"
             }`}
           >
-            <RiSearchLine className="absolute left-3 top-3.5 text-gray-400" onClick={getproduct()} />
+            <RiSearchLine className="absolute left-3 top-3.5 text-gray-400" onClick={getproduct} />
             <input
               type="search"
               name="ProductName"

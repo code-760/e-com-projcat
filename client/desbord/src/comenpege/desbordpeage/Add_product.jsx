@@ -39,10 +39,10 @@ export default function Add_product() {
     SubsubCategory: "",
     color: [],
     material: [],
-    ProductType: null,
-    BestSelling: null,
-    TopRated: null,
-    Upsell: null,
+    ProductType: "",
+    BestSelling: "",
+    TopRated: "",
+    Upsell: "",
     ActualPrice: "",
     SalePrice: "",
     Description: "",
@@ -70,6 +70,10 @@ export default function Add_product() {
 
     let Formdata = new FormData(Form);
     Formdata.append("Description", value);
+
+//    for (let [key, value] of Formdata.entries()) {
+//   console.log(`${key}:`, value);
+// }
 
     if (id) {
       axios
@@ -235,13 +239,13 @@ export default function Add_product() {
     }
   }, [id]);
 
-  useEffect(() => {
-    console.log("Category:", formvalue.SubCategory);
-    console.log(
-      "Options:",
-      subcategroydeta.map((o) => o._id),
-    );
-  }, [formvalue.SubCategory, subcategroydeta]);
+  // useEffect(() => {
+  //   // console.log("Category:", formvalue.SubCategory);
+  //   console.log(
+  //     "Options:",
+  //     subcategroydeta.map((o) => o._id),
+  //   );
+  // }, [formvalue.SubCategory, subcategroydeta]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans">

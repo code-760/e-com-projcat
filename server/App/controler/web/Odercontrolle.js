@@ -13,7 +13,7 @@ key_id : process.env.RAZORPAY_KEYID,
 key_secret: process.env.RAZORPAY_SECRET
 });
 
-console.log( process.env.RAZORPAY_KEYID)
+// console.log( process.env.RAZORPAY_KEYID)
 
 let Odercreate = async (req, res) => {
   try {

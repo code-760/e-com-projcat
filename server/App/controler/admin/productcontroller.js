@@ -10,9 +10,7 @@ const { log } = require("console");
 
 let Productcreate = async (req, rec) => {
   let insertobj = { ...req.body };
-
-  console.log(insertobj);
-
+  
   if (req.files) {
     if (req.files.ProductImage) {
       insertobj.ProductImage = req.files.ProductImage[0].path;
@@ -39,20 +37,11 @@ let Productcreate = async (req, rec) => {
       ProductRec,
     });
   } catch (err) {
-    let error = {};
-
-    for (let key in err.errors) {
-      error[key] = err.errors[key].message;
-    }
-
-    if (err.code == 11000) {
-      error.ProductName = "Product name already exists";
-    }
-
-    rec.send({
-      status: false,
-      messages: "error found",
-      error,
+    console.error("ASLI ERROR:", err); // Terminal check karein
+    return rec.status(500).json({
+        status: false,
+        message: err.message, // Ab yahan text dikhega, [object Object] nahi
+        errorDetail: err
     });
   }
 
