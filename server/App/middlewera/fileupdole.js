@@ -2,7 +2,7 @@
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-require('dotenv').config();
+
 
 // 1. Cloudinary ko apne account ki keys do (Render/Laptop ke .env se lega)
 cloudinary.config({
@@ -10,6 +10,10 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+console.log("Cloudinary Name:", process.env.CLOUDINARY_CLOUD_NAME);
+    console.log("Cloudinary Key:", process.env.CLOUDINARY_API_KEY);
+    console.log("Cloudinary Secret:", process.env.CLOUDINARY_API_SECRET);
 
 
 
