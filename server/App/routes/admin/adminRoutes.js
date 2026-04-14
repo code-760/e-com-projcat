@@ -16,8 +16,8 @@ const { ProductRoutes } = require("./productRoutes");
 const userRoutes = require("./userRoutes");
 
 
-const AdminRoutes = require("./AdminuserRoutes");
 const { orderRoutes } = require("./oderRoutes");
+const { AdminRoutes } = require("./AdminuserRoutes");
 
 
 
@@ -41,6 +41,6 @@ adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/Product",ProductRoutes);
 adminRoutes.use("/user",userRoutes);
 adminRoutes.use("/oder-viwe",orderRoutes);
-adminRoutes.use("/",AdminRoutes);
+adminRoutes.use("/portal",AdminRoutes);
 
 module.exports = { adminRoutes };

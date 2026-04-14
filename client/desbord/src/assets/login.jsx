@@ -39,7 +39,7 @@ export default function Login() {
         const tokan = credential.accessToken;
         const user = result.user;
 
-        console.log(user);
+        // console.log(user);
 
         let obj = {
           Adminemail: user.email,
@@ -48,11 +48,13 @@ export default function Login() {
           Adminprofile: user.photoURL || "N/A", // Agar photoURL available nahi hai toh "N/A" set kar do
         };
 
+        // console.log(obj);
+
         axios
-          .post(`${apibaseurl}/Admin-google-login`, obj)
+          .post(`${apibaseurl}/portal/Admin-google-login`, obj)
           .then((rec) => rec.data)
           .then((finalrec) => {
-            if (finalrec. _status) {
+            if (finalrec._status) {
               console.log(finalrec);
               toast.success("Google login successful!");
               dispatch(settokan({ tokan: finalrec.token}));
@@ -60,6 +62,7 @@ export default function Login() {
             } else {
               toast.error("Google login failed. Please try again.");
             }
+
           });
       })
       .catch((error) => {

@@ -6,10 +6,14 @@ const { cartModel } = require("../../models/cart.model");
 let crypto = require("crypto");
 const { log } = require("console");
 
+
+
 var instance = new Razorpay({
- key_id: process.env.RAZORPAY_KEY_ID,
+key_id : process.env.RAZORPAY_KEYID,
 key_secret: process.env.RAZORPAY_SECRET
 });
+
+console.log( process.env.RAZORPAY_KEYID)
 
 let Odercreate = async (req, res) => {
   try {

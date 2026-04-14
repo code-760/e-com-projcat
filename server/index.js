@@ -1,10 +1,11 @@
+require("dotenv").config()
 const express=require("express");
 const { adminRoutes } = require("./App/routes/admin/adminRoutes");
 let mongoose=require("mongoose")
 let App=express();
 let cous=require("cors");
 const { webRoutes } = require("./App/routes/web/wedRoutes");
-require("dotenv").config()
+
 App.use(cous({
   origin: [
     "https://e-com-projcat.vercel.app",        // Tumhari Furniture site
