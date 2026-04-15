@@ -157,44 +157,51 @@ let loginuser = async (req, res) => {
 };
 
 let googlelogin = async (req, res) => {
-  let { useremail, UserName, userphone, userprofile } = { ...req.body };
+  try {
+    let { useremail, UserName, userphone, userprofile } = { ...req.body };
 
-  let user = await UserModel.findOne({ useremail });
-  if (user) {
-    let tokan = jwt.sign({ UserID: user._id }, process.env.TOKEN);
-    return res.send({
-      _status: "success",
-      message: "login successful",
-      tokan,
-    });
-  } else {
-    // 1. Ek 16-character ka random strong password generate karo
-    let randomPassword = crypto.randomBytes(8).toString("hex");
+    let user = await UserModel.findOne({ useremail });
+    
+    if (user) {
+      // Agar user mil gaya toh seedha token do
+      let tokan = jwt.sign({ UserID: user._id }, process.env.TOKEN);
+      return res.send({
+        _status: "success",
+        message: "login successful",
+        tokan,
+      });
+    } else {
+      // Naya user banane ka logic
+      let randomPassword = crypto.randomBytes(8).toString("hex");
+      const salt = await bcrypt.genSalt(10);
+      let encryptedPassword = await bcrypt.hash(randomPassword, salt);
 
-    // 2. Us random password ko bcrypt se encrypt (hash) karo
-    const salt = await bcrypt.genSalt(10);
-    let encryptedPassword = await bcrypt.hash(randomPassword, salt);
+      let userobj = {
+        UserName,
+        useremail,
+        userphone,
+        userprofile,
+        Password: encryptedPassword,
+      };
 
-    let userobj = {
-      UserName,
-      useremail,
-      userphone,
-      userprofile,
-      Password: encryptedPassword,
-    };
-
-    let user = await new UserModel(userobj);
-    let userres = await user.save();
-    let tokan = jwt.sign({ UserID: userres._id }, process.env.TOKEN);
-    res.send({
-      _status: "success",
-      message: "user created and login successful",
-      tokan,
-    });
+      // Yahan variable ka naam badal kar 'newUser' kar diya taaki conflict na ho
+      let newUser = new UserModel(userobj); 
+      let userres = await newUser.save();
+      
+      let tokan = jwt.sign({ UserID: userres._id }, process.env.TOKEN);
+      
+      return res.send({
+        _status: "success",
+        message: "user created and login successful",
+        tokan,
+      });
+    }
+  } catch (error) {
+    console.log("Google Login Error:", error);
+    res.status(500).send({ _status: "error", message: error.message });
   }
-
-  // Implementation for Google login
 };
+
 
 let changepassword = async (req, res) => {
   let { oldpassword, newpassword, ConfirmPassword } = req.body;

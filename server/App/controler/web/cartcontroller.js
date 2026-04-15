@@ -1,27 +1,41 @@
 let jwt = require("jsonwebtoken");
 const { cartModel } = require("../../models/cart.model");
+
 let Addcart = async (req, res) => {
-  let token = req.headers.authorization.split(" ")[1];
-  let decoded = jwt.verify(token, process.env.TOKEN);
-  let userid = decoded.UserID;
+  try {
+    let token = req.headers.authorization.split(" ")[1];
+    let decoded = jwt.verify(token, process.env.TOKEN);
+    let userid = decoded.UserID;
 
-  let obj = { ...req.body, user: userid };
+    // Aapne obj mein 'user' likha tha, maine use 'userId' kiya hai 
+    // kyunki aapke Cart Schema mein 'userId' (small i) hai.
+    let obj = { ...req.body };
 
-  console.log(`Received cart data:`, obj);
+    let data = await cartModel.findOneAndUpdate(
+      { 
+        productId: obj.productId, 
+        userId: userid  // Ye line zaroori hai taaki sahi user ka cart update ho
+      }, 
+      {
+        $inc: { quantity: Number(obj.productQuantity) || 1 }, 
+        $set: { 
+          productName: obj.productName, 
+          price: obj.price, 
+          productImg: obj.productImg, 
+          userId: userid 
+        },
+      },
+      { upsert: true, new: true } 
+    );
 
- let data = await cartModel.findOneAndUpdate(
-    { productId: obj.productId }, // 1. Filter (Dhoondo)
-    {
-      $inc: { quantity: Number(obj.productQuantity) }, // 2. Update ($inc se plus hoga)
-      $set: { productName: obj.productName, price: obj.price, productImg: obj.productImg, userId: userid }, // 3. Set (Baaki fields bhi update kar do)
-    },
-    { upsert: true }, // 4. Option (Nahi mila toh insert kar do)
-  );
-  res.send({
-    _status: "success",
-    message: "Product added to cart successfully",
-    data: data
-  });
+    res.send({
+      _status: "success",
+      message: "Product added to cart successfully",
+      data: data
+    });
+  } catch (error) {
+    res.status(500).send({ _status: "error", error: error.message });
+  }
 };
 
 let viweCart = async (req, res) => {
