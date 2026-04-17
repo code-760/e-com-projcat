@@ -1,116 +1,61 @@
+// wishlistSlice.js
 import axios from "axios";
 import Cookies from "js-cookie";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-let basurl = process.env.NEXT_PUBLIC_BASEURL;
+const basurl = process.env.NEXT_PUBLIC_BASEURL;
 
-// ==========================================
-// 1. API: FETCH WISHLIST
-// ==========================================
-export let fetchwishlist = createAsyncThunk(
-  "wishlist/fetchwishlist",
-  async () => {
-    let tokan = Cookies.get("tokan") || null;
-    let wishlistdata = await axios.post(
-      `${basurl}wishlist/viwe-Wishlist`,
-      {},
-      { headers: { Authorization: `Bearer ${tokan}` } },
-    );
-
-    let dataditals = await wishlistdata.data;
-    // let path = dataditals.path;
-    let wishlistdetails = dataditals.data;
-
-    return { wishlistdetails};
-  },
-);
-
-// ==========================================
-// 2. API: ADD TO WISHLIST
-// ==========================================
-export let aadwishlist = createAsyncThunk("wishlist/add", async (productId) => {
-  let tokan = Cookies.get("tokan") || null;
-  await axios.post(
-    `${basurl}wishlist/add-to-wishlist`,
-    { productId: productId },
-    { headers: { Authorization: `Bearer ${tokan}` } },
-  );
-  return productId;
+export const fetchwishlist = createAsyncThunk("wishlist/fetch", async () => {
+    const tokan = Cookies.get("tokan");
+    const res = await axios.post(`${basurl}wishlist/viwe-Wishlist`, {}, {
+        headers: { Authorization: `Bearer ${tokan}` },
+    });
+    return { wishlistdetails: res.data.data || [] };
 });
 
-// ==========================================
-// 3. API: REMOVE FROM WISHLIST
-// (Backend API ke hisaab se URL check kar lena)
-// ==========================================
-export let removewishlist = createAsyncThunk("wishlist/remove", async (productId) => {
-  let tokan = Cookies.get("tokan") || null;
-  
-  // 1. axios.delete ka use karein (standard practice)
-  // 2. productId ko object ki jagah URL ke end me bhejein (Kyunki backend me req.params hai)
-  await axios.delete( 
-    `${basurl}wishlist/remove/${productId}`,
-    { headers: { Authorization: `Bearer ${tokan}` } }
-  );
-  
-  return productId;
+export const aadwishlist = createAsyncThunk("wishlist/add", async (productId) => {
+    const tokan = Cookies.get("tokan");
+    const res = await axios.post(`${basurl}wishlist/add-to-wishlist`, { productId }, {
+        headers: { Authorization: `Bearer ${tokan}` },
+    });
+    return res.data.updatedData; // Poora updated product return karwao backend se
 });
 
-// ==========================================
-// REDUX SLICE (The Brain)
-// ==========================================
-export let wishlistslice = createSlice({
-  name: "wishlist",
-  initialState: {
-    wishlist: { wishlistdetails: [] },
-  },
-  reducers: {
-    // UI me turant DIL LAL (Red) karne ke liye
-    addItemToWishlistLocal: (state, action) => {
-      if (state.wishlist && state.wishlist.wishlistdetails) {
-        // Double check taaki array me duplicate na jaye
-        const isAlreadyThere = state.wishlist.wishlistdetails.some(
-          (item) => item._id === action.payload._id,
-        );
-        if (!isAlreadyThere) {
-          state.wishlist.wishlistdetails.push(action.payload);
-        }
-      }
+export const removewishlist = createAsyncThunk("wishlist/remove", async (productId) => {
+    const tokan = Cookies.get("tokan");
+    await axios.delete(`${basurl}wishlist/remove/${productId}`, {
+        headers: { Authorization: `Bearer ${tokan}` },
+    });
+    return productId;
+});
+
+export const wishlistslice = createSlice({
+    name: "wishlist",
+    initialState: { wishlist: { wishlistdetails: [] }, status: "idle" },
+    reducers: {
+        // UI Sync ke liye (Optimistic updates)
+        addItemToWishlistLocal: (state, action) => {
+            const exists = state.wishlist.wishlistdetails.some(i => i._id === action.payload._id);
+            if (!exists) state.wishlist.wishlistdetails.push(action.payload);
+        },
+        removeItemFromwishlist: (state, action) => {
+            state.wishlist.wishlistdetails = state.wishlist.wishlistdetails.filter(i => i._id !== action.payload);
+        },
     },
-
-    // UI me turant DIL NORMAL (Grey) karne ke liye
-    removeItemFromwishlist: (state, action) => {
-      if (state.wishlist && state.wishlist.wishlistdetails) {
-        state.wishlist.wishlistdetails = state.wishlist.wishlistdetails.filter(
-          (item) => item._id !== action.payload,
-        );
-      }
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchwishlist.fulfilled, (state, action) => {
+                state.wishlist = action.payload;
+            })
+            // API successful hone par state sync karo
+            .addCase(aadwishlist.fulfilled, (state, action) => {
+                // Agar local add nahi hua hai toh yahan ensure karo
+            })
+            .addCase(removewishlist.fulfilled, (state, action) => {
+                state.wishlist.wishlistdetails = state.wishlist.wishlistdetails.filter(i => i._id !== action.payload);
+            });
     },
-  },
-  extraReducers: (builder) => {
-    // A) SUCCESS: Jab data server se aaye
-    builder.addCase(fetchwishlist.fulfilled, (state, action) => {
-      state.wishlist = action.payload;
-    });
-
-    // B) ERROR: Agar Add API fail ho jaye
-    builder.addCase(aadwishlist.rejected, (state, action) => {
-      console.log("Add API fail ho gayi! Dil wapas normal kar rahe hain...");
-      if (state.wishlist && state.wishlist.wishlistdetails) {
-        // action.meta.arg me productId hota hai
-        state.wishlist.wishlistdetails = state.wishlist.wishlistdetails.filter(
-          (item) => item._id !== action.meta.arg,
-        );
-      }
-    });
-
-    // C) ERROR: Agar Remove API fail ho jaye
-    builder.addCase(removewishlist.rejected, (state, action) => {
-      console.log("Remove API fail ho gayi!");
-      // Is case me aap chahein toh error dikha sakte hain ya automatically `dispatch(fetchwishlist())` call karwa sakte hain UI me
-    });
-  },
 });
 
-export const { removeItemFromwishlist, addItemToWishlistLocal } =
-  wishlistslice.actions;
+export const { addItemToWishlistLocal, removeItemFromwishlist } = wishlistslice.actions;
 export default wishlistslice.reducer;

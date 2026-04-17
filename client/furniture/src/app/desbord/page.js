@@ -1,6 +1,12 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
+import {
+  BiMapPin,
+  BiPackage,
+  BiUserCircle,
+  BiCreditCard,
+} from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,10 +15,9 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
 
-import { Suspense } from 'react';
-import Dashboard from "../desbordpages/Dashboard";
+import { Suspense } from "react";
 
- function DashboardContent() {
+function DashboardContent() {
   let [oldPassword, setOldPassword] = useState("");
   let [newPassword, setNewPassword] = useState("");
   let [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -132,8 +137,8 @@ import Dashboard from "../desbordpages/Dashboard";
 
   const updateShippingInfo = (e) => {
     e.preventDefault(); // Form reload hone se rokne ke liye
-
     // Check karein ki shippingAddress khali to nahi hai
+
     if (!user.shippingAddress.address || !user.shippingAddress.shippingPhone) {
       toast.error("Please fill all shipping fields");
       return;
@@ -195,117 +200,265 @@ import Dashboard from "../desbordpages/Dashboard";
   }, [tabQuery]);
 
   return (
-    <div className="bg-white text-gray-800">
+    <div className="bg-[#F9F9F9] min-h-screen text-gray-800 font-sans">
       {/* Header Section */}
-      <div className="border-b border-[#CCC] py-7">
-        <div className="text-center flex flex-col items-center">
-          <h1 className="p-4 text-4xl font-semibold font-[cha]">
+      <div className="bg-white border-b border-gray-200 py-10">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-black mb-3 font-[cha]">
             My Dashboard
           </h1>
-          <div className="flex items-center gap-1 text-sm">
-            <Link href={"/"} className="hover:text-[#c09578]">
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500 uppercase tracking-widest">
+            <Link href={"/"} className="hover:text-[#c09578] transition-colors">
               Home
             </Link>
-            <MdOutlineNavigateNext />
-            <p>My Dashboard</p>
+            <MdOutlineNavigateNext className="text-lg" />
+            <span className="text-black font-medium">My Dashboard</span>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto border-b border-[#ccc] py-7">
-        {/* Layout: Sidebar + Content */}
-        <div className="grid grid-cols-1 md:grid-cols-[260px_auto] gap-[50px] items-start">
-          {/* --- YOUR ORIGINAL SIDEBAR STYLE --- */}
-          <div className="flex flex-col gap-2 mt-6">
-            {[
-              { label: "My Dasboard", value: "My Dasboard" },
-              { label: "Orders", value: "Orders" },
-              { label: "Addresses", value: "Addresses" },
-              { label: "My Profile", value: "My Profile" },
-              { label: "Change Password", value: "Change Password" },
-            ].map((tab) => (
-              <div key={tab.value}>
-                <h2
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* --- SIDEBAR --- */}
+          <div className="w-full lg:w-[300px] sticky top-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              {[
+                { label: "My Dashboard", value: "My Dasboard" },
+                { label: "Orders", value: "Orders" },
+                { label: "Addresses", value: "Addresses" },
+                { label: "My Profile", value: "My Profile" },
+                { label: "Change Password", value: "Change Password" },
+              ].map((tab) => (
+                <button
+                  key={tab.value}
                   onClick={() => setdesboerdTab(tab.value)}
-                  className={`border w-full md:w-[250px] font-bold duration-200 cursor-pointer text-white py-2 text-center 
-                                    ${desboerdTab === tab.value ? "bg-[#C09578]" : "bg-black hover:bg-[#C09578]"}`}
+                  className={`w-full text-left px-6 py-4 font-semibold transition-all duration-300 border-b border-gray-50 last:border-0
+                ${
+                  desboerdTab === tab.value
+                    ? "bg-[#C09578] text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-50 hover:text-[#C09578]"
+                }`}
                 >
                   {tab.label}
-                </h2>
-              </div>
-            ))}
-
-            {/* Log Out Button (Same Style) */}
-            <div>
-              <h2
+                </button>
+              ))}
+              <button
                 onClick={handleLogout}
-                className="border w-full md:w-[250px] bg-black font-bold duration-200 cursor-pointer hover:bg-red-600 text-white py-2 text-center"
+                className="w-full text-left px-6 py-4 font-semibold text-red-500 hover:bg-red-50 transition-colors"
               >
                 Log Out
-              </h2>
+              </button>
             </div>
           </div>
 
-          {/* --- CONTENT AREA (Improved UI) --- */}
-          <div className="w-full">
+          {/* --- CONTENT AREA --- */}
+          <div className="flex-1 w-full bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             {/* Dashboard Tab */}
             {desboerdTab === "My Dasboard" && (
-              <Dashboard />
-              // <div className="animate-fadeIn">
-              //   <h1 className="p-4 text-4xl font-semibold font-[cha]">
-              //     My Dashboard
-              //   </h1>
-              //   <p className="mt-2 text-gray-600">
-              //     From your account dashboard. you can easily check & view your
-              //     recent orders, manage your shipping and billing addresses and
-              //     Edit your password and account details.
-              //   </p>
-              // </div>
+              <div className="min-h-screen bg-[#FDFCFB] p-4 md:p-10 text-slate-800 font-sans">
+                <div className="max-w-6xl mx-auto">
+                  {/* Header Section */}
+                  <header className="mb-12">
+                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 tracking-tight">
+                      Account <span className="text-[#C09578]">Overview</span>
+                    </h1>
+                    <div className="h-1 w-20 bg-[#C09578] mt-4 rounded-full"></div>
+                  </header>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* 1. Welcome Card */}
+                    <div className="lg:col-span-8 bg-white border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-8 flex flex-col md:flex-row items-center gap-8">
+                      <div className="relative">
+                        <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#F3EEEA] shadow-inner bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-400">
+                          H
+                        </div>
+                        <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+                      </div>
+
+                      <div className="text-center md:text-left flex-1">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                          Welcome back, Himanshu!
+                        </h2>
+                        <p className="text-slate-500 text-sm md:text-base leading-relaxed max-w-md">
+                          Managing your sanctuary is easy. Track your furniture
+                          orders, update delivery locations, and secure your
+                          account from here.
+                        </p>
+                      </div>
+
+                      <button className="bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-[#C09578] transition-all duration-300 shadow-lg">
+                        Edit Account
+                      </button>
+                    </div>
+
+                    {/* 2. Stats Grid */}
+                    <div className="lg:col-span-4 grid grid-cols-2 lg:grid-cols-1 gap-4">
+                      <div className="bg-[#FAF9F6] p-6 rounded-3xl border border-slate-100 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                          <BiPackage className="text-2xl text-[#C09578]" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                            Orders
+                          </p>
+                          <p className="text-xl font-bold">03 Active</p>
+                        </div>
+                      </div>
+                      <div className="bg-[#FAF9F6] p-6 rounded-3xl border border-slate-100 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                          <BiCreditCard className="text-2xl text-[#C09578]" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                            Wallet
+                          </p>
+                          <p className="text-xl font-bold">₹2,450</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Recent Orders (Fake List) */}
+                    <div className="lg:col-span-7 bg-white p-8 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                      <div className="flex justify-between items-center mb-8">
+                        <h3 className="font-bold text-xl flex items-center gap-2">
+                          <BiPackage className="text-[#C09578]" /> Recent Orders
+                        </h3>
+                        <button className="text-sm font-semibold text-[#C09578] hover:underline">
+                          View All
+                        </button>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Order Row 1 */}
+                        <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <div>
+                              <p className="font-bold text-slate-900">
+                                #ORD-1024
+                              </p>
+                              <p className="text-xs text-slate-400">
+                                Oct 12, 2023
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-slate-900">₹14,500</p>
+                            <p className="text-[10px] font-bold uppercase text-blue-600">
+                              In Transit
+                            </p>
+                          </div>
+                        </div>
+                        {/* Order Row 2 */}
+                        <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            <div>
+                              <p className="font-bold text-slate-900">
+                                #ORD-1021
+                              </p>
+                              <p className="text-xs text-slate-400">
+                                Sep 28, 2023
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-slate-900">₹8,200</p>
+                            <p className="text-[10px] font-bold uppercase text-green-600">
+                              Delivered
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Address Section (Fake Info) */}
+                    <div className="lg:col-span-5 space-y-6">
+                      <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full">
+                        <h3 className="font-bold text-xl mb-8 flex items-center gap-2">
+                          <BiMapPin className="text-[#C09578]" /> Delivery Hub
+                        </h3>
+
+                        <div className="space-y-8">
+                          <div className="flex gap-4">
+                            <div className="w-10 h-10 bg-[#FDF8F3] rounded-xl flex items-center justify-center shrink-0">
+                              <BiMapPin className="text-xl text-[#C09578]" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900 text-sm italic">
+                                Shipping Address
+                              </p>
+                              <p className="text-sm text-slate-500 leading-relaxed mt-1">
+                                123 Streetrest, <br />
+                                Horizon, FL 36207
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-4 border-t pt-6">
+                            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
+                              <BiUserCircle className="text-xl text-slate-400" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900 text-sm italic">
+                                Billing Profile
+                              </p>
+                              <p className="text-sm text-slate-500 leading-relaxed mt-1">
+                                Same as shipping <br />
+                                imyummame@gmail.com
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button className="w-full mt-10 border-2 border-slate-100 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50">
+                          Manage All Locations
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Orders Tab */}
             {desboerdTab === "Orders" && (
-              <div className="mt-6">
-                <div className="overflow-x-auto rounded-lg border border-[#e6e6e6]">
-                  <table className="min-w-full divide-y text-sm">
-                    <thead className="bg-gray-50">
+              <div className="animate-fadeIn">
+                <h3 className="text-2xl font-bold mb-6 font-[cha]">
+                  Order History
+                </h3>
+                <div className="overflow-x-auto rounded-xl border border-gray-100">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
                       <tr>
-                        <th className="px-4 py-3 text-left font-medium text-gray-700">
-                          Order
-                        </th>
-                        <th className="px-4 py-3 text-left font-medium text-gray-700">
-                          Date
-                        </th>
-                        <th className="px-4 py-3 text-left font-medium text-gray-700">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 text-left font-medium text-gray-700">
-                          Total
-                        </th>
-                        <th className="px-4 py-3 text-left font-medium text-gray-700">
+                        <th className="px-6 py-4 font-bold">Order</th>
+                        <th className="px-6 py-4 font-bold">Date</th>
+                        <th className="px-6 py-4 font-bold">Status</th>
+                        <th className="px-6 py-4 font-bold">Total</th>
+                        <th className="px-6 py-4 font-bold text-right">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y">
-                      <tr>
-                        <td className="px-4 py-3 font-medium text-gray-800">
+                    <tbody className="divide-y divide-gray-100">
+                      <tr className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 font-bold text-black">
                           #1001
                         </td>
-                        <td className="px-4 py-3 text-gray-600">2025-11-01</td>
-                        <td className="px-4 py-3">
-                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+                        <td className="px-6 py-4 text-gray-500">2025-11-01</td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700 uppercase">
                             Completed
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-800">$120.00</td>
-                        <td className="px-4 py-3">
+                        <td className="px-6 py-4 font-medium">$120.00</td>
+                        <td className="px-6 py-4 text-right">
                           <Link
                             href="/orders/1001"
-                            className="mr-3 text-[#c09578] hover:underline"
+                            className="text-[#c09578] font-bold hover:underline"
                           >
-                            View
+                            View Details
                           </Link>
                         </td>
                       </tr>
@@ -317,284 +470,211 @@ import Dashboard from "../desbordpages/Dashboard";
 
             {/* Change Password Tab */}
             {desboerdTab === "Change Password" && (
-              <div className="mt-8 p-6 rounded-lg border border-gray-200 shadow-sm max-w-xl">
-                <h3 className="text-xl font-semibold mb-4 font-[cha]">
-                  Change Password
+              <div className="max-w-lg animate-fadeIn">
+                <h3 className="text-2xl font-bold mb-6 font-[cha]">
+                  Security Settings
                 </h3>
-                <form onSubmit={changePassword} className="space-y-4">
+                <form onSubmit={changePassword} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                       Old Password
                     </label>
                     <input
                       type="password"
-                      name="oldPassword"
                       value={oldPassword}
                       onChange={(e) => setOldPassword(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
+                      className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-[#C09578] focus:border-transparent outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                       New Password
                     </label>
                     <input
                       type="password"
-                      name="newPassword"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
+                      className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-[#C09578] focus:border-transparent outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
                       Confirm New Password
                     </label>
                     <input
                       type="password"
-                      name="confirmNewPassword"
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 border outline-none p-2 rounded-[10px] focus:border-[#C09578]"
+                      className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-[#C09578] focus:border-transparent outline-none transition-all"
                     />
                   </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      className="w-[200px] bg-[#cb9b7a] text-white py-2 px-4 rounded-md hover:bg-[#b99781]"
-                    >
-                      Update Password
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-black text-white py-4 rounded-lg font-bold hover:bg-[#c09578] transition-all shadow-lg active:scale-[0.98]"
+                  >
+                    Update Password
+                  </button>
                 </form>
               </div>
             )}
 
             {/* Addresses Tab */}
             {desboerdTab === "Addresses" && (
-              <div>
-                <p className="mb-6 text-gray-600">
-                  The following addresses will be used on the checkout page by
-                  default.
+              <div className="animate-fadeIn">
+                <p className="text-gray-500 mb-8 italic">
+                  Manage your billing and shipping information for a faster
+                  checkout.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
                   {/* Billing */}
-                  <div className="rounded-lg p-6 bg-white border border-gray-200 shadow-sm">
-                    <h3 className="text-2xl font-[cha] font-medium mb-4 border-b pb-2">
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-bold border-b pb-3 font-[cha]">
                       Billing Address
                     </h3>
                     <form className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
                           Billing Name*
                         </label>
                         <input
                           type="text"
                           onChange={gatdata}
                           value={user.UserName}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="Full Name"
+                          className="w-full border-b border-gray-200 py-2 focus:border-[#c09578] outline-none transition-all"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
                           Billing Email*
                         </label>
                         <input
                           type="email"
                           value={user.useremail}
                           readOnly
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="Email Address"
+                          className="w-full border-b border-gray-200 py-2 bg-gray-50 text-gray-400 outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Billing Mobile Number*
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                          Mobile Number*
                         </label>
-
                         <PhoneInput
                           country={"in"}
-                          enableSearch={true}
                           value={user.userphone}
                           onChange={handlePhoneChange}
-                          inputStyle={{
-                            width: "100%",
-                            height: "50px",
-                            borderRadius: "0.5rem",
-                            border: "1px solid #e5e7eb",
-                            fontSize: "16px",
-                            paddingLeft: "48px",
-                          }}
-                          buttonStyle={{
-                            borderRadius: "0.5rem 0 0 0.5rem",
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "white",
-                          }}
-                          containerClass="w-full"
+                          containerClass="phone-input-custom"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Billing Address*
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                          Street Address*
                         </label>
                         <input
                           type="text"
                           value={user.useraddress}
                           onChange={gatdata}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="House No, Street, Area"
+                          className="w-full border-b border-gray-200 py-2 focus:border-[#c09578] outline-none"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Country*
-                          </label>
-                          <input
-                            type="text"
-                            value={user.country || ""}
-                            onChange={gatdata}
-                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            State*
-                          </label>
-                          <input
-                            value={user.state || ""}
-                            onChange={gatdata}
-                            type="text"
-                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          City*
-                        </label>
                         <input
                           type="text"
-                          value={user.city || ""}
+                          placeholder="Country"
+                          value={user.country || ""}
                           onChange={gatdata}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          className="border-b border-gray-200 py-2 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="State"
+                          value={user.state || ""}
+                          onChange={gatdata}
+                          className="border-b border-gray-200 py-2 outline-none"
                         />
                       </div>
-                      <div className="flex justify-end pt-2">
-                        <button
-                          type="submit"
-                          className="bg-[#c09578] text-white py-2 px-8 rounded-3xl hover:bg-[#a88264] transition"
-                        >
-                          Update
-                        </button>
-                      </div>
+                      <button className="bg-[#c09578] text-white px-8 py-2 rounded-full text-sm font-bold hover:shadow-md transition-all">
+                        Update Billing
+                      </button>
                     </form>
                   </div>
 
                   {/* Shipping */}
-                  <div className="rounded-lg p-6 bg-white border border-gray-200 shadow-sm">
-                    <h3 className="text-2xl font-[cha] font-medium mb-4 border-b pb-2">
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-bold border-b pb-3 font-[cha]">
                       Shipping Address
                     </h3>
-
                     <form onSubmit={updateShippingInfo} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
                           Shipping Name*
                         </label>
                         <input
                           type="text"
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="Full Name"
+                          name="shippingName"
                           value={user.shippingAddress?.shippingName || ""}
                           onChange={handleShippingChange}
+                          className="w-full border-b border-gray-200 py-2 focus:border-[#c09578] outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
                           Shipping Email*
                         </label>
                         <input
                           type="email"
                           value={user.shippingAddress?.shippingEmail || ""}
                           readOnly
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="Email Address"
+                          className="w-full border-b border-gray-200 py-2 bg-gray-50 text-gray-400 outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Shipping Mobile Number*
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                          Shipping Phone*
                         </label>
                         <input
                           type="text"
                           name="shippingPhone"
                           value={user.shippingAddress?.shippingPhone || ""}
                           onChange={handleShippingChange}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="Phone Number"
+                          className="w-full border-b border-gray-200 py-2 focus:border-[#c09578] outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Shipping Address*
+                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">
+                          Address*
                         </label>
                         <input
                           type="text"
                           name="address"
                           value={user.shippingAddress?.address || ""}
                           onChange={handleShippingChange}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          placeholder="House No, Street, Area"
+                          className="w-full border-b border-gray-200 py-2 focus:border-[#c09578] outline-none"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            Country*
-                          </label>
-                          <input
-                            type="text"
-                            name="country"
-                            value={user.shippingAddress?.country || ""}
-                            onChange={handleShippingChange}
-                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">
-                            State*
-                          </label>
-                          <input
-                            type="text"
-                            name="state"
-                            value={user.shippingAddress?.state || ""}
-                            onChange={handleShippingChange}
-                            className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          City*
-                        </label>
                         <input
                           type="text"
-                          name="city"
-                          value={user.shippingAddress?.city || ""}
+                          name="country"
+                          placeholder="Country"
+                          value={user.shippingAddress?.country || ""}
                           onChange={handleShippingChange}
-                          className="mt-1 block w-full py-2 px-3 border border-gray-300 shadow-sm focus:border-[#c09578] outline-none"
+                          className="border-b border-gray-200 py-2 outline-none"
+                        />
+                        <input
+                          type="text"
+                          name="state"
+                          placeholder="State"
+                          value={user.shippingAddress?.state || ""}
+                          onChange={handleShippingChange}
+                          className="border-b border-gray-200 py-2 outline-none"
                         />
                       </div>
-                      <div className="flex justify-end pt-2">
-                        <button
-                          type="submit"
-                          className="bg-[#c09578] text-white py-2 px-8 rounded-3xl hover:bg-[#a88264] transition"
-                        >
-                          Update
-                        </button>
-                      </div>
+                      <button
+                        type="submit"
+                        className="bg-[#c09578] text-white px-8 py-2 rounded-full text-sm font-bold hover:shadow-md transition-all"
+                      >
+                        Update Shipping
+                      </button>
                     </form>
                   </div>
                 </div>
@@ -602,167 +682,128 @@ import Dashboard from "../desbordpages/Dashboard";
             )}
 
             {/* My Profile Tab */}
-            {/* My Profile Tab */}
             {desboerdTab === "My Profile" && (
-              <div className="flex justify-center">
-                <div className="w-full max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-lg p-8">
-                  <h1 className="text-2xl font-semibold mb-6 text-gray-800 font-[cha] border-b pb-2">
-                    Update Profile
-                  </h1>
-                  <form onSubmit={userprofileupdate} className="space-y-4">
-                    {/* ✅ PROFILE PHOTO SECTION START */}
-                    <div className="flex flex-col items-center mb-6">
-                      <div className="relative group">
-                        {/* Photo Circle */}
-                        <div className="w-32 h-32 rounded-full border-4 border-[#c09578] overflow-hidden flex items-center justify-center bg-gray-100">
-                          {preview ? (
-                            <img
-                              src={preview}
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            // Agar photo nahi hai to ye default icon dikhega
-                            <span className="text-gray-400 text-5xl font-bold">
-                              {user.UserName
-                                ? user.UserName.charAt(0).toUpperCase()
-                                : "U"}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Camera Icon (Upload Button) */}
-                        <label
-                          htmlFor="profile-upload"
-                          className="absolute bottom-1 right-1 bg-[#c09578] p-2 rounded-full text-white cursor-pointer hover:bg-[#a88264] shadow-md transition-all"
-                        >
-                          <MdCameraAlt size={20} />
-                        </label>
-
-                        {/* Hidden Input for File Upload */}
-                        <input
-                          id="profile-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          name="userprofile"
-                          onChange={handleImageChange}
-                        />
+              <div className="max-w-3xl mx-auto animate-fadeIn">
+                <h3 className="text-2xl font-bold mb-8 text-center font-[cha]">
+                  Edit Profile
+                </h3>
+                <form onSubmit={userprofileupdate} className="space-y-8">
+                  <div className="flex flex-col items-center">
+                    <div className="relative group">
+                      <div className="w-32 h-32 rounded-full border-4 border-[#c09578] overflow-hidden shadow-xl bg-gray-50 flex items-center justify-center">
+                        {preview ? (
+                          <img
+                            src={preview}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-[#c09578] text-4xl font-bold uppercase">
+                            {user.UserName ? user.UserName.charAt(0) : "U"}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Click icon to upload
-                      </p>
-                    </div>
-                    {/* ✅ PROFILE PHOTO SECTION END */}
-
-                    {/* Gender Selection */}
-                    <div className="flex items-center gap-4 mb-4 justify-center">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="userGender"
-                          checked={user.userGender === "male"}
-                          value="male"
-                          onChange={gatdata}
-                          className="accent-[#c09578]"
-                        />{" "}
-                        Mr.
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="userGender"
-                          checked={user.userGender === "female"}
-                          value="female"
-                          onChange={gatdata}
-                          className="accent-[#c09578]"
-                        />{" "}
-                        Mrs.
-                      </label>
-                    </div>
-
-                    {/* Name & Email */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Name*
-                        </label>
-                        <input
-                          type="text"
-                          name="UserName"
-                          onChange={gatdata}
-                          value={user.UserName}
-                          placeholder="Your name"
-                          className="w-full rounded-lg border border-gray-200 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#C09578]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Email*
-                        </label>
-                        <input
-                          type="email"
-                          name="useremail"
-                          value={user.useremail}
-                          readOnly
-                          className="w-full rounded-lg border border-gray-200 px-4 py-3 bg-gray-50 text-gray-500"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Mobile & Address */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Mobile Number*
-                        </label>
-                        <PhoneInput
-                          country={"in"}
-                          enableSearch={true}
-                          value={user.userphone}
-                          onChange={handlePhoneChange}
-                          inputStyle={{
-                            width: "100%",
-                            height: "50px",
-                            borderRadius: "0.5rem",
-                            border: "1px solid #e5e7eb",
-                            fontSize: "16px",
-                            paddingLeft: "48px",
-                          }}
-                          buttonStyle={{
-                            borderRadius: "0.5rem 0 0 0.5rem",
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "white",
-                          }}
-                          containerClass="w-full"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Address*
-                        </label>
-                        <input
-                          type="text"
-                          name="useraddress"
-                          value={user.useraddress}
-                          onChange={gatdata}
-                          placeholder="Address"
-                          className="w-full rounded-lg border border-gray-200 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#C09578]"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Update Button */}
-                    <div className="w-full flex justify-end mt-6">
-                      <button
-                        type="submit"
-                        className="rounded-full w-[150px] bg-[#c09578] text-white py-3 font-medium hover:bg-[#a88264] shadow-md transition-all active:scale-95"
+                      <label
+                        htmlFor="profile-upload"
+                        className="absolute bottom-1 right-1 bg-black text-white p-2 rounded-full cursor-pointer hover:bg-[#c09578] transition-all shadow-lg"
                       >
-                        Update
-                      </button>
+                        <MdCameraAlt size={18} />
+                      </label>
+                      <input
+                        id="profile-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        name="userprofile"
+                        onChange={handleImageChange}
+                      />
                     </div>
-                  </form>
-                </div>
+                  </div>
+
+                  <div className="flex justify-center gap-8">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold">
+                      <input
+                        type="radio"
+                        name="userGender"
+                        checked={user.userGender === "male"}
+                        value="male"
+                        onChange={gatdata}
+                        className="w-4 h-4 accent-[#c09578]"
+                      />
+                      <span>Mr.</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer font-bold">
+                      <input
+                        type="radio"
+                        name="userGender"
+                        checked={user.userGender === "female"}
+                        value="female"
+                        onChange={gatdata}
+                        className="w-4 h-4 accent-[#c09578]"
+                      />
+                      <span>Mrs.</span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Full Name*
+                      </label>
+                      <input
+                        type="text"
+                        name="UserName"
+                        onChange={gatdata}
+                        value={user.UserName}
+                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-1 focus:ring-[#C09578] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Email Address*
+                      </label>
+                      <input
+                        type="email"
+                        value={user.useremail}
+                        readOnly
+                        className="w-full border border-gray-200 p-3 rounded-lg bg-gray-50 text-gray-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Mobile Number*
+                      </label>
+                      <PhoneInput
+                        country={"in"}
+                        value={user.userphone}
+                        onChange={handlePhoneChange}
+                        containerClass="w-full"
+                        inputClass="!w-full !h-[50px] !rounded-lg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                        Location*
+                      </label>
+                      <input
+                        type="text"
+                        name="useraddress"
+                        value={user.useraddress}
+                        onChange={gatdata}
+                        className="w-full border border-gray-200 p-3 rounded-lg focus:ring-1 focus:ring-[#C09578] outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className="bg-black text-white px-12 py-4 rounded-full font-bold hover:bg-[#c09578] transition-all shadow-xl active:scale-95"
+                    >
+                      Save Profile Changes
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
           </div>
@@ -775,8 +816,10 @@ import Dashboard from "../desbordpages/Dashboard";
 export default function dashboard() {
   return (
     // Yeh Suspense tab tak "Loading..." dikhayega jab tak URL parameters read nahi ho jate
-    <Suspense fallback={<div className="p-4 text-center">Loading Dashboard...</div>}>
-      <DashboardContent />
+    <Suspense
+      fallback={<div className="p-4 text-center">Loading Dashboard...</div>}
+    >
+            <DashboardContent />
     </Suspense>
   );
 }

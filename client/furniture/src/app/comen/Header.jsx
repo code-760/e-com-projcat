@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
 import { CiSearch } from "react-icons/ci";
@@ -13,13 +13,7 @@ import { removetokan } from "../redex/slice/userslice";
 import { redirect } from "next/navigation";
 import { fetchcart, removeItemFromCart } from "../redex/slice/cartslice";
 import axios from "axios";
-import {
-  aadwishlist,
-  addItemToWishlistLocal,
-  fetchwishlist,
-  removeItemFromwishlist,
-  removewishlist,
-} from "../redex/slice/wishlist";
+import {fetchwishlist} from "../redex/slice/wishlist";
 
 import {
   RiUser3Line,
@@ -30,83 +24,53 @@ import {
 import { magamanu } from "../api-servis/megamanu";
 
 export default function Header() {
-  let [menu, setMenu] = useState([]);
-  const dispatch = useDispatch(); // Action bhejne ke liye
+  const dispatch = useDispatch();
+  const [menu, setMenu] = useState([]);
+  const [opencart, setopencart] = useState(false);
 
-  let basurl = process.env.NEXT_PUBLIC_BASEURL;
+  const basurl = process.env.NEXT_PUBLIC_BASEURL;
+  const tokan = useSelector((state) => state.userstore.tokan);
+  const userData = useSelector((state) => state.userstore.userData);
 
-  let tokan = useSelector((Allmystroy) => Allmystroy.userstore.tokan);
+  // Direct selectors with default values to prevent reference changes
+  const cartdetails = useSelector(
+    (state) => state.cartstore.cart?.cartdetails || [],
+  );
+  const wishlistItems = useSelector(
+    (state) => state.wishliststore.wishlist?.wishlistdetails || [],
+  );
 
-  let [opencart, setopencart] = useState(false);
-
-  let Logout = () => {
-    dispatch(removetokan());
-    redirect("/Login-Register");
-  };
-
-  useEffect(() => {
-    dispatch(fetchcart());
-  }, [tokan]);
-
-  let cart = useSelector((Allmystroy) => Allmystroy.cartstore.cart) || {};
-  let { cartdetails = []} = cart;
-
-  const wishlist =
-    useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
-
-  const product = wishlist?.wishlistdetails || [];
-
-  let userData = useSelector((Allmystroy) => Allmystroy.userstore.userData);
-
-  
-
-  // console.log(userData);
-
-  // --- TOTAL CALCULATE KARNE KA LOGIC ---
-  const calculateSubtotal = () => {
-    if (!cartdetails || !Array.isArray(cartdetails)) return 0;
+const wishlistCount = wishlistItems.length;
+  // 1. Memoized Subtotal (Har render par calculate nahi hoga)
+  const subtotal = useMemo(() => {
     return cartdetails.reduce(
-      (acc, obj) => acc + obj.price * (obj.quantity || 1),
+      (acc, obj) => acc + (obj.price || 0) * (obj.quantity || 1),
       0,
     );
-  };
-
-  const subtotal = calculateSubtotal();
-
-  const [sideCartData, setSideCartData] = useState([]);
-
-  // Jab Redux se data aaye, local state update karein
-  useEffect(() => {
-    setSideCartData(cartdetails);
   }, [cartdetails]);
 
-  // Delete function jo UI se item hatayega
-  const handleSideDelete = (id) => {
-    const updated = sideCartData.filter((item) => item._id !== id);
-    setSideCartData(updated);
-  };
-
-  const handleLikeClick = (e, product, isLiked) => {
-    e.preventDefault(); // Link ko trigger hone se roke
-
-    if (isLiked) {
-      // Agar liked hai, toh remove karo
-      dispatch(removeItemFromwishlist(product._id));
-      dispatch(removewishlist(product._id));
-    } else {
-      // Agar liked nahi hai, toh add karo
-      dispatch(addItemToWishlistLocal(product));
-      dispatch(aadwishlist(product._id));
-    }
-  };
-
+  // 2. Fetch Logic (Token change hone par hi chalega)
   useEffect(() => {
-    magamanu().then((manu) => {
-      setMenu(manu);
-    });
+    if (tokan) {
+      dispatch(fetchcart());
+      dispatch(fetchwishlist()); // Wishlist bhi fetch karein
+    }
+  }, [tokan, dispatch]);
+
+  // 3. Mega Menu Fetch
+  useEffect(() => {
+    magamanu()
+      .then(setMenu)
+      .catch((err) => console.error("Menu Error:", err));
   }, []);
 
-  console.log(menu);
+  // 4. Logout with Router (Redirect loop se bachne ke liye)
+  const Logout = () => {
+    dispatch(removetokan());
+    window.location.href = "/Login-Register"; // Hard redirect is safer here
+  };
+  console.log(userData);
+
 
   return (
     <div className=" ">
@@ -221,7 +185,7 @@ export default function Header() {
 
                 {/* Top Layer (Badge): Number on top of Heart */}
                 <sup className="absolute -top-1.5 -right-2 bg-[#ff3f6c] text-[#282c3f] text-[11px] font-bold h-5 w-5 rounded-full flex items-center justify-center border border-white">
-                  {product.length}
+                  {wishlistCount.length}
                 </sup>
               </Link>
 
@@ -268,9 +232,7 @@ export default function Header() {
                   <>
                     {cartdetails && cartdetails.length > 0 ? (
                       cartdetails.map((item, index) => {
-                        const isLiked = (wishlist?.wishlistdetails || []).some(
-                          (wItem) => wItem._id === item._id,
-                        );
+                        const isLiked = wishlistItems.some((wItem) => wItem._id === item._id);
 
                         return (
                           /* --- AAPKA PURANA CARD CODE START --- */
@@ -399,10 +361,7 @@ export default function Header() {
 
               {menu?.map((item, index) => {
                 return (
-                  <li
-                    key={index}
-                    className=" menu-items"
-                  >
+                  <li key={index} className=" menu-items">
                     {item?.categoryName}
                     <FaAngleDown />
 

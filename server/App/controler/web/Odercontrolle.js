@@ -41,11 +41,13 @@ let Odercreate = async (req, res) => {
       oderobj["userID"] = userid;
       let oderdata = new oderModel(oderobj);
       await oderdata.save();
+      await cartModel.deleteMany({ userId: userid });
 
       let rezorpayOrder = {
         amount: oderobj.totalAmount * 100,
         currency: "INR",
         receipt: oderdata._id.toString(),
+        
         
       };
 
@@ -57,6 +59,7 @@ let Odercreate = async (req, res) => {
       res.send({
         _status: "success",
         message: "oder created successfully",
+         OderiD:oderdata.OderiD,
         fainlrezorpayOrder,
       });
       // online payment
@@ -67,7 +70,7 @@ let Odercreate = async (req, res) => {
     res.status(500).send({
       _status: "error",
       message: "Order create karte waqt koi error aayi",
-      error: error.message,
+      error: error,
     });
   }
 };
@@ -79,7 +82,7 @@ let verifyPayment = async (req, res) => {
 
   let { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
-  console.log("Received payment verification request: ", req.body);
+  // console.log("Received payment verification request: ", req.body);
 
   let sign = razorpay_order_id + "|" + razorpay_payment_id;
   let expectedSign = crypto

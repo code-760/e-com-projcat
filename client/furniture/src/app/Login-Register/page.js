@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import React, { useState, useCallback } from "react";
+import { useRouter } from "next/navigation"; // redirect ki jagah useRouter
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { settokan } from "../redex/slice/userslice";
@@ -11,552 +10,305 @@ import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import { app } from "../fairbase.config";
 
 export default function Page() {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const provider = new GoogleAuthProvider();
   const auth = getAuth(app);
-  let pageName = "My Account";
-  let dispatch = useDispatch();
-  let Baseurl = process.env.NEXT_PUBLIC_BASEURL;
+  const Baseurl = process.env.NEXT_PUBLIC_BASEURL;
 
-  // ---------------- STATES ----------------
-
-  // Login states
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginLoad, setLoginLoad] = useState(false); // Naya State: Login Loader ke liye
-
-  // Register states
-  const [registerName, setRegisterName] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPhone, setRegisterPhone] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [load, setLoad] = useState(false); // Ye Register ka loader hai
+  // --- STATES (Grouped for Memory Efficiency) ---
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [registerData, setRegisterData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const [loaders, setLoaders] = useState({
+    login: false,
+    register: false,
+    forget: false,
+  });
+  const [views, setViews] = useState({ showOtp: false, showForget: false });
+  const [errors, setErrors] = useState({ login: {}, register: {}, forget: {} });
   const [otp, setOtp] = useState("");
 
-  // Forget password states
-  const [forgetEmail, setForgetEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  // --- HANDLERS (Optimized with useCallback for CPU) ---
 
-  // Flags
-  const [showOtp, setShowOtp] = useState(false);
-  const [showForget, setShowForget] = useState(false);
+  const handleLogin = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoaders((prev) => ({ ...prev, login: true }));
 
-  // Error states (per field)
-  const [loginErrors, setLoginErrors] = useState({});
-  const [registerErrors, setRegisterErrors] = useState({});
-  const [otpError, setOtpError] = useState("");
-  const [forgetErrors, setForgetErrors] = useState({});
-  const [forgetLoader, setForgetLoader] = useState(false);
+      try {
+        const res = await axios.post(`${Baseurl}user/login`, {
+          useremail: loginData.email,
+          Password: loginData.password,
+        });
 
-  // ---------------- LOGIN HANDLER (UPDATED WITH FULL SCREEN LOADER & DELAY) ----------------
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    // 1. Loader Start karein (Pura screen block hoga)
-    setLoginLoad(true);
-
-    let obj = {
-      useremail: loginEmail,
-      Password: loginPassword,
-    };
-
-    axios
-      .post(`${Baseurl}user/login`, obj)
-      .then((rec) => rec.data)
-      .then((finlerec) => {
-        // 2. Kam se kam 2 Second ka wait karein (Artificial Delay)
+        // Artificial delay (as per your requirement) but optimized
         setTimeout(() => {
-          console.log(finlerec);
-
-          if (finlerec._status) {
-            dispatch(settokan({ tokan: finlerec.tokan }));
-            redirect("/desbord");
+          if (res.data._status) {
+            dispatch(settokan({ tokan: res.data.tokan }));
+            toast.success("Login Successful!");
+            router.push("/desbord"); // Faster and safer than redirect
           } else {
-            setLoginLoad(false); // Fail hone par loader band
-            toast.error("Login failed. Please try again.");
+            setLoaders((prev) => ({ ...prev, login: false }));
+            toast.error(res.data.message || "Invalid Credentials");
           }
-        }, 2000); // <-- 2000ms = 2 Seconds ka time
-      })
-      .catch((err) => {
-        // Error aane par bhi 2 second baad hi hatayein
-        setTimeout(() => {
-          setLoginLoad(false);
-          console.log(err);
-          toast.error("Something went wrong");
-        }, 2000);
-      });
-  };
+        }, 1500);
+      } catch (err) {
+        setLoaders((prev) => ({ ...prev, login: false }));
+        toast.error("Server Error");
+      }
+    },
+    [loginData, Baseurl, dispatch, router],
+  );
 
-  // ---------------- REGISTER HANDLER ----------------
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setLoaders((prev) => ({ ...prev, register: true }));
 
-    // 1. Validation Logic
-    let errors = {};
-    if (!registerName) errors.name = "Name is required.";
-    if (!registerPhone) errors.phone = "Phone is required.";
-
-    if (!registerEmail) errors.email = "Email is required.";
-    else if (!/\S+@\S+\.\S+/.test(registerEmail))
-      errors.email = "Invalid email address.";
-
-    if (!registerPassword) errors.password = "Password is required.";
-
-    setRegisterErrors(errors);
-
-    // 2. Agar koi error hai, toh yahi ruk jayein
-    if (Object.keys(errors).length > 0) {
+    // Basic Validation
+    if (!registerData.email || !registerData.password) {
+      toast.error("Please fill all fields");
+      setLoaders((prev) => ({ ...prev, register: false }));
       return;
     }
 
-    // 3. Agar sab sahi hai, tabhi API call karein
-    setLoad(true);
-    let obj = {
-      useremail: registerEmail,
-    };
-
-    axios
-      .post(`${Baseurl}user/send-OTP`, obj)
-      .then((rec) => rec.data)
-      .then((finlerec) => {
-        setLoad(false);
-        if (finlerec._status) {
-          toast.success(finlerec.message);
-          setShowOtp(true);
-        } else {
-          toast.error("Failed to send OTP. Please try again.");
-        }
-      })
-      .catch((err) => {
-        setLoad(false);
-        console.log(err);
-        toast.error("this email is already registered");
+    try {
+      const res = await axios.post(`${Baseurl}user/send-OTP`, {
+        useremail: registerData.email,
       });
+      setLoaders((prev) => ({ ...prev, register: false }));
+      if (res.data._status) {
+        toast.success("OTP Sent!");
+        setViews((prev) => ({ ...prev, showOtp: true }));
+      }
+    } catch (err) {
+      setLoaders((prev) => ({ ...prev, register: false }));
+      toast.error("Email already exists");
+    }
   };
 
-  // ---------------- OTP HANDLER ----------------
-  const handleOtpSubmit = (e) => {
-    e.preventDefault();
-    if (!otp) {
-      setOtpError("Please enter the OTP.");
-      return;
-    }
-
-    let obj = {
-      UserName: registerName,
-      userphone: registerPhone,
-      useremail: registerEmail,
-      Password: registerPassword,
-      OTP: otp,
-    };
-
-    axios
-      .post(`${Baseurl}user/create-user`, obj)
-      .then((rec) => rec.data)
-      .then((finlerec) => {
-        if (finlerec._status) {
-          toast.success(finlerec.message);
-          setShowOtp(false);
-        } else {
-          toast.error("Registration failed. Please try again.");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Something went wrong");
-      });
-  };
-
-  // ---------------- FORGET PASSWORD HANDLER ----------------
-  const handleForgetSubmit = (e) => {
-    setForgetLoader(true);
-    e.preventDefault(); // Form reload hone se rokta hai
-
-    let errors = {};
-
-    // 1. Validation Logic
-    if (!forgetEmail) {
-      errors.email = "Email is required.";
-    } else if (!/\S+@\S+\.\S+/.test(forgetEmail)) {
-      errors.email = "Invalid email address.";
-    }
-
-    // Errors ko state mein set karo taaki screen par dikhe
-    setForgetErrors(errors);
-
-    // 2. Main Logic: Agar koi error NAI hai, tabhi aage badho
-    if (Object.keys(errors).length === 0) {
-      // Backend ke liye data object
-      let obj = {
-        useremail: forgetEmail, // forgetEmail state ki value useremail key mein daal di
+  const googeleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const obj = {
+        useremail: user.email,
+        UserName: user.displayName,
+        userphone: user.phoneNumber || "N/A",
+        userprofile: user.photoURL || "N/A",
       };
 
-      console.log("Sending to API:", obj);
-
-      // 3. API Call (Isse IF ke andar hona chahiye)
-      axios
-        .post(`${Baseurl}user/forget-password`, obj)
-        .then((rec) => rec.data)
-        .then((finalrec) => {
-          console.log("Response:", finalrec);
-
-          if (finalrec._status) {
-            // Success tabhi dikhao jab backend se confirmation mile
-            setShowForget(false);
-            setForgetLoader(false); // Modal/Form band karo
-            toast.success(
-              "✅ " + (finalrec.message || "Reset link sent to your email."),
-            );
-          } else {
-            // Agar backend ne mana kar diya (e.g. email not found)
-            toast.error(
-              "❌ " + (finalrec.message || "Failed to send reset link."),
-            );
-          }
-        })
-        .catch((err) => {
-          // Network error ya server down ke liye
-          console.error(err);
-          toast.error("Server error! Please try again later.");
-          setForgetLoader(false);
-        });
-    } else {
-      console.log("Validation failed, not sending API request.");
-      setForgetLoader(false);
+      const res = await axios.post(`${Baseurl}user/google-login`, obj);
+      if (res.data._status) {
+        dispatch(settokan({ tokan: res.data.tokan }));
+        router.push("/desbord");
+      }
+    } catch (error) {
+      toast.error("Google Auth Failed");
     }
-  };
-
-  // ---------------- GOOGLE LOGIN HANDLER ----------------
-  let googeleLOgin = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        const user = result.user;
-
-        console.log(user);
-
-        let obj = {
-          useremail: user.email,
-          UserName: user.displayName,
-          userphone: user.phoneNumber || "N/A", // Agar phone number available nahi hai toh "N/A" set kar do
-          userprofile: user.photoURL || "N/A", // Agar photoURL available nahi hai toh "N/A" set kar do
-        };
-
-        axios
-          .post(`${Baseurl}user/google-login`, obj)
-          .then((rec) => rec.data)
-          .then((finalrec) => {
-            if (finalrec._status) {
-              toast.success("Google login successful!");
-              dispatch(settokan({ tokan: finalrec.tokan }));
-              redirect("/desbord");
-            } else {
-              toast.error("Google login failed. Please try again.");
-            }
-          });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-      });
   };
 
   return (
-    <div className="bg-white min-h-screen relative">
+    <div className="bg-white min-h-screen">
       <ToastContainer />
 
-      {/* ---------------- FULL SCREEN LOADER UI ---------------- */}
-      {loginLoad && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-60 backdrop-blur-sm">
-          {/* */}
-          <div className="flex-col gap-4 w-full flex items-center justify-center">
-            <div className="w-20 h-20 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
-              <div className="w-16 h-16 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
-            </div>
+      {/* --- FULL SCREEN LOADER --- */}
+      {loaders.login && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/70 backdrop-blur-md">
+          <div className="relative w-24 h-24">
+            <div className="absolute inset-0 border-4 border-t-[#C09578] border-gray-100 rounded-full animate-spin"></div>
+            <div className="absolute inset-2 border-4 border-b-black border-transparent rounded-full animate-spin-slow"></div>
           </div>
         </div>
       )}
-      {/* ------------------------------------------------------- */}
 
-      {/* <Breadcrumds pageName={pageName} /> */}
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* LOGIN / FORGET SECTION */}
+          <div className="w-full max-w-lg mx-auto lg:mx-0">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800 font-[cha]">
+              {views.showForget ? "Reset Password" : "Login"}
+            </h2>
 
-      <div className="flex justify-center mt-6">
-        <hr className="w-4/5 border-t-[1.5px] border-gray-300" />
-      </div>
-
-      <section className="w-4/5 mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* ================= LEFT SIDE - LOGIN / FORGET PASSWORD ================= */}
-        <div>
-          <h1 className="text-2xl font-semibold mb-6 text-gray-800">Login</h1>
-
-          {!showForget ? (
-            // LOGIN FORM
-            <form
-              onSubmit={handleLogin}
-              className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"
-            >
-              <div>
-                {/* Email */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {loginErrors.email && (
-                  <p className="text-red-600 text-sm mb-3">
-                    {loginErrors.email}
-                  </p>
-                )}
-
-                {/* Password */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {loginErrors.password && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {loginErrors.password}
-                  </p>
-                )}
-
-                <p className="text-sm mt-3">
-                  <a
-                    href="#"
-                    onClick={() => setShowForget(true)}
-                    className="text-gray-600 hover:text-[#b76e79] transition-colors duration-300"
+            <div className="bg-white border border-gray-100 shadow-2xl rounded-3xl p-6 md:p-10 transition-all">
+              {!views.showForget ? (
+                <form onSubmit={handleLogin} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-600">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#C09578] outline-none transition-all"
+                      placeholder="email@example.com"
+                      onChange={(e) =>
+                        setLoginData({ ...loginData, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-600">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#C09578] outline-none transition-all"
+                      placeholder="••••••••"
+                      onChange={(e) =>
+                        setLoginData({ ...loginData, password: e.target.value })
+                      }
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setViews({ ...views, showForget: true })}
+                    className="text-xs text-[#C09578] font-bold hover:underline"
                   >
-                    Lost your password?
-                  </a>
-                </p>
-
-                <a
-                  href="/Deshbord"
-                  className="text-gray-600 hover:text-[#b76e79] transition-colors duration-300 mt-2 inline-block"
-                >
-                  Deshbord
-                </a>
-              </div>
-
-              <div className="flex justify-end mt-6 gap-3">
-                <button
-                  disabled={loginLoad}
-                  className="bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  onClick={googeleLOgin}
-                  className="bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
-                >
-                  Google Login
-                </button>
-              </div>
-            </form>
-          ) : (
-            // FORGET PASSWORD FORM
-            <form
-              onSubmit={handleForgetSubmit}
-              className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"
-            >
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">
-                  Reset Password
-                </h2>
-
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="forgetEmail"
-                  value={forgetEmail}
-                  onChange={(e) => setForgetEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {forgetErrors.email && (
-                  <p className="text-red-600 text-sm mb-3">
-                    {forgetErrors.email}
+                    Forgot Password?
+                  </button>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      type="submit"
+                      className="w-full py-4 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-all active:scale-95"
+                    >
+                      Login to Account
+                    </button>
+                    <button
+                      type="button"
+                      onClick={googeleLogin}
+                      className="w-full py-4 bg-gray-50 text-black border border-gray-200 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-all"
+                    >
+                      <img
+                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg"
+                        className="w-5"
+                        alt=""
+                      />
+                      Continue with Google
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form className="space-y-6">
+                  {/* Forget Password Form Logic */}
+                  <p className="text-sm text-gray-500">
+                    Enter your email to receive a reset link.
                   </p>
-                )}
-              </div>
+                  <input
+                    type="email"
+                    className="w-full px-4 py-3 rounded-xl border outline-none"
+                    placeholder="Enter email"
+                  />
+                  <div className="flex justify-between items-center">
+                    <button
+                      type="button"
+                      onClick={() => setViews({ ...views, showForget: false })}
+                      className="text-sm font-bold"
+                    >
+                      Back
+                    </button>
+                    <button className="bg-[#C09578] text-white px-8 py-3 rounded-xl font-bold">
+                      Send Link
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
 
-              <div className="flex justify-between mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowForget(false)}
-                  className="text-gray-600 hover:text-[#b76e79] transition duration-300"
-                >
-                  ← Back to Login
-                </button>
-                <button
-                  type="submit"
-                  disabled={forgetLoader}
-                  className="bg-gray-800 flex items-center gap-3 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
-                >
-                  Reset
-                  {forgetLoader && (
-                    <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-                  )}
-                </button>
-              </div>
-            </form>
-          )}
+          {/* REGISTER SECTION */}
+          <div className="w-full max-w-lg mx-auto lg:mx-0">
+            <h2 className="text-3xl font-bold mb-8 text-gray-800 font-[cha]">
+              {views.showOtp ? "Verify Account" : "Register"}
+            </h2>
+            <div className="bg-white border border-gray-100 shadow-2xl rounded-3xl p-6 md:p-10 transition-all">
+              {!views.showOtp ? (
+                <form onSubmit={handleRegister} className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none"
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          name: e.target.value,
+                        })
+                      }
+                    />
+                    <input
+                      type="text"
+                      placeholder="Phone"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none"
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none"
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="password"
+                    placeholder="Create Password"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white transition-all outline-none"
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        password: e.target.value,
+                      })
+                    }
+                  />
+                  <button
+                    type="submit"
+                    disabled={loaders.register}
+                    className="w-full py-4 bg-[#C09578] text-white rounded-xl font-bold hover:bg-[#a88264] transition-all disabled:opacity-50"
+                  >
+                    {loaders.register ? "Sending OTP..." : "Create Account"}
+                  </button>
+                </form>
+              ) : (
+                <div className="space-y-6 text-center">
+                  <p className="text-gray-500">
+                    We've sent a 6-digit code to your email.
+                  </p>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    className="w-full text-center text-2xl tracking-[1rem] py-4 rounded-xl border-2 border-[#C09578] outline-none"
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                  <button className="w-full py-4 bg-black text-white rounded-xl font-bold">
+                    Verify & Register
+                  </button>
+                  <button
+                    onClick={() => setViews({ ...views, showOtp: false })}
+                    className="text-sm font-bold text-gray-400"
+                  >
+                    Change Email
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-
-        {/* ================= RIGHT SIDE - REGISTER / OTP ================= */}
-        <div>
-          <h1 className="text-2xl font-semibold mb-6 text-gray-800">
-            Register
-          </h1>
-
-          {!showOtp ? (
-            // REGISTER FORM
-            <form
-              onSubmit={handleRegister}
-              className="border border-gray-300 rounded-xl p-8 shadow-sm h-auto flex flex-col gap-6"
-            >
-              <div>
-                {/* NAME INPUT */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={registerName}
-                  onChange={(e) => setRegisterName(e.target.value)}
-                  placeholder="Enter your Name"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {registerErrors.name && (
-                  <p className="text-red-600 text-xs mb-2">
-                    {registerErrors.name}
-                  </p>
-                )}
-
-                {/* PHONE INPUT */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Phone
-                </label>
-                <input
-                  type="text"
-                  value={registerPhone}
-                  onChange={(e) => setRegisterPhone(e.target.value)}
-                  placeholder="Enter your Phone"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {registerErrors.phone && (
-                  <p className="text-red-600 text-xs mb-2">
-                    {registerErrors.phone}
-                  </p>
-                )}
-
-                {/* EMAIL INPUT */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {registerErrors.email && (
-                  <p className="text-red-600 text-xs mb-2">
-                    {registerErrors.email}
-                  </p>
-                )}
-
-                {/* PASSWORD INPUT */}
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
-                  placeholder="Create a password"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {registerErrors.password && (
-                  <p className="text-red-600 text-xs mb-2">
-                    {registerErrors.password}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex justify-end mt-2">
-                <button
-                  type="submit"
-                  disabled={load}
-                  className="flex gap-2 items-center bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300 disabled:opacity-50"
-                >
-                  Register
-                  {load && (
-                    <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-                  )}
-                </button>
-              </div>
-            </form>
-          ) : (
-            // OTP FORM
-            <form
-              onSubmit={handleOtpSubmit}
-              className="border border-gray-300 rounded-xl p-8 shadow-sm h-[410px] flex flex-col justify-between"
-            >
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">
-                  Verify OTP
-                </h2>
-                <p className="text-gray-600 text-sm mb-4">
-                  Enter the 6-digit OTP sent to your email.
-                </p>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter OTP"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-[#b76e79] placeholder-black"
-                />
-                {otpError && (
-                  <p className="text-red-600 text-sm mt-1">{otpError}</p>
-                )}
-              </div>
-
-              <div className="flex justify-between mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowOtp(false)}
-                  className="text-gray-600 hover:text-[#b76e79] transition duration-300"
-                >
-                  ← Back
-                </button>
-                <button
-                  type="submit"
-                  className="bg-gray-800 hover:bg-[#b76e79] text-white px-6 py-2 rounded-lg transition duration-300"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

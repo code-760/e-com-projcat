@@ -1,38 +1,44 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo } from "react"; // useState ki jagah useMemo behtar hai yahan
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import Image from "next/image"; // Memory optimization ke liye Next Image use karein
 
 export default function Banner({ bannerdata }) {
-  // Safe check agar bannerdata ya data undefined ho
-  const [banner] = useState(bannerdata || []);
-  // let [basePath] = useState(path || "") // Base path for images
+  
+  // Optimization: State ki jagah useMemo use karein taaki har render par naya array na bane
+  const banners = useMemo(() => bannerdata || [], [bannerdata]);
 
-// console.log(banner,basePath);
+  console.log(banners);
 
 
   const settings = {
     dots: true,
-    infinite: true,
-    speed: 500,
+    infinite: banners.length > 1, // Agar 1 hi banner ho toh infinite loop band kar dein
+    speed: 800,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
+    autoplay: banners.length > 1, // Single banner par autoplay ki CPU waste na karein
+    autoplaySpeed: 4000,
+    fade: true, // Smooth transition, CPU par kam load padta hai sliding se
+    lazyLoad: "progressive", // Sirf wahi image load hogi jo screen par hai
   };
 
-  // Agar images backend server par hain toh uska URL yahan likhein
-  
+  if (banners.length === 0) return null;
+
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="w-full h-[300px] md:h-[550px] overflow-hidden bg-gray-100">
       <Slider {...settings}>
-        {banner.map((item) => (
-          <div key={item._id} className="w-full h-[550px] "> 
-            <img
-              src={item.Slidersimg} // Console ke mutabik 'Slidersimg' use karein
-              className="w-full h-full object-cover object-center "
-              alt={item.Title}
+        {banners.map((item) => (
+          <div key={item._id} className="relative w-full h-[300px] md:h-[550px]"> 
+            <Image
+              src={item.Slidersimg}
+              alt={item.Title|| "Banner Image"}
+              fill // Image container ko pura fill karegi
+              className=" object-center"
+              priority // Slider ki images ko priority load milega
+              sizes="100vw"
             />
           </div>
         ))}

@@ -7,34 +7,37 @@ let Addcart = async (req, res) => {
     let decoded = jwt.verify(token, process.env.TOKEN);
     let userid = decoded.UserID;
 
-    // Aapne obj mein 'user' likha tha, maine use 'userId' kiya hai 
-    // kyunki aapke Cart Schema mein 'userId' (small i) hai.
-    let obj = { ...req.body };
+    const { productId, productName, price, productImg, productQuantity } = req.body;
 
+    // YAHAN FIX HAI: Filter mein productId aur userId DONO hone chahiye
     let data = await cartModel.findOneAndUpdate(
       { 
-        productId: obj.productId, 
-        userId: userid  // Ye line zaroori hai taaki sahi user ka cart update ho
+        productId: productId, 
+        userId: userid 
       }, 
       {
-        $inc: { quantity: Number(obj.productQuantity) || 1 }, 
+        $inc: { quantity: Number(productQuantity) || 1 }, 
         $set: { 
-          productName: obj.productName, 
-          price: obj.price, 
-          productImg: obj.productImg, 
-          userId: userid 
+          productName: productName, 
+          price: price, 
+          productImg: productImg,
+          userId: userid // Ensure schema field matches (userId small i)
         },
       },
       { upsert: true, new: true } 
     );
 
-    res.send({
+    console.log("Cart updated for user:", userid); // Render logs mein check karne ke liye
+
+    res.status(200).send({
       _status: "success",
       message: "Product added to cart successfully",
       data: data
     });
+
   } catch (error) {
-    res.status(500).send({ _status: "error", error: error.message });
+    console.log("Database Save Error:", error.message);
+    res.status(500).send({ _status: "error", message: error.message });
   }
 };
 

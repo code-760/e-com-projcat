@@ -1,108 +1,115 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react"; // useMemo add kiya
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchwishlist } from "../redex/slice/wishlist";
+import { fetchwishlist, removeItemFromwishlist, removewishlist } from "../redex/slice/wishlist";
 import { FaHeart } from "react-icons/fa6";
+import Image from "next/image"; // Memory optimization ke liye
 
 export default function Wishlist() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Ye line hi Redux ke function ko chalati hai!
-    console.log("Component load hua, ab Redux call hoga...");
     dispatch(fetchwishlist());
   }, [dispatch]);
 
-  const wishlist =
-    useSelector((Allmystroy) => Allmystroy.wishliststore.wishlist) || {};
-
-  // const path = wishlist?.path;
+  const wishlist = useSelector((state) => state.wishliststore.wishlist) || {};
   const product = wishlist?.wishlistdetails || [];
 
-  const uniqueProducts = product.filter(
-  (item, index, self) =>
-    index === self.findIndex((p) => p._id === item._id)
-);
+  // CPU Optimization: Unique products calculation ko memoize kiya
+  // Ab ye har render par nahi chalega, sirf tab chalega jab 'product' array badlega
+  const uniqueProducts = useMemo(() => {
+    return product.filter(
+      (item, index, self) => index === self.findIndex((p) => p._id === item._id)
+    );
+  }, [product]);
 
-console.log(uniqueProducts,"uniqueProducts");
-
+  const handleRemove = (id) => {
+    dispatch(removeItemFromwishlist(id)); // Local State fix
+    dispatch(removewishlist(id)); // Database fix
+  };
 
   return (
-    <>
-      <div>
-        <div className=" border-b border-[#CCC] py-7">
-          <div className="text-center flex flex-col items-center">
-            <h1 className="p-4 text-4xl font-semibold font-[cha]">
-              My Wishlist
-            </h1>
-            <div className=" flex ">
-              <div className=" flex items-center hover:text-[#c09578]">
-                <Link href={"/"}>Home</Link>
-                <MdOutlineNavigateNext />
-              </div>
-              <p>My Wishlist</p>
-            </div>
+    <div className="bg-white min-h-screen">
+      {/* Header Section */}
+      <div className="border-b border-gray-200 py-6 md:py-10">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold font-[cha] mb-3">My Wishlist</h1>
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <Link href="/" className="hover:text-[#c09578] transition-colors">Home</Link>
+            <MdOutlineNavigateNext />
+            <span className="text-gray-800">My Wishlist</span>
           </div>
         </div>
-        <div className="w-[1370px] mx-auto border-b border-[#ccc] pb-7">
-          {product.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-7">
-              {uniqueProducts.map((item, index) => (
-                <div className="w-72 bg-white shadow-md hover:shadow-xl">
-                  {/* Note: If you want this to be clickable, change this <div> to an <a> tag */}
-                  <div href="#">
-                    <img
-                      src={item.ProductImage}
-                      alt="Modern Wooden Nesting Tables"
-                      className="h-40 w-72 object-cover object-center rounded-t-xl"
-                    />
-                    <div className="px-4 py-3 text-center w-72">
-                      <span className="text-gray-400 my-5 text-[12px] uppercase">
-                        Nest Of Tables
-                      </span>
-                      <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">
-                        {item.ProductName}
-                      </p>
-                      <div className="border my-4 border-[#ccc]"></div>
-                      <div className="flex flex-col justify-center items-center">
-                        <div className="flex items-center">
-                          <p className="text-sm text-gray-600 cursor-auto line-through">
-                           ${item.SalePrice}
-                          </p>
-                          <p className="text-lg font-semibold text-black ml-2">
-                            ${item.ActualPrice}
-                          </p>
-                        </div>
-                        <div className="text-center flex gap-1 mt-2">
-                          <div className="py-1 px-2 border-[#ebebeb] hover:text-[#C09578] flex items-center bg-[#ebebeb] cursor-pointer">
-                            {/* Since this is the wishlist page, the item is always in the wishlist, so we style it as active (golden/theme color) */}
-                            <FaHeart className="text-[#c09578]" />
-                          </div>
-                          <div className="border p-1 border-[#ebebeb] bg-[#ebebeb] cursor-pointer px-3">
-                            <h5 className="font-medium text-sm">Add cart</h5>
-                          </div>
-                        </div>
-                      </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="max-w-[1370px] mx-auto px-4 py-8 md:py-12">
+        {uniqueProducts.length > 0 ? (
+          /* Responsive Grid: 1 col on mobile, 2 on tablet, 4 on desktop */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {uniqueProducts.map((item) => (
+              <div key={item._id} className="group bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full">
+                
+                {/* Product Image Wrapper */}
+                <div className="relative h-48 sm:h-56 bg-gray-50 overflow-hidden">
+                  <img
+                    src={item.ProductImage}
+                    alt={item.ProductName}
+                    loading="lazy"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                  />
+                  {/* Remove from Wishlist Button */}
+                  <button 
+                    onClick={() => handleRemove(item._id)}
+                    className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-2 rounded-full text-[#c09578] hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                  >
+                    <FaHeart size={18} />
+                  </button>
+                </div>
+
+                <div className="p-5 text-center flex flex-col flex-grow">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">
+                    Premium Furniture
+                  </span>
+                  <h3 className="text-md font-bold text-gray-800 line-clamp-1 group-hover:text-[#C09578] transition-colors mb-3">
+                    {item.ProductName}
+                  </h3>
+                  
+                  <div className="w-10 h-0.5 bg-gray-100 mx-auto mb-4"></div>
+
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-center gap-3 mb-5">
+                      <span className="text-sm text-gray-400 line-through">₹{item.SalePrice}</span>
+                      <span className="text-lg font-black text-gray-900">₹{item.ActualPrice}</span>
                     </div>
+
+                    <button className="w-full py-3 bg-gray-950 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-[#C09578] transition-all shadow-lg active:scale-95">
+                      Move to Cart
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center">
-              <img
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Empty State - Improved UI */
+          <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
+            <div className="w-48 h-48 relative mb-6 grayscale opacity-50">
+               <img
                 src="https://wscubetech.co/Assignments/furniture/public/frontend/img/icon/wishlist-Empty.jpg"
                 alt="Empty Wishlist"
+                className="w-full h-full object-contain"
               />
-              <div className="text-center mt-4">
-                <p>Your wishlist is empty!</p>
-              </div>
             </div>
-          )}
-        </div>
+            <h2 className="text-2xl font-bold text-gray-400 mb-4 tracking-tight">Your Wishlist is Empty!</h2>
+            <Link href="/" className="px-8 py-3 bg-[#c09578] text-white font-bold rounded-full shadow-lg hover:bg-[#a88264] transition-all">
+              Go Shopping
+            </Link>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

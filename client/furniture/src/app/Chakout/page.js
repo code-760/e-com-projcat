@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchcart } from "../redex/slice/cartslice";
 import { redirect } from "next/navigation";
@@ -46,13 +46,13 @@ function Chakout() {
       })
       .then((response) => {
         userditels();
-       
+
         toast.success("Profile updated successfully");
       })
       .catch((err) => console.log("Update Error:", err));
   };
 
-  let userditels = () => {
+  const userditels = useCallback(() => {
     axios
       .post(
         `${basurl}user/user-detail`,
@@ -62,11 +62,9 @@ function Chakout() {
         },
       )
       .then((response) => {
-        if (response.data.data) {
-          setuser(response.data.data);
-        }
+        if (response.data.data) setuser(response.data.data);
       });
-  };
+  }, [basurl, tokan]);
 
   let gatdata = (e) => {
     let { name, value } = e.target;
@@ -75,7 +73,7 @@ function Chakout() {
 
   useEffect(() => {
     if (tokan) userditels();
-  }, [tokan]);
+  }, [tokan, userditels]);
 
   let cartitems = cart.cartdetails || [];
 
@@ -87,27 +85,45 @@ function Chakout() {
   let saveorder = () => {
     let orderData = {
       OderiD: "ORD" + Math.floor(Math.random() * 1000000),
+
       OderItem: cartitems.map((item) => ({
         productName: item.productName,
+
         quantity: item.quantity,
+
         price: item.price,
+
         productimg: item.productImg,
       })),
+
       shippingAddess: {
         name: user.UserName,
+
         email: user.useremail,
+
         phone: user.userphone,
+
         address: user.useraddress,
+
         country: user.country,
+
         state: user.state,
+
         city: user.city,
+
         pincode: user.pincode,
       },
+
       paymentMethod,
+
       orderAmount: subtotal,
+
       shippingCharges: 100,
+
       totalAmount: subtotal + 100,
+
       paymentStatus: "1",
+
       orderDate: new Date().toISOString(),
     };
 
@@ -117,51 +133,55 @@ function Chakout() {
       })
       .then((rec) => rec.data)
       .then(async (data) => {
-        // <-- Yahan maine 'async' lagaya hai
-        // console.log(data);
-
-        // --- LOGIC FIX: Yahan "2" aayega kyunki "2" Cash on Delivery hai ---
         if (paymentMethod === "2") {
           dispatch(fetchcart());
-          ("Order Placed Successfully via COD!");
+          toast.success("Order Placed Successfully via COD!");
         } else {
-          // --- Yahan "1" (Online Payment) par Razorpay chalega ---
-
-          // Pehle check karenge ki script aayi ya nahi
           const isScriptLoaded = await loadRazorpayScript();
           if (!isScriptLoaded) {
-            toast.error(
-              "Razorpay SDK failed to load. Please check your connection.",
-            );
+            toast.error("Razorpay SDK failed to load.");
             return;
           }
 
+          // Backend spelling check: fainlrezorpayOrder
+          console.log(data,"jjjjjj")
           let { fainlrezorpayOrder } = data;
+          console.log("Razorpay Order Details:", fainlrezorpayOrder);
+
           const options = {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             amount: fainlrezorpayOrder.amount_due,
             currency: "INR",
             name: "E-Furniture Web",
             description: "Premium Furniture",
-            image: "https://example.com/your-logo.png",
             order_id: fainlrezorpayOrder.id,
             handler: (response) => {
+              // Ye tabhi chalega jab aap dummy "Success" click karenge
+              console.log("Payment Data Received:", response);
+
               axios
                 .post(`${basurl}order/verify-payment`, response, {
                   headers: { Authorization: `Bearer ${tokan}` },
                 })
-                .then((rec) => rec.data)
-                .then((data) => {
-                  console.log("Payment Verification Response:", data);
-                  redirect(`/than-you/${data.OderiD}`); // <-- Redirect to Thank You page with order ID
-                });
-              dispatch(fetchcart());
+                .then((res) => {
+                  dispatch(fetchcart());
+                  window.location.href = `/than-you/${data.OderiD}`;
+                })
+                .catch((err) => console.log("Verification Failed", err));
             },
+
             prefill: {
               name: user.UserName,
               email: user.useremail,
               contact: user.userphone,
             },
+
+            // Forceful UI setting
+            modal: {
+              layout: "v2",
+              confirm_close: true,
+            },
+
             theme: {
               color: "#4A2311",
             },
@@ -172,10 +192,9 @@ function Chakout() {
         }
       });
   };
-
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-       <ToastContainer />
+      <ToastContainer />
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-2xl font-semibold mb-8">Checkout</h1>
 
