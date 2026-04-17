@@ -21,11 +21,16 @@ function AuthWrapper({ children }) {
         {
           headers: { Authorization: `Bearer ${tokan}` },
         }
-      );
+      )
+      .then((response) => {
+        console.log("API Response:", response.data);
+        // return response;
+      })
 
       if (res.data?._status || res.data?.data) {
         const { UserName, useremail, userprofile } = res.data.data;
-        
+        // console.log("User Details:", res.data.data);
+
         const safeUserData = {
           UserName,
           useremail,
@@ -42,7 +47,7 @@ function AuthWrapper({ children }) {
 
   useEffect(() => {
     fetchUserDetails();
-  }, [fetchUserDetails]); // Sirf token change hone par hi chalega
+  }, [fetchUserDetails, tokan]); // Sirf token change hone par hi chalega
 
   return <>{children}</>;
 }

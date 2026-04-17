@@ -3,13 +3,17 @@ const { colorModel } = require("../../models/color.model");
 const { materialModel } = require("../../models/material.model");
 const { ProductModel } = require("../../models/perodect.model");
 const { SubcategoryModel } = require("../../models/Subcategory");
+const { SubsubcategoryModel } = require("../../models/Subsubcategory");
 
 let producteditela = async (req, res) => {
   let { id } = req.params;
   let diteleddata = await ProductModel.findOne({ _id: id })
     .populate("color", "colorName")
     .populate("material", "materialName")
-    .populate("Category", "categoryName");
+    .populate("Category", "categoryName")
+    .populate("SubCategory", "SubcategoryName")
+    .populate("SubsubCategory", "SubsubcategoryName");
+
   res.send({
     _status: "success",
     _massage: "product data fetch successfully",
@@ -27,7 +31,8 @@ let getWebSidebarFilters = async (req, res) => {
     })
       .populate("Category", "categoryName")
       .populate("SubCategory", "SubcategoryName")
-      .select("Category SubCategory");
+      .populate("SubsubCategory", "SubsubcategoryName")
+      .select("Category SubCategory SubsubCategory");
 
     // 2. Sirf Categories aur SubCategories ki unique list nikalne ka asaan tarika
     const categories = await categoryModel
@@ -36,6 +41,11 @@ let getWebSidebarFilters = async (req, res) => {
     const subcategories = await SubcategoryModel.find({
       Subcategorystatus: true,
     }).select("SubcategoryName Category");
+
+    const subsubCategories = await SubsubcategoryModel.find({
+      Subsubcategorystatus: true,
+    }).select("SubsubcategoryName Category SubCategory");
+    console.log(subsubCategories, "subsubCategories");
 
     // 3. Materials aur Colors fetch karein
     const materials = await materialModel
@@ -50,6 +60,7 @@ let getWebSidebarFilters = async (req, res) => {
       status: true,
       categories, // Saari Main Categories (Table, Mirror etc.)
       subcategories, // Saari Sub Categories (Coffee Table, Wooden Mirror etc.)
+      subsubCategories, // Saari Sub-Sub Categories (Modern Coffee Table, Traditional Wooden Mirror etc.)
       materials,
       colors,
     });
@@ -62,7 +73,15 @@ let getWebSidebarFilters = async (req, res) => {
 
 let product_website_viwe = async (req, rec) => {
   try {
-    let { categories, materials, colors, minPrice, maxPrice, sort } = req.query;
+    let {
+      subsubcategories,
+      categories,
+      materials,
+      colors,
+      minPrice,
+      maxPrice,
+      sort,
+    } = req.query;
 
     // 1. Base Filter
     let filter = {
@@ -74,6 +93,11 @@ let product_website_viwe = async (req, rec) => {
     if (categories && categories.trim() !== "") {
       // DHYAN DEIN: Agar ye subcategory ki IDs hain, toh field ka naam SubCategory likhein
       filter.SubCategory = { $in: categories.split(",") };
+    }
+
+    if (subsubcategories && subsubcategories.trim() !== "") {
+      // DHYAN DEIN: Yahan field ka naam wahi rakhein jo Product Model mein hai (e.g., SubsubCategory)
+      filter.SubsubCategory = { $in: subsubcategories.split(",") };
     }
 
     // 3. Material Filter (Check if it's not empty)
@@ -106,17 +130,20 @@ let product_website_viwe = async (req, rec) => {
 
     let data = await ProductModel.find(filter)
       .populate("Category", "categoryName")
-      .populate("SubCategory", "SubcategoryName") // SubCategory ko bhi populate karein
+      .populate("SubCategory", "SubcategoryName")
+      .populate("SubsubCategory", "SubsubcategoryName") // <-- Is spelling ko Schema se match karein
       .populate("color", "colorName")
       .populate("material", "materialName")
       .sort(sortOption);
+
+      console.log(data, "filtered products");
+      
 
     rec.status(200).send({
       status: true,
       path: process.env.PRODUCTIMAGEPATH,
       data,
     });
-    
   } catch (err) {
     rec.status(500).send({ status: false, message: err.message });
   }

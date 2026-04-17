@@ -65,6 +65,8 @@ function DashboardContent() {
       .then((finlerec) => {
         let userData = finlerec.data;
 
+        console.log("Fetched User Data:", userData); // Debugging ke liye
+
         if (!userData.shippingAddress || !userData.shippingAddress?.address) {
           userData.shippingAddress = {
             shippingName: userData.UserName || "",
