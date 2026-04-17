@@ -140,13 +140,15 @@ export default function ProductListing() {
           </div>
 
           {/* Categories */}
+          {/* Categories Section */}
           <div className="mb-6">
             <h2 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">
               Categories
             </h2>
             {sidebarData.categories.map((cat) => (
               <div key={cat._id} className="mb-5">
-                <h3 className="text-xs font-black text-gray-900 mb-3 border-l-2 border-[#c09578] pl-2">
+                {/* --- Main Category Name --- */}
+                <h3 className="text-xs font-black text-gray-900 mb-3 border-l-2 border-[#c09578] pl-2 uppercase">
                   {cat.categoryName}
                 </h3>
 
@@ -155,7 +157,7 @@ export default function ProductListing() {
                     ?.filter((sub) => sub.Category === cat._id)
                     .map((sub) => (
                       <div key={sub._id} className="mb-4">
-                        {/* --- Subcategory Checkbox (Added Here) --- */}
+                        {/* --- Subcategory Checkbox --- */}
                         <label className="flex items-center group cursor-pointer mb-2">
                           <input
                             type="checkbox"
@@ -174,34 +176,75 @@ export default function ProductListing() {
                           </span>
                         </label>
 
-                        {/* Sub-subcategories */}
-                        <div className="space-y-2 ml-6 border-l border-gray-100">
-                          {sidebarData?.subsubcategories
-                            ?.filter((subsub) => subsub.SubCategory === sub._id)
-                            .map((subsub) => (
-                              <label
-                                key={subsub._id}
-                                className="flex items-center group cursor-pointer pl-2"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedSubsubCats.includes(
-                                    subsub._id,
-                                  )}
-                                  onChange={() =>
-                                    handleCheck(
-                                      subsub._id,
-                                      selectedSubsubCats,
-                                      setSelectedSubsubCats,
-                                    )
-                                  }
-                                  className="w-3.5 h-3.5 rounded border-gray-300 accent-[#c09578] mr-3"
-                                />
-                                <span className="text-gray-600 text-xs group-hover:text-black transition-colors">
-                                  {subsub.SubsubcategoryName}
-                                </span>
-                              </label>
-                            ))}
+                        {/* --- NEW: Sub-subcategories (Material & Color) --- */}
+                        <div className="space-y-3 ml-6 mt-2 border-l border-gray-100 pl-3">
+                          {/* 1. Material Filter */}
+                          {sidebarData?.materials?.length > 0 && (
+                            <div className="mb-2">
+                              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">
+                                Material
+                              </p>
+                              {sidebarData.materials
+                                .filter((m) => m.SubCategory === sub._id) // Agar material subcategory se linked hai
+                                .map((mat) => (
+                                  <label
+                                    key={mat._id}
+                                    className="flex items-center cursor-pointer mb-1"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedMats?.includes(mat._id)}
+                                      onChange={() =>
+                                        handleCheck(
+                                          mat._id,
+                                          selectedMats,
+                                          setSelectedMats,
+                                        )
+                                      }
+                                      className="w-3 h-3 accent-[#c09578] mr-2"
+                                    />
+                                    <span className="text-xs text-gray-600">
+                                      {mat.materialName}
+                                    </span>
+                                  </label>
+                                ))}
+                            </div>
+                          )}
+
+                          {/* 2. Color Filter */}
+                          {sidebarData?.colors?.length > 0 && (
+                            <div>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">
+                                Color
+                              </p>
+                              {sidebarData.colors
+                                .filter((c) => c.SubCategory === sub._id) // Agar color subcategory se linked hai
+                                .map((col) => (
+                                  <label
+                                    key={col._id}
+                                    className="flex items-center cursor-pointer mb-1"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedColors?.includes(
+                                        col._id,
+                                      )}
+                                      onChange={() =>
+                                        handleCheck(
+                                          col._id,
+                                          selectedColors,
+                                          setSelectedColors,
+                                        )
+                                      }
+                                      className="w-3 h-3 accent-[#c09578] mr-2"
+                                    />
+                                    <span className="text-xs text-gray-600">
+                                      {col.colorName}
+                                    </span>
+                                  </label>
+                                ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -209,7 +252,6 @@ export default function ProductListing() {
               </div>
             ))}
           </div>
-
           <button
             onClick={() => setIsMobileFilterOpen(false)}
             className="lg:hidden w-full bg-black text-white py-4 rounded-xl font-bold mt-6 shadow-lg"
