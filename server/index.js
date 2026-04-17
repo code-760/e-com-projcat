@@ -52,7 +52,7 @@ mongoose.connect(DB_URL)
     App.listen(process.env.PORT || 8000, () => {
       console.log(`🚀 Server start on port: ${process.env.PORT || 8000}`);
       
-      Ye line tumhe console mein bata degi ki kaunsa DB connect hua hai
+     
       if(process.env.MONGO_URI) {
           console.log("🌐 Database: LIVE (MongoDB Atlas) Connect ho gaya!");
       } else {
