@@ -1,23 +1,20 @@
 "use client";
 import axios from "axios";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { FaHeart, FaFilter, FaTimes } from "react-icons/fa"; // Mobile filters ke liye icons
+import { useEffect, useState, useCallback } from "react";
+import { FaHeart, FaFilter, FaTimes } from "react-icons/fa";
 
 export default function ProductListing() {
   const [products, setProducts] = useState([]);
   const [sidebarData, setSidebarData] = useState({
     categories: [],
     subcategories: [],
-    materials: [],
-    colors: [],
+    subsubcategories: [], // Iska use nesting ke liye hoga
   });
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false); // Mobile drawer state
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Filter States
   const [selectedCats, setSelectedCats] = useState([]);
   const [selectedSubCats, setSelectedSubCats] = useState([]);
-  const [selectedMats, setSelectedMats] = useState([]);
-  const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSubsubCats, setSelectedSubsubCats] = useState([]);
   const [price, setPrice] = useState(200000);
   const [sort, setSort] = useState("");
@@ -25,7 +22,6 @@ export default function ProductListing() {
 
   const Baseurl = process.env.NEXT_PUBLIC_BASEURL;
 
-  // CPU Optimization: useCallback taaki fetch function baar-baar memory na bhare
   const fetchSidebar = useCallback(async () => {
     try {
       const res = await axios.get(`${Baseurl}product/sidebar-filters`);
@@ -35,8 +31,6 @@ export default function ProductListing() {
     }
   }, [Baseurl]);
 
-  console.log("Sidebar Data:", sidebarData); // Debugging ke liye
-
   const getProducts = useCallback(async () => {
     setLoading(true);
     try {
@@ -45,8 +39,6 @@ export default function ProductListing() {
           categories: selectedCats.join(","),
           subcategories: selectedSubCats.join(","),
           subsubcategories: selectedSubsubCats.join(","),
-          materials: selectedMats.join(","),
-          colors: selectedColors.join(","),
           maxPrice: price,
           sort: sort,
         },
@@ -57,33 +49,20 @@ export default function ProductListing() {
     } finally {
       setLoading(false);
     }
-  }, [
-    selectedCats,
-    selectedSubCats,
-    selectedMats,
-    selectedColors,
-    selectedSubsubCats,
-    price,
-    sort,
-    Baseurl,
-  ]);
+  }, [selectedCats, selectedSubCats, selectedSubsubCats, price, sort, Baseurl]);
 
-  useEffect(() => {
-    fetchSidebar();
-  }, [fetchSidebar]);
-  useEffect(() => {
-    getProducts();
-  }, [getProducts]);
+  useEffect(() => { fetchSidebar(); }, [fetchSidebar]);
+  useEffect(() => { getProducts(); }, [getProducts]);
 
   const handleCheck = (id, state, setState) => {
     setState((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Mobile Header for Filters */}
+      {/* Mobile Header */}
       <div className="lg:hidden flex justify-between items-center bg-white p-4 sticky top-0 z-30 shadow-sm">
         <button
           onClick={() => setIsMobileFilterOpen(true)}
@@ -91,160 +70,71 @@ export default function ProductListing() {
         >
           <FaFilter size={14} /> Filter & Sort
         </button>
-        <p className="text-sm font-bold text-gray-500">
-          {products.length} Items
-        </p>
+        <p className="text-sm font-bold text-gray-500">{products.length} Items</p>
       </div>
 
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4 lg:p-6">
-        {/* --- SIDEBAR (RESPONSIVE) --- */}
-        <aside
-          className={`
-    fixed lg:sticky lg:top-6 inset-0 z-40 lg:z-10 bg-white p-6 shadow-xl lg:shadow-sm 
-    h-full lg:h-[calc(100vh-48px)] overflow-y-auto transition-transform duration-300
-    ${isMobileFilterOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-  `}
-        >
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 lg:p-6">
+        
+        {/* --- SIDEBAR --- */}
+        <aside className={`
+          fixed lg:sticky lg:top-6 inset-0 z-40 lg:z-10 bg-white p-6 shadow-xl lg:shadow-none 
+          h-full lg:h-[calc(100vh-48px)] overflow-y-auto transition-transform duration-300
+          ${isMobileFilterOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}>
           <div className="flex justify-between items-center mb-6 lg:hidden">
             <h1 className="font-bold text-xl">Filters</h1>
-            <FaTimes
-              onClick={() => setIsMobileFilterOpen(false)}
-              className="text-2xl cursor-pointer"
-            />
+            <FaTimes onClick={() => setIsMobileFilterOpen(false)} className="text-2xl cursor-pointer" />
           </div>
 
-          <h1 className="hidden lg:block font-bold text-2xl mb-6 border-b pb-2">
-            Filters
+          <h1 className="hidden lg:block font-serif text-3xl mb-8 border-b pb-4 text-gray-800">
+            Categories
           </h1>
 
-          {/* Price Range */}
-          <div className="mb-8">
-            <h2 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">
-              Price Range
-            </h2>
-            <input
-              type="range"
-              min="0"
-              max="200000"
-              step="5000"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#c09578]"
-            />
-            <div className="flex justify-between text-xs mt-3 font-bold">
-              <span className="text-gray-400">Rs. 0</span>
-              <span className="text-[#c09578] bg-[#c09578]/10 px-2 py-1 rounded">
-                Up to: ₹{price}
-              </span>
-            </div>
-          </div>
-
-          {/* Categories */}
-          {/* Categories Section */}
-          <div className="mb-6">
-            <h2 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-4">
-              Categories
-            </h2>
+          {/* Hierarchical Filters */}
+          <div className="space-y-8">
             {sidebarData.categories.map((cat) => (
-              <div key={cat._id} className="mb-5">
-                {/* --- Main Category Name --- */}
-                <h3 className="text-xs font-black text-gray-900 mb-3 border-l-2 border-[#c09578] pl-2 uppercase">
+              <div key={cat._id} className="relative">
+                {/* 1. Category Name (Bold Title) */}
+                <h3 className="text-md font-bold text-[#c09578] mb-4 uppercase tracking-wider">
                   {cat.categoryName}
                 </h3>
 
-                <div className="space-y-4 ml-2">
+                <div className="space-y-5 ml-1">
                   {sidebarData?.subcategories
                     ?.filter((sub) => sub.Category === cat._id)
                     .map((sub) => (
-                      <div key={sub._id} className="mb-4">
-                        {/* --- Subcategory Checkbox --- */}
-                        <label className="flex items-center group cursor-pointer mb-2">
+                      <div key={sub._id} className="group">
+                        
+                        {/* 2. Subcategory Checkbox */}
+                        <label className="flex items-center cursor-pointer mb-3">
                           <input
                             type="checkbox"
                             checked={selectedSubCats?.includes(sub._id)}
-                            onChange={() =>
-                              handleCheck(
-                                sub._id,
-                                selectedSubCats,
-                                setSelectedSubCats,
-                              )
-                            }
-                            className="w-4 h-4 rounded border-gray-300 accent-black mr-2"
+                            onChange={() => handleCheck(sub._id, selectedSubCats, setSelectedSubCats)}
+                            className="w-4 h-4 rounded border-gray-300 accent-black mr-3"
                           />
-                          <span className="text-sm font-bold text-gray-800">
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-black">
                             {sub.SubcategoryName}
                           </span>
                         </label>
 
-                        {/* --- NEW: Sub-subcategories (Material & Color) --- */}
-                        <div className="space-y-3 ml-6 mt-2 border-l border-gray-100 pl-3">
-                          {/* 1. Material Filter */}
-                          {sidebarData?.materials?.length > 0 && (
-                            <div className="mb-2">
-                              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">
-                                Material
-                              </p>
-                              {sidebarData.materials
-                                .filter((m) => m.SubCategory === sub._id) // Agar material subcategory se linked hai
-                                .map((mat) => (
-                                  <label
-                                    key={mat._id}
-                                    className="flex items-center cursor-pointer mb-1"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedMats?.includes(mat._id)}
-                                      onChange={() =>
-                                        handleCheck(
-                                          mat._id,
-                                          selectedMats,
-                                          setSelectedMats,
-                                        )
-                                      }
-                                      className="w-3 h-3 accent-[#c09578] mr-2"
-                                    />
-                                    <span className="text-xs text-gray-600">
-                                      {mat.materialName}
-                                    </span>
-                                  </label>
-                                ))}
-                            </div>
-                          )}
-
-                          {/* 2. Color Filter */}
-                          {sidebarData?.colors?.length > 0 && (
-                            <div>
-                              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">
-                                Color
-                              </p>
-                              {sidebarData.colors
-                                .filter((c) => c.SubCategory === sub._id) // Agar color subcategory se linked hai
-                                .map((col) => (
-                                  <label
-                                    key={col._id}
-                                    className="flex items-center cursor-pointer mb-1"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedColors?.includes(
-                                        col._id,
-                                      )}
-                                      onChange={() =>
-                                        handleCheck(
-                                          col._id,
-                                          selectedColors,
-                                          setSelectedColors,
-                                        )
-                                      }
-                                      className="w-3 h-3 accent-[#c09578] mr-2"
-                                    />
-                                    <span className="text-xs text-gray-600">
-                                      {col.colorName}
-                                    </span>
-                                  </label>
-                                ))}
-                            </div>
-                          )}
+                        {/* 3. Sub-Subcategories (Material/Color list) */}
+                        <div className="ml-7 space-y-2 border-l border-gray-100 pl-4 py-1">
+                          {sidebarData?.subsubcategories
+                            ?.filter((subsub) => subsub.SubCategory === sub._id)
+                            .map((subsub) => (
+                              <label key={subsub._id} className="flex items-center group/item cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedSubsubCats.includes(subsub._id)}
+                                  onChange={() => handleCheck(subsub._id, selectedSubsubCats, setSelectedSubsubCats)}
+                                  className="w-3.5 h-3.5 rounded border-gray-300 accent-[#c09578] mr-3"
+                                />
+                                <span className="text-gray-500 text-xs group-hover/item:text-black transition-colors font-light">
+                                  {subsub.SubsubcategoryName}
+                                </span>
+                              </label>
+                            ))}
                         </div>
                       </div>
                     ))}
@@ -252,120 +142,73 @@ export default function ProductListing() {
               </div>
             ))}
           </div>
-          <button
-            onClick={() => setIsMobileFilterOpen(false)}
-            className="lg:hidden w-full bg-black text-white py-4 rounded-xl font-bold mt-6 shadow-lg"
-          >
-            Apply Filters
-          </button>
+
+          {/* Price Filter */}
+          <div className="mt-12 pt-8 border-t border-gray-100">
+            <h2 className="font-serif text-xl text-gray-800 mb-6">Filter By Price</h2>
+            <input
+              type="range" min="0" max="200000" step="5000"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#c09578]"
+            />
+            <p className="text-xs font-bold mt-4 text-gray-500">
+              Rs. 0 - Rs. {price}
+            </p>
+            <button className="w-full mt-4 bg-gray-900 text-white py-2 text-xs font-bold uppercase tracking-widest hover:bg-black">
+              Filter
+            </button>
+          </div>
         </aside>
 
-        {/* --- MAIN CONTENT --- */}
+        {/* --- MAIN CONTENT (Product Grid) --- */}
         <main className="px-4 lg:px-0">
-          {/* Top Sort Bar (Desktop Only Hidden on Mobile) */}
           <div className="hidden lg:flex justify-between items-center bg-white p-4 mb-6 shadow-sm rounded-xl">
             <p className="text-gray-500 font-medium">
-              Showing{" "}
-              <span className="text-black font-bold">{products.length}</span>{" "}
-              luxury pieces
+              Showing <span className="text-black font-bold">{products.length}</span> luxury pieces
             </p>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold uppercase text-gray-400">
-                Sort By
-              </span>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="border-none bg-gray-50 rounded-lg px-4 py-2 text-sm font-bold outline-none focus:ring-2 ring-[#c09578]/20"
-              >
-                <option value="">Default Sorting</option>
-                <option value="3">Price: Low to High</option>
-                <option value="4">Price: High to Low</option>
-                <option value="1">Name: A - Z</option>
-              </select>
-            </div>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="bg-gray-50 rounded-lg px-4 py-2 text-sm font-bold outline-none"
+            >
+              <option value="">Default Sorting</option>
+              <option value="3">Price: Low to High</option>
+              <option value="4">Price: High to Low</option>
+              <option value="1">Name: A - Z</option>
+            </select>
           </div>
 
-          {/* Product Grid - Responsive Columns */}
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-96 bg-gray-200 rounded-2xl"></div>
-              ))}
+              {[...Array(6)].map((_, i) => <div key={i} className="h-96 bg-gray-200 rounded-2xl"></div>)}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
               {products.map((item) => (
-                <div
-                  key={item._id}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full"
-                >
+                <div key={item._id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col h-full">
                   <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
-                    <img
-                      src={item.ProductImage}
-                      alt={item.ProductName}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <button className="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg text-gray-400 hover:text-red-500 transition-all active:scale-90">
+                    <img src={item.ProductImage} alt={item.ProductName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <button className="absolute top-4 right-4 p-2 bg-white/80 rounded-full shadow-md text-gray-400 hover:text-red-500">
                       <FaHeart />
                     </button>
                   </div>
-
                   <div className="p-5 flex flex-col flex-grow text-center">
-                    <span className="text-[10px] text-[#c09578] font-black uppercase tracking-[0.2em] mb-2">
-                      {item.Category?.categoryName || "Premium"}
+                    <span className="text-[10px] text-[#c09578] font-bold uppercase tracking-widest mb-1">
+                      {item.Category?.categoryName || "Premium Furniture"}
                     </span>
-                    <h3 className="text-md font-bold text-gray-800 line-clamp-1 group-hover:text-[#c09578] transition-colors cursor-pointer mb-3">
-                      {item.ProductName}
-                    </h3>
-
-                    <div className="mt-auto space-y-4">
-                      <div className="flex justify-center items-center gap-3">
-                        <span className="text-gray-400 line-through text-xs italic">
-                          ₹{item.ActualPrice}
-                        </span>
-                        <span className="text-lg font-black text-gray-900 font-[cha]">
-                          ₹{item.SalePrice}
-                        </span>
-                      </div>
-                      <button className="w-full py-3 bg-gray-950 text-white text-xs font-bold uppercase tracking-widest hover:bg-[#c09578] transition-all duration-300 rounded-xl shadow-lg shadow-black/5 active:scale-95">
-                        Add to Cart
-                      </button>
+                    <h3 className="text-sm font-bold text-gray-800 line-clamp-1 mb-3">{item.ProductName}</h3>
+                    <div className="mt-auto flex justify-center items-center gap-3">
+                      <span className="text-gray-400 line-through text-xs">₹{item.ActualPrice}</span>
+                      <span className="text-md font-black text-gray-900">₹{item.SalePrice}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-
-          {!loading && products.length === 0 && (
-            <div className="text-center py-32 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-              <p className="text-gray-400 font-bold text-xl italic">
-                No luxury pieces match your selection.
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedCats([]);
-                  setSelectedMats([]);
-                  setPrice(200000);
-                }}
-                className="mt-4 text-[#c09578] font-bold underline"
-              >
-                Clear All Filters
-              </button>
-            </div>
-          )}
         </main>
       </div>
-
-      {/* Mobile Filter Overlay */}
-      {isMobileFilterOpen && (
-        <div
-          onClick={() => setIsMobileFilterOpen(false)}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden transition-opacity"
-        />
-      )}
     </div>
   );
 }
