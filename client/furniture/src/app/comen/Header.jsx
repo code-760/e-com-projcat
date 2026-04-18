@@ -32,6 +32,9 @@ export default function Header() {
   const tokan = useSelector((state) => state.userstore.tokan);
   const userData = useSelector((state) => state.userstore.userData);
 
+  console.log(userData,"jjjjj");
+  
+
   const cartdetails = useSelector(
     (state) => state.cartstore.cart?.cartdetails || [],
   );

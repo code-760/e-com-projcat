@@ -16,6 +16,7 @@ import "react-phone-input-2/lib/style.css";
 import { MdCameraAlt } from "react-icons/md"; // Camera icon ke liye
 
 import { Suspense } from "react";
+import { setUserData } from "../redex/slice/userslice";
 
 function DashboardContent() {
   let [oldPassword, setOldPassword] = useState("");
@@ -64,8 +65,9 @@ function DashboardContent() {
       .then((response) => response.data)
       .then((finlerec) => {
         let userData = finlerec.data;
+        dispatch(setUserData(userData)); // Redux store mein user data set karna
 
-        console.log("Fetched User Data:", userData); // Debugging ke liye
+        // console.log("Fetched User Data:", userData); // Debugging ke liye
 
         if (!userData.shippingAddress || !userData.shippingAddress?.address) {
           userData.shippingAddress = {
