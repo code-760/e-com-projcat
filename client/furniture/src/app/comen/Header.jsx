@@ -32,8 +32,7 @@ export default function Header() {
   const tokan = useSelector((state) => state.userstore.tokan);
   const userData = useSelector((state) => state.userstore.userData);
 
-  console.log(userData,"jjjjj");
-  
+  console.log(userData, "jjjjj");
 
   const cartdetails = useSelector(
     (state) => state.cartstore.cart?.cartdetails || [],
@@ -212,19 +211,22 @@ export default function Header() {
       <nav className="hidden lg:block border-b border-[#ebebeb]">
         <div className="max-w-[1370px] mx-auto">
           <ul className="flex justify-center gap-10">
+            {/* Home Link */}
             <Link
               href="/"
               className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
             >
               Home
             </Link>
+
+            {/* Dynamic Menu Items */}
             {menu?.map((item, idx) => (
               <li
                 key={idx}
-                className="group relative py-4 text-[13px] font-medium uppercase flex items-center gap-1 cursor-pointer hover:text-amber-600"
+                className="group relative py-4 text-[13px] font-medium uppercase flex items-center gap-1 cursor-pointer hover:text-amber-600 menu-items"
               >
                 {item.categoryName} <FaAngleDown />
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-6 grid grid-cols-3">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-6 grid grid-cols-3 dropdown">
                   {item.subcategories?.map((sub, sIdx) => (
                     <div key={sIdx}>
                       <h3 className="font-bold text-black mb-3">
@@ -244,6 +246,37 @@ export default function Header() {
                 </div>
               </li>
             ))}
+
+            {/* Static Pages Dropdown */}
+            <li className="relative z-10 uppercase cursor-pointer group hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium gap-2">
+              pages <FaAngleDown />
+              <div className="absolute top-full bg-white w-[250px] border border-[#ccc] shadow-sm hidden group-hover:flex">
+                <div className="p-3">
+                  <ul className="flex flex-col p-6 text-[#ccc] text-left">
+                    <Link
+                      href="/About-us"
+                      className="pb-3 hover:text-black text-nowrap"
+                    >
+                      About Us
+                    </Link>
+                    <Link href="/Cart" className="pb-3 hover:text-black">
+                      Cart
+                    </Link>
+                    <Link href="/Chachout" className="pb-3 hover:text-black">
+                      Checkout
+                    </Link>
+                    <Link
+                      href="/Frequently-Questions"
+                      className="pb-3 hover:text-black text-nowrap"
+                    >
+                      Frequently Questions
+                    </Link>
+                  </ul>
+                </div>
+              </div>
+            </li>
+
+            {/* Contact Link */}
             <Link
               href="/contect"
               className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
@@ -256,13 +289,18 @@ export default function Header() {
 
       {/* --- UPDATED MOBILE DRAWER NAVIGATION --- */}
       <div
-        className={`fixed inset-0 bg-black/50 z-[100] transition-opacity ${openMobileMenu ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        className={`fixed inset-0 bg-black/50 z-[100] transition-opacity ${
+          openMobileMenu ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
         onClick={() => setOpenMobileMenu(false)}
       >
         <div
-          className={`w-[280px] bg-white h-full transition-transform duration-300 overflow-y-auto ${openMobileMenu ? "translate-x-0" : "-translate-x-full"}`}
+          className={`w-[280px] bg-white h-full transition-transform duration-300 overflow-y-auto ${
+            openMobileMenu ? "translate-x-0" : "-translate-x-full"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Header */}
           <div className="flex justify-between items-center p-6 border-b">
             <h2 className="text-xl font-bold">Menu</h2>
             <RxCross2
@@ -272,6 +310,7 @@ export default function Header() {
           </div>
 
           <ul className="flex flex-col">
+            {/* Home Link */}
             <li className="border-b">
               <Link
                 href="/"
@@ -282,9 +321,9 @@ export default function Header() {
               </Link>
             </li>
 
+            {/* Dynamic Menu Items */}
             {menu?.map((item, idx) => (
               <li key={idx} className="border-b">
-                {/* Category Header */}
                 <div
                   className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => toggleMobileSub(idx)}
@@ -301,7 +340,7 @@ export default function Header() {
 
                 {/* Subcategories (Accordion Content) */}
                 {activeMobileSub === idx && (
-                  <div className="bg-gray-50 px-4 pb-4 animate-fadeIn">
+                  <div className="dropdown bg-gray-50 px-4 pb-4">
                     {item.subcategories?.map((sub, sIdx) => (
                       <div key={sIdx} className="mt-4">
                         <h3 className="font-bold text-xs uppercase text-gray-800 mb-2 border-l-2 border-amber-500 pl-2">
@@ -326,6 +365,7 @@ export default function Header() {
               </li>
             ))}
 
+            {/* Contact Link */}
             <li className="border-b">
               <Link
                 href="/contect"
