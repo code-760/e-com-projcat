@@ -1,20 +1,15 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { RxCross2 } from "react-icons/rx";
-
+import { RxCross2, RxHamburgerMenu } from "react-icons/rx";
 import { CiSearch } from "react-icons/ci";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaAngleDown, FaAngleUp } from "react-icons/fa"; // Added FaAngleUp
 import { MdShoppingCart } from "react-icons/md";
-import { FaAngleDown } from "react-icons/fa";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-
 import { removetokan } from "../redex/slice/userslice";
-import { redirect } from "next/navigation";
 import { fetchcart, removeItemFromCart } from "../redex/slice/cartslice";
 import axios from "axios";
-import {fetchwishlist} from "../redex/slice/wishlist";
-
+import { fetchwishlist } from "../redex/slice/wishlist";
 import {
   RiUser3Line,
   RiSettings4Line,
@@ -27,21 +22,24 @@ export default function Header() {
   const dispatch = useDispatch();
   const [menu, setMenu] = useState([]);
   const [opencart, setopencart] = useState(false);
+  const [openMobileMenu, setOpenMobileMenu] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
+
+  // Logical State for Mobile Dropdowns
+  const [activeMobileSub, setActiveMobileSub] = useState(null);
 
   const basurl = process.env.NEXT_PUBLIC_BASEURL;
   const tokan = useSelector((state) => state.userstore.tokan);
   const userData = useSelector((state) => state.userstore.userData);
 
-  // Direct selectors with default values to prevent reference changes
   const cartdetails = useSelector(
     (state) => state.cartstore.cart?.cartdetails || [],
   );
   const wishlistItems = useSelector(
     (state) => state.wishliststore.wishlist?.wishlistdetails || [],
   );
+  const wishlistCount = wishlistItems.length;
 
-const wishlistCount = wishlistItems.length;
-  // 1. Memoized Subtotal (Har render par calculate nahi hoga)
   const subtotal = useMemo(() => {
     return cartdetails.reduce(
       (acc, obj) => acc + (obj.price || 0) * (obj.quantity || 1),
@@ -49,396 +47,412 @@ const wishlistCount = wishlistItems.length;
     );
   }, [cartdetails]);
 
-  // 2. Fetch Logic (Token change hone par hi chalega)
   useEffect(() => {
     if (tokan) {
       dispatch(fetchcart());
-      dispatch(fetchwishlist()); // Wishlist bhi fetch karein
+      dispatch(fetchwishlist());
     }
   }, [tokan, dispatch]);
 
-  // 3. Mega Menu Fetch
   useEffect(() => {
     magamanu()
       .then(setMenu)
       .catch((err) => console.error("Menu Error:", err));
   }, []);
 
-  // 4. Logout with Router (Redirect loop se bachne ke liye)
   const Logout = () => {
     dispatch(removetokan());
-    window.location.href = "/Login-Register"; // Hard redirect is safer here
+    window.location.href = "/Login-Register";
   };
-  console.log(userData);
 
+  // Toggle function for mobile categories
+  const toggleMobileSub = (idx) => {
+    setActiveMobileSub(activeMobileSub === idx ? null : idx);
+  };
 
   return (
-    <div className=" ">
-      {/* top */}
-      <div className="  border-b border-[#ebebeb]  ">
-        <div className="w-[1370px] mx-auto flex justify-between p-2.5">
-          <div>
-            <p className="text-[12px]">
-              Contact us 24/7 : +91-98745612330 / furnitureinfo@gmail.com
-            </p>
-          </div>
-          <div>
-            <div className="relative group">
-              <div className="flex items-center gap-3 cursor-pointer">
-                {/* Avatar with Ring */}
-                <img
-                  src={userData?.userprofile}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100 group-hover:ring-purple-500 transition-all duration-300"
-                />
-
-                {/* User Info (Hidden on mobile) */}
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-gray-700 group-hover:text-purple-600 transition-colors">
-                    {userData?.UserName}
-                  </p>
-                  <p className="text-xs text-gray-500">{userData?.useremail}</p>
-                </div>
-
-                <RiArrowDownSLine className="text-gray-400 group-hover:text-purple-600 transition-transform group-hover:rotate-180" />
+    <div className="w-full bg-white">
+      {/* --- TOP BAR & MIDDLE SECTION (SAME AS YOUR CODE) --- */}
+      <div className="border-b border-[#ebebeb]">
+        <div className="max-w-[1370px] mx-auto flex flex-col md:flex-row justify-between items-center p-2.5 gap-2">
+          <p className="text-[10px] md:text-[12px] text-center md:text-left">
+            Contact us 24/7 : +91-98745612330 / furnitureinfo@gmail.com
+          </p>
+          <div
+            className="relative group"
+            onClick={() => setOpenDropdown(!openDropdown)} // mobile click
+          >
+            <div className="flex items-center gap-3 cursor-pointer">
+              <img
+                src={userData?.userprofile || "/default-avatar.png"}
+                alt="Profile"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100"
+              />
+              <div className="hidden sm:block text-left">
+                <p className="text-sm font-semibold text-gray-700">
+                  {userData?.UserName || "Guest"}
+                </p>
+                <p className="text-xs text-gray-500">{userData?.useremail}</p>
               </div>
+              <RiArrowDownSLine className="text-gray-400 group-hover:rotate-180 transition-transform" />
+            </div>
+            <div
+              className={`absolute right-0 mt-4 w-56 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 
+  transform transition-all duration-300 ease-out z-50 overflow-hidden
 
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 mt-4 w-56 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-y-0 translate-y-2 transition-all duration-300 ease-out z-50 overflow-hidden">
-                {/* Header inside dropdown */}
-                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                  <p className="text-sm font-semibold text-gray-800">
-                    My Account
-                  </p>
-                </div>
+  ${openDropdown ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-2"}
 
-                <ul className="py-2">
+  md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible md:group-hover:translate-y-0
+  `}
+            >
+              <div className="p-4">
+                <p className="text-sm font-semibold">My Account</p>
+              </div>
+              <ul className="py-2">
+                <li>
+                  <Link
+                    href="/desbord?tab=dashboard"
+                    className="flex items-center px-4 py-2 text-sm hover:bg-purple-50"
+                  >
+                    <RiUser3Line className="mr-3" /> Profile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/desbord?tab=profile"
+                    className="flex items-center px-4 py-2 text-sm hover:bg-purple-50"
+                  >
+                    <RiSettings4Line className="mr-3 text-lg" /> Complete
+                    Profile
+                  </Link>
+                </li>
+
+                {tokan ? (
+                  <li
+                    onClick={Logout}
+                    className="px-4 py-2.5 text-sm text-red-500 cursor-pointer hover:bg-red-50 flex items-center transition-colors"
+                  >
+                    <RiLogoutCircleRLine className="mr-3 text-lg" />
+                    Logout
+                  </li>
+                ) : (
                   <li>
                     <Link
-                      href="/desbord?tab=dashboard"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                      href="/Login-Register"
+                      className="flex items-center px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
                     >
                       <RiUser3Line className="mr-3 text-lg" />
-                      View Profile
+                      Login / Register
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      href="/desbord?tab=profile"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                    >
-                      <RiSettings4Line className="mr-3 text-lg" />
-                      Complete Profile
-                    </Link>
-                  </li>
-                  <div className="my-1 border-t border-gray-100"></div>{" "}
-                  {/* Divider */}
-                  <li>
-                    {tokan ? (
-                      <button
-                        onClick={Logout}
-                        className="w-full flex items-center px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <RiLogoutCircleRLine className="mr-3 text-lg" />
-                        Logout
-                      </button>
-                    ) : (
-                      <Link href={"/Login-Register"}>
-                        <p className="w-full flex items-center px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
-                          Login / Register
-                        </p>
-                      </Link>
-                    )}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* midde */}
-      <div>
-        <div className=" border-b border-[#ebebeb] relative ">
-          <div className=" w-[1370px] mx-auto flex justify-between p-5  ">
-            <div>
-              <img src="/images1.png" className="w-[156px] h[40px]" alt="" />
-            </div>
-            <div className=" flex items-center gap-4">
-              <div className="relative  ">
-                <input
-                  placeholder="Search..."
-                  className=" inputn w-60 shadow-lg focus:border-2 border-gray-300 px-5 py-3 rounded-xl w- transition-all focus:w-64 outline-none"
-                  name="search"
-                  type="text"
-                />
-                <div className=" absolute top-3 right-2  border-l  p-2">
-                  <CiSearch className="  " />
-                </div>
-              </div>
-
-              <Link
-                href={`/Wishlist`}
-                className="relative w-fit h-fit cursor-pointer group m-2"
-              >
-                {/* Base Layer: Heart Icon */}
-                <FaHeart className="text-black text-3xl transition-colors duration-300 group-hover:text-amber-200" />
-
-                {/* Top Layer (Badge): Number on top of Heart */}
-                <sup className="absolute -top-1.5 -right-2 bg-[#ff3f6c] text-[#282c3f] text-[11px] font-bold h-5 w-5 rounded-full flex items-center justify-center border border-white">
-                  {wishlistCount.length}
-                </sup>
-              </Link>
-
-              <div
-                className="border relative flex items-center  px-3 border-[#ccc] py-2 hover:text-[#C09578] gap-2"
-                onClick={() => setopencart(true)}
-              >
-                <div className=" border-r p-2 border-[#ccc]">
-                  <MdShoppingCart />
-                </div>
-                <div>
-                  <p>Rs.{subtotal}</p>
-                </div>
-                <div>
-                  <FaAngleDown />
-                </div>
-                <div className=" bg-[#C09578] w-5 h-5 absolute top-3.5 -left-2.5  rounded-2xl flex items-center text-center">
-                  <p className="text-black p-1.5 text-center">
-                    {cartdetails?.length || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* side cart */}
-          <div
-            className={`w-[320px] z-50 bg-white shadow-2xl h-screen fixed top-0 right-0 transform transition-all duration-500 ${opencart ? "translate-x-0" : "translate-x-full"}`}
-          >
-            {/* Header Section */}
-            <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
-              <Link href="/Cart">
-                <h3 className="text-[20px] font-bold">Cart</h3>
-              </Link>
-              <RxCross2
-                className="cursor-pointer text-2xl"
-                onClick={() => setopencart(false)}
-              />
-            </div>
-
-            {/* Scrollable Area: Yahan 'overflow-y-auto' aur 'custom-scrollbar' zaroori hai */}
-            <div className="h-[calc(100vh-190px)] overflow-y-auto custom-scrollbar px-4 py-6">
-              <div className="flex flex-col gap-6 text-center">
-                {tokan ? (
-                  <>
-                    {cartdetails && cartdetails.length > 0 ? (
-                      cartdetails.map((item, index) => {
-                        const isLiked = wishlistItems.some((wItem) => wItem._id === item._id);
-
-                        return (
-                          /* --- AAPKA PURANA CARD CODE START --- */
-                          <div key={item._id}>
-                            <div className="w-72 bg-white shadow-md hover:shadow-xl">
-                              <div>
-                                <img
-                                  src={item.productImg}
-                                  alt={item.ProductName}
-                                  className="h-40 w-72 object-center rounded-t-xl"
-                                />
-                                <div className="px-4 py-3 text-center w-72">
-                                  <span className="text-gray-400 my-5 text-[12px] uppercase ">
-                                    Nest Of Tables
-                                  </span>
-                                  <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">
-                                    {item.ProductName}
-                                  </p>
-                                  <div className=" border my-4 border-[#ccc] "></div>
-                                  <div className=" flex flex-col justify-center items-center">
-                                    <div className=" flex items-center">
-                                      <p className=" text-sm cursor-auto text-gray-600 line-through ">
-                                        {item.price}
-                                      </p>
-                                      <p className=" text-lg font-semibold text-black ml-2">
-                                        {item.SalePrice}
-                                      </p>
-                                    </div>
-                                    <div className="text-center flex gap-1 ">
-                                      {/* 4. ONCLICK LAGAYA YAHAN */}
-                                      <div
-                                        onClick={(e) =>
-                                          handleLikeClick(e, product, isLiked)
-                                        }
-                                        className="py-1 px-2 border-[#ebebeb] flex items-center bg-[#ebebeb] cursor-pointer"
-                                      >
-                                        <FaHeart
-                                          className={`transition-colors duration-300 ${
-                                            isLiked
-                                              ? "text-[#c09578]" // Liked color
-                                              : "text-gray-400 hover:text-[#C09578]" // Normal color
-                                          }`}
-                                        />
-                                      </div>
-                                      <div className=" border p-1 border-[#ebebeb] bg-[#ebebeb]">
-                                        <h5
-                                          onClick={() => {
-                                            // 1. API call karein
-
-                                            axios
-                                              .delete(
-                                                `${basurl}cart/delete-cart/${item._id}`,
-                                              )
-
-                                              .then((res) => res.data)
-
-                                              .then((finalres) => {
-                                                if (finalres._status === true) {
-                                                  // 1. Redux wala function call karo (Poori web app se item hatane ke liye)
-
-                                                  dispatch(
-                                                    removeItemFromCart(
-                                                      item._id,
-                                                    ),
-                                                  );
-
-                                                  // 2. Agar aapne parent se koi function pass kiya hai toh use bhi call kar sakte ho
-
-                                                  // cartdelete(id);
-                                                }
-                                              });
-                                          }}
-                                          className="text-[13px] font-bold uppercase"
-                                        >
-                                          Remove from Cart
-                                        </h5>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      /* --- AAPKA PURANA CARD CODE END --- */
-
-                      <div className="py-10 text-gray-400 font-medium">
-                        Your cart is empty!
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="py-10 text-gray-400">
-                    Please login to see cart!
-                  </div>
                 )}
-              </div>
-            </div>
 
-            {/* Total & Checkout (Bottom Fixed) */}
-            <div className="absolute bottom-0 left-0 w-full p-5 bg-white border-t">
-              <div className="flex justify-between items-center mb-4 text-xl font-bold">
-                <span>Total:</span>
-                <span className="text-[#C09578]">{subtotal}</span>
-              </div>
-              <button className="w-full py-4 bg-black text-white font-bold hover:bg-[#C09578] transition-all">
-                CHECKOUT
-              </button>
+                {/* <li
+                  onClick={Logout}
+                  className="px-4 py-2 text-sm text-red-500 cursor-pointer hover:bg-red-50 flex items-center"
+                >
+                  <RiLogoutCircleRLine className="mr-3" /> Logout
+                </li> */}
+              </ul>
             </div>
           </div>
         </div>
       </div>
-      {/* manu */}
-      <div className=" border flex items-center border-[#ebebeb]  ">
-        <div className="w-[1370px] mx-auto text-center  ">
-          <nav className="">
-            <ul className=" flex gap-[60px] justify-center   ">
+
+      <div className="border-b border-[#ebebeb]">
+        <div className="max-w-[1370px] mx-auto flex flex-wrap justify-between items-center p-4 md:p-5 gap-4">
+          <div className="flex items-center gap-4">
+            <RxHamburgerMenu
+              className="text-2xl lg:hidden cursor-pointer"
+              onClick={() => setOpenMobileMenu(true)}
+            />
+            <Link href="/">
+              <img
+                src="/images1.png"
+                className="w-[120px] md:w-[156px]"
+                alt="Logo"
+              />
+            </Link>
+          </div>
+          <div className="flex items-center gap-3 md:gap-6 order-3 md:order-2 w-full md:w-auto">
+            <div className="relative flex-grow md:flex-grow-0">
+              <input
+                placeholder="Search..."
+                className="w-full md:w-60 shadow-sm focus:border-purple-400 border border-gray-200 px-4 py-2 rounded-xl outline-none"
+                type="text"
+              />
+              <CiSearch className="absolute top-3 right-3 text-gray-400" />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 order-2 md:order-3">
+            <Link href="/Wishlist" className="relative group">
+              <FaHeart className="text-2xl group-hover:text-amber-500 transition-colors" />
+              <sup className="absolute -top-2 -right-2 bg-[#ff3f6c] text-white text-[10px] h-5 w-5 rounded-full flex items-center justify-center border-2 border-white">
+                {wishlistCount}
+              </sup>
+            </Link>
+            <div
+              className="flex items-center border border-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:border-amber-500 transition-all gap-2"
+              onClick={() => setopencart(true)}
+            >
+              <MdShoppingCart className="text-xl" />
+              <p className="hidden sm:block font-semibold">Rs.{subtotal}</p>
+              <div className="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                {cartdetails?.length || 0}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- DESKTOP NAVIGATION --- */}
+      <nav className="hidden lg:block border-b border-[#ebebeb]">
+        <div className="max-w-[1370px] mx-auto">
+          <ul className="flex justify-center gap-10">
+            <Link
+              href="/"
+              className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
+            >
+              Home
+            </Link>
+            {menu?.map((item, idx) => (
+              <li
+                key={idx}
+                className="group relative py-4 text-[13px] font-medium uppercase flex items-center gap-1 cursor-pointer hover:text-amber-600"
+              >
+                {item.categoryName} <FaAngleDown />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-6 grid grid-cols-3">
+                  {item.subcategories?.map((sub, sIdx) => (
+                    <div key={sIdx}>
+                      <h3 className="font-bold text-black mb-3">
+                        {sub.SubcategoryName}
+                      </h3>
+                      {sub.Subsubcategories?.map((ssub, ssIdx) => (
+                        <Link
+                          key={ssIdx}
+                          href="/Product-Listing"
+                          className="block text-gray-500 py-1 hover:text-amber-600 normal-case font-normal"
+                        >
+                          {ssub.SubsubcategoryName}
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
+            <Link
+              href="/contect"
+              className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
+            >
+              Contact Us
+            </Link>
+          </ul>
+        </div>
+      </nav>
+
+      {/* --- UPDATED MOBILE DRAWER NAVIGATION --- */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-[100] transition-opacity ${openMobileMenu ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        onClick={() => setOpenMobileMenu(false)}
+      >
+        <div
+          className={`w-[280px] bg-white h-full transition-transform duration-300 overflow-y-auto ${openMobileMenu ? "translate-x-0" : "-translate-x-full"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center p-6 border-b">
+            <h2 className="text-xl font-bold">Menu</h2>
+            <RxCross2
+              className="text-2xl cursor-pointer"
+              onClick={() => setOpenMobileMenu(false)}
+            />
+          </div>
+
+          <ul className="flex flex-col">
+            <li className="border-b">
               <Link
-                href={"/"}
-                className="text-[#C09578]  uppercase cursor-pointer text-[13px]  py-5  font-medium"
+                href="/"
+                className="block p-4 font-medium uppercase text-sm"
+                onClick={() => setOpenMobileMenu(false)}
               >
                 Home
               </Link>
+            </li>
 
-              {menu?.map((item, index) => {
-                return (
-                  <li key={index} className=" menu-items">
-                    {item?.categoryName}
+            {menu?.map((item, idx) => (
+              <li key={idx} className="border-b">
+                {/* Category Header */}
+                <div
+                  className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => toggleMobileSub(idx)}
+                >
+                  <span className="font-medium uppercase text-sm">
+                    {item.categoryName}
+                  </span>
+                  {activeMobileSub === idx ? (
+                    <FaAngleUp className="text-amber-600" />
+                  ) : (
                     <FaAngleDown />
-
-                    <div className=" dropdown">
-                      <div className="grid grid-cols-3 p-3 ">
-                        {item?.subcategories?.map((subItem, subIndex) => {
-                          return (
-                            <div key={subIndex}>
-                              <ul className="p-6 text-[#ccc] text-left">
-                                <h3 className="pb-4 text-black font-bold hover:text-[#D2A278]">
-                                  {subItem?.SubcategoryName}
-                                </h3>
-
-                                {subItem?.Subsubcategories?.map(
-                                  (subsubItem, subsubIndex) => {
-                                    return (
-                                      <Link
-                                        key={subsubIndex}
-                                        href={"/Product-Listing"}
-                                        className="block pb-3 hover:text-black"
-                                      >
-                                        {subsubItem?.SubsubcategoryName}
-                                      </Link>
-                                    );
-                                  },
-                                )}
-                              </ul>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-
-              <li className=" relative z-10  uppercase cursor-pointer group  hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium  gap-2">
-                pages
-                <FaAngleDown />
-                <div className=" absolute top-full bg-white w-[250px] border border-[#ccc] shadow-[#ccc] hidden group-hover:flex  ">
-                  <div className=" grid grid-cols-3 p-3 ">
-                    <div>
-                      <ul className=" flex flex-col p-6 text-[#ccc] text-left">
-                        <Link
-                          href={"/About-us"}
-                          className="pb-3 hover:text-black text-nowrap"
-                        >
-                          About Us
-                        </Link>
-                        <Link href={"/Cart"} className="pb-3 hover:text-black">
-                          Cart
-                        </Link>
-                        <Link
-                          href={"/Chachout"}
-                          className="pb-3 hover:text-black"
-                        >
-                          Checkout
-                        </Link>
-                        <Link
-                          href={"/Frequently-Questions"}
-                          className="pb-3 hover:text-black text-nowrap"
-                        >
-                          Frequently Questions
-                        </Link>
-                      </ul>
-                    </div>
-                  </div>
+                  )}
                 </div>
+
+                {/* Subcategories (Accordion Content) */}
+                {activeMobileSub === idx && (
+                  <div className="bg-gray-50 px-4 pb-4 animate-fadeIn">
+                    {item.subcategories?.map((sub, sIdx) => (
+                      <div key={sIdx} className="mt-4">
+                        <h3 className="font-bold text-xs uppercase text-gray-800 mb-2 border-l-2 border-amber-500 pl-2">
+                          {sub.SubcategoryName}
+                        </h3>
+                        <div className="flex flex-col gap-2 pl-3">
+                          {sub.Subsubcategories?.map((ssub, ssIdx) => (
+                            <Link
+                              key={ssIdx}
+                              href="/Product-Listing"
+                              className="text-sm text-gray-600 py-1"
+                              onClick={() => setOpenMobileMenu(false)}
+                            >
+                              {ssub.SubsubcategoryName}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </li>
+            ))}
+
+            <li className="border-b">
               <Link
-                href={"/contect"}
-                className=" uppercase cursor-pointer  hover:text-[#C09578] text-[13px]  py-5 flex items-center font-medium gap-2"
+                href="/contect"
+                className="block p-4 font-medium uppercase text-sm"
+                onClick={() => setOpenMobileMenu(false)}
               >
                 Contact Us
               </Link>
-            </ul>
-          </nav>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* --- CART SIDEBAR (SAME AS YOUR CODE) --- */}
+
+      <div
+        className={`w-[320px] z-50 bg-white shadow-2xl h-screen fixed top-0 right-0 transform transition-all duration-500 ${opencart ? "translate-x-0" : "translate-x-full"}`}
+      >
+        {/* Header Section */}
+        <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
+          <Link href="/Cart">
+            <h3 className="text-[20px] font-bold">Cart</h3>
+          </Link>
+          <RxCross2
+            className="cursor-pointer text-2xl"
+            onClick={() => setopencart(false)}
+          />
+        </div>
+
+        {/* Scrollable Area */}
+        <div className="h-[calc(100vh-190px)] overflow-y-auto custom-scrollbar px-4 py-6">
+          <div className="flex flex-col gap-6 text-center">
+            {tokan ? (
+              <>
+                {cartdetails && cartdetails.length > 0 ? (
+                  cartdetails.map((item) => {
+                    const isLiked = wishlistItems.some(
+                      (wItem) => wItem._id === item._id,
+                    );
+
+                    return (
+                      <div
+                        key={item._id}
+                        className="w-full flex justify-center"
+                      >
+                        <div className="w-full bg-white shadow-md hover:shadow-xl rounded-xl overflow-hidden border border-gray-100">
+                          <img
+                            src={item.productImg}
+                            alt={item.ProductName}
+                            className="h-40 w-full object-cover"
+                          />
+                          <div className="px-4 py-3">
+                            <span className="text-gray-400 text-[12px] uppercase block mb-1">
+                              Nest Of Tables
+                            </span>
+                            <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">
+                              {item.ProductName}
+                            </p>
+
+                            <div className="border-t my-3 border-[#ccc]"></div>
+
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm text-gray-600 line-through">
+                                  Rs. {item.price}
+                                </p>
+                                <p className="text-lg font-semibold text-black">
+                                  Rs. {item.SalePrice}
+                                </p>
+                              </div>
+
+                              <div className="flex gap-2 mt-2">
+                                <div
+                                  onClick={(e) =>
+                                    handleLikeClick(e, item, isLiked)
+                                  }
+                                  className="p-2 border border-[#ebebeb] bg-[#f9f9f9] cursor-pointer rounded-md"
+                                >
+                                  <FaHeart
+                                    className={`transition-colors duration-300 ${isLiked ? "text-[#c09578]" : "text-gray-400"}`}
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    axios
+                                      .delete(
+                                        `${basurl}cart/delete-cart/${item._id}`,
+                                      )
+                                      .then((res) => {
+                                        if (res.data._status === true) {
+                                          dispatch(
+                                            removeItemFromCart(item._id),
+                                          );
+                                        }
+                                      });
+                                  }}
+                                  className="bg-[#ebebeb] px-3 py-1 text-[12px] font-bold uppercase rounded-md hover:bg-red-50 hover:text-red-500 transition-all"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="py-10 text-gray-400 font-medium">
+                    Your cart is empty!
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="py-10 text-gray-400 font-medium">
+                Please login to see cart!
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Total & Checkout (Bottom Fixed) */}
+        <div className="absolute bottom-0 left-0 w-full p-5 bg-white border-t">
+          <div className="flex justify-between items-center mb-4 text-xl font-bold">
+            <span>Total:</span>
+            <span className="text-[#C09578]">Rs. {subtotal}</span>
+          </div>
+          <button className="w-full py-4 bg-black text-white font-bold hover:bg-[#C09578] transition-all uppercase tracking-wider">
+            Checkout
+          </button>
         </div>
       </div>
     </div>

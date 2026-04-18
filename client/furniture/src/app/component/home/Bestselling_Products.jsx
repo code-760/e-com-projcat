@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react"; // useMemo add kiya
+import React, { useMemo } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaHeart } from "react-icons/fa";
@@ -14,7 +14,6 @@ import {
 } from "@/app/redex/slice/wishlist";
 
 export default function Bestselling_Products({ bdata }) {
-  // Logic: Filters ko useMemo mein dala taaki har render par filter na chale
   const filteredProducts = useMemo(() => {
     return (bdata || []).filter(
       (item) => item.BestSelling === true || item.BestSelling === 1
@@ -22,26 +21,45 @@ export default function Bestselling_Products({ bdata }) {
   }, [bdata]);
 
   const settings = {
-    infinite: filteredProducts.length > 4, // Bug fix: Agar 4 se kam product hain toh infinite band
+    infinite: filteredProducts.length > 4,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
     arrows: true,
-    lazyLoad: 'ondemand', // CPU saving: Sirf dikhne wali images load karega
+    lazyLoad: "ondemand",
+
+    // ✅ responsive fix
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: 3 },
+      },
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 1 },
+      },
+    ],
   };
 
   const dispatch = useDispatch();
 
-  // Wishlist data optimization
-  const wishlistItems = useSelector((state) => state.wishliststore.wishlist?.wishlistdetails || []);
+  const wishlistItems = useSelector(
+    (state) => state.wishliststore.wishlist?.wishlistdetails || []
+  );
 
-  // Performance Fix: Wishlist IDs ka Set banaya taaki loop na chalana pade
-  const wishlistIds = useMemo(() => new Set(wishlistItems.map(item => item._id)), [wishlistItems]);
+  const wishlistIds = useMemo(
+    () => new Set(wishlistItems.map((item) => item._id)),
+    [wishlistItems]
+  );
 
   const handleLikeClick = (e, product, isLiked) => {
     e.preventDefault();
-    e.stopPropagation(); // Event bubbling roka
+    e.stopPropagation();
 
     if (isLiked) {
       dispatch(removeItemFromwishlist(product._id));
@@ -53,7 +71,9 @@ export default function Bestselling_Products({ bdata }) {
   };
 
   return (
-    <div className="slider-container w-[1170px] h-auto my-12 mx-auto">
+    // ✅ container responsive
+    <div className="slider-container max-w-[1170px] w-full px-4 h-auto my-12 mx-auto">
+      
       <div className="relative flex items-center mb-10">
         <h2 className="pr-5 text-3xl font-[cha] bg-white z-10">
           Bestselling Products
@@ -62,24 +82,29 @@ export default function Bestselling_Products({ bdata }) {
       </div>
 
       {filteredProducts.length > 0 ? (
-        <Slider {...settings} className="h-full">
+       <Slider {...settings} className="w-full">
           {filteredProducts.map((product, index) => {
-            // Memory Optimization: Loop ke andar .some() ki jagah .has() use kiya
             const isLiked = wishlistIds.has(product._id);
 
             return (
               <div key={product._id || index} className="p-3">
-                <div className="w-72 bg-white shadow-md hover:shadow-xl mx-auto rounded-t-xl">
+                
+                {/* ✅ card responsive */}
+                <div className="w-full max-w-[280px] bg-white shadow-md hover:shadow-xl mx-auto rounded-t-xl">
+                  
                   <Link href={`/product/${product._id}`}>
                     <div>
+                      
+                      {/* ✅ image responsive */}
                       <img
                         src={product.ProductImage}
                         alt={product.ProductName}
-                        loading="lazy" // Memory optimization
-                        className="h-40 w-72 object-center rounded-t-xl"
+                        loading="lazy"
+                        className="h-40 w-full object-cover rounded-t-xl"
                       />
 
                       <div className="px-4 py-3 text-center w-full">
+                        
                         <span className="text-gray-400 my-5 text-[12px] uppercase block truncate">
                           {product.Category?.categoryName || "Furniture"}
                         </span>
@@ -91,8 +116,9 @@ export default function Bestselling_Products({ bdata }) {
                         <div className="border my-4 border-[#ccc]"></div>
 
                         <div className="flex flex-col justify-center items-center">
+                          
                           <div className="flex items-center">
-                            <p className="text-sm text-gray-600 cursor-auto line-through">
+                            <p className="text-sm text-gray-600 line-through">
                               Rs. {product.ActualPrice}
                             </p>
                             <p className="text-lg font-semibold text-black ml-2">
@@ -101,25 +127,34 @@ export default function Bestselling_Products({ bdata }) {
                           </div>
 
                           <div className="text-center flex gap-1 mt-3">
+                            
                             <div
-                              onClick={(e) => handleLikeClick(e, product, isLiked)}
+                              onClick={(e) =>
+                                handleLikeClick(e, product, isLiked)
+                              }
                               className="py-1 px-2 border-[#ebebeb] flex items-center bg-[#ebebeb] cursor-pointer hover:bg-gray-100"
                             >
                               <FaHeart
                                 className={`transition-colors duration-300 ${
-                                  isLiked ? "text-[#c09578]" : "text-gray-400"
+                                  isLiked
+                                    ? "text-[#c09578]"
+                                    : "text-gray-400"
                                 }`}
                               />
                             </div>
 
                             <div className="border p-1 border-[#ebebeb] bg-[#ebebeb] cursor-pointer hover:bg-gray-100">
-                              <h5 className="font-medium text-sm">Add cart</h5>
+                              <h5 className="font-medium text-sm">
+                                Add cart
+                              </h5>
                             </div>
+
                           </div>
                         </div>
                       </div>
                     </div>
                   </Link>
+
                 </div>
               </div>
             );

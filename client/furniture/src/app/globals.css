@@ -85,3 +85,20 @@
   opacity: 1;
   visibility: visible;
 }
+.slick-slider {
+  width: 100% !important;
+}
+
+.slick-list {
+  width: 100% !important;
+}
+
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide {
+  height: auto !important;
+  display: flex !important;
+  justify-content: center;
+}

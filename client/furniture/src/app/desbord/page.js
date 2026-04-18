@@ -223,7 +223,7 @@ function DashboardContent() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           {/* --- SIDEBAR --- */}
-          <div className="w-full lg:w-[300px] sticky top-6">
+          <div className="w-full lg:w-[300px]  top-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               {[
                 { label: "My Dashboard", value: "My Dasboard" },
