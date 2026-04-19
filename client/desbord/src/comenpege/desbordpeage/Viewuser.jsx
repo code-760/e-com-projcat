@@ -39,6 +39,8 @@ export default function Viewuser() {
         // setpath(finlerec.path);
 
         setdata(finlerec.data);
+        console.log(finlerec,"data");
+        
         
       });
   };
@@ -111,9 +113,9 @@ export default function Viewuser() {
     viweuser();
   }, []);
 
-   let toteldata = data.length;
+   let toteldata = data?.length;
   // Note: Corrected status key from `Subcategorystatus` to `Tastimonialstatus` based on mapping below
-  let activdata = data.filter((v) => v.Userstatus).length;
+  let activdata = data?.filter((v) => v.Userstatus).length;
   let dactivdeta = toteldata - activdata;
 
   return (
