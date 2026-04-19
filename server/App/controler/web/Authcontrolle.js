@@ -260,7 +260,7 @@ let updateuser = async (req, res) => {
   res.send({
     _status: "success",
     message: "user updated successfully",
-    data: updateData,
+   // data: updateData,
   });
 };
 
@@ -274,7 +274,7 @@ let userdetail = async (req, res) => {
     _status: "success",
     message: "user details fetched successfully",
     path: process.env.PROFILEIMAGEPATH,
-    data,
+    // data,
   });
 };
 

@@ -65,7 +65,7 @@ function DashboardContent() {
       .then((response) => response.data)
       .then((finlerec) => {
         let userData = finlerec.data;
-        dispatch(setUserData(userData)); // Redux store mein user data set karna
+        // dispatch(setUserData(userData)); // Redux store mein user data set karna
 
         // console.log("Fetched User Data:", userData); // Debugging ke liye
 

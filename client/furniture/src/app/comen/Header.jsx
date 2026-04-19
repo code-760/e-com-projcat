@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { RxCross2, RxHamburgerMenu } from "react-icons/rx";
 import { CiSearch } from "react-icons/ci";
-import { FaHeart, FaAngleDown, FaAngleUp } from "react-icons/fa"; // Added FaAngleUp
+import { FaHeart, FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { MdShoppingCart } from "react-icons/md";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,14 +25,11 @@ export default function Header() {
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
 
-  // Logical State for Mobile Dropdowns
   const [activeMobileSub, setActiveMobileSub] = useState(null);
 
   const basurl = process.env.NEXT_PUBLIC_BASEURL;
   const tokan = useSelector((state) => state.userstore.tokan);
   const userData = useSelector((state) => state.userstore.userData);
-
-  console.log(userData, "jjjjj");
 
   const cartdetails = useSelector(
     (state) => state.cartstore.cart?.cartdetails || [],
@@ -67,22 +64,23 @@ export default function Header() {
     window.location.href = "/Login-Register";
   };
 
-  // Toggle function for mobile categories
   const toggleMobileSub = (idx) => {
     setActiveMobileSub(activeMobileSub === idx ? null : idx);
   };
 
   return (
     <div className="w-full bg-white">
-      {/* --- TOP BAR & MIDDLE SECTION (SAME AS YOUR CODE) --- */}
+      {/* --- TOP BAR & MIDDLE SECTION --- */}
       <div className="border-b border-[#ebebeb]">
         <div className="max-w-[1370px] mx-auto flex flex-col md:flex-row justify-between items-center p-2.5 gap-2">
           <p className="text-[10px] md:text-[12px] text-center md:text-left">
             Contact us 24/7 : +91-98745612330 / furnitureinfo@gmail.com
           </p>
+          
+          {/* FIXED SECTION: Changed 'p' to 'div' here */}
           <div
             className="relative group"
-            onClick={() => setOpenDropdown(!openDropdown)} // mobile click
+            onClick={() => setOpenDropdown(!openDropdown)}
           >
             <div className="flex items-center gap-3 cursor-pointer">
               <img
@@ -91,21 +89,19 @@ export default function Header() {
                 className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100"
               />
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-semibold text-gray-700">
+                {/* Fixed internal nesting error: Changed 'p' to 'span' */}
+                <span className="text-sm font-semibold text-gray-700 block">
                   {userData?.UserName || "Guest"}
-                </p>
-                <p className="text-xs text-gray-500">{userData?.useremail}</p>
+                </span>
+                <span className="text-xs text-gray-500 block">{userData?.useremail}</span>
               </div>
               <RiArrowDownSLine className="text-gray-400 group-hover:rotate-180 transition-transform" />
             </div>
             <div
               className={`absolute right-0 mt-4 w-56 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 
   transform transition-all duration-300 ease-out z-50 overflow-hidden
-
   ${openDropdown ? "opacity-100 visible translate-y-0" : "opacity-0 invisible translate-y-2"}
-
-  md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible md:group-hover:translate-y-0
-  `}
+  md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible md:group-hover:translate-y-0`}
             >
               <div className="p-4">
                 <p className="text-sm font-semibold">My Account</p>
@@ -124,8 +120,7 @@ export default function Header() {
                     href="/desbord?tab=profile"
                     className="flex items-center px-4 py-2 text-sm hover:bg-purple-50"
                   >
-                    <RiSettings4Line className="mr-3 text-lg" /> Complete
-                    Profile
+                    <RiSettings4Line className="mr-3 text-lg" /> Complete Profile
                   </Link>
                 </li>
 
@@ -148,13 +143,6 @@ export default function Header() {
                     </Link>
                   </li>
                 )}
-
-                {/* <li
-                  onClick={Logout}
-                  className="px-4 py-2 text-sm text-red-500 cursor-pointer hover:bg-red-50 flex items-center"
-                >
-                  <RiLogoutCircleRLine className="mr-3" /> Logout
-                </li> */}
               </ul>
             </div>
           </div>
@@ -211,7 +199,6 @@ export default function Header() {
       <nav className="hidden lg:block border-b border-[#ebebeb]">
         <div className="max-w-[1370px] mx-auto">
           <ul className="flex justify-center gap-10">
-            {/* Home Link */}
             <Link
               href="/"
               className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
@@ -219,7 +206,6 @@ export default function Header() {
               Home
             </Link>
 
-            {/* Dynamic Menu Items */}
             {menu?.map((item, idx) => (
               <li
                 key={idx}
@@ -247,36 +233,20 @@ export default function Header() {
               </li>
             ))}
 
-            {/* Static Pages Dropdown */}
             <li className="relative z-10 uppercase cursor-pointer group hover:text-[#C09578] text-[13px] flex items-center py-5 font-medium gap-2">
               pages <FaAngleDown />
               <div className="absolute top-full bg-white w-[250px] border border-[#ccc] shadow-sm hidden group-hover:flex">
                 <div className="p-3">
                   <ul className="flex flex-col p-6 text-[#ccc] text-left">
-                    <Link
-                      href="/About-us"
-                      className="pb-3 hover:text-black text-nowrap"
-                    >
-                      About Us
-                    </Link>
-                    <Link href="/Cart" className="pb-3 hover:text-black">
-                      Cart
-                    </Link>
-                    <Link href="/Chachout" className="pb-3 hover:text-black">
-                      Checkout
-                    </Link>
-                    <Link
-                      href="/Frequently-Questions"
-                      className="pb-3 hover:text-black text-nowrap"
-                    >
-                      Frequently Questions
-                    </Link>
+                    <Link href="/About-us" className="pb-3 hover:text-black text-nowrap">About Us</Link>
+                    <Link href="/Cart" className="pb-3 hover:text-black">Cart</Link>
+                    <Link href="/Chachout" className="pb-3 hover:text-black">Checkout</Link>
+                    <Link href="/Frequently-Questions" className="pb-3 hover:text-black text-nowrap">Frequently Questions</Link>
                   </ul>
                 </div>
               </div>
             </li>
 
-            {/* Contact Link */}
             <Link
               href="/contect"
               className="py-4 text-[13px] font-medium uppercase hover:text-amber-600"
@@ -287,7 +257,7 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* --- UPDATED MOBILE DRAWER NAVIGATION --- */}
+      {/* --- MOBILE DRAWER NAVIGATION --- */}
       <div
         className={`fixed inset-0 bg-black/50 z-[100] transition-opacity ${
           openMobileMenu ? "opacity-100 visible" : "opacity-0 invisible"
@@ -300,7 +270,6 @@ export default function Header() {
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="flex justify-between items-center p-6 border-b">
             <h2 className="text-xl font-bold">Menu</h2>
             <RxCross2
@@ -310,7 +279,6 @@ export default function Header() {
           </div>
 
           <ul className="flex flex-col">
-            {/* Home Link */}
             <li className="border-b">
               <Link
                 href="/"
@@ -321,24 +289,16 @@ export default function Header() {
               </Link>
             </li>
 
-            {/* Dynamic Menu Items */}
             {menu?.map((item, idx) => (
               <li key={idx} className="border-b">
                 <div
                   className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => toggleMobileSub(idx)}
                 >
-                  <span className="font-medium uppercase text-sm">
-                    {item.categoryName}
-                  </span>
-                  {activeMobileSub === idx ? (
-                    <FaAngleUp className="text-amber-600" />
-                  ) : (
-                    <FaAngleDown />
-                  )}
+                  <span className="font-medium uppercase text-sm">{item.categoryName}</span>
+                  {activeMobileSub === idx ? <FaAngleUp className="text-amber-600" /> : <FaAngleDown />}
                 </div>
 
-                {/* Subcategories (Accordion Content) */}
                 {activeMobileSub === idx && (
                   <div className="dropdown bg-gray-50 px-4 pb-4">
                     {item.subcategories?.map((sub, sIdx) => (
@@ -365,7 +325,6 @@ export default function Header() {
               </li>
             ))}
 
-            {/* Contact Link */}
             <li className="border-b">
               <Link
                 href="/contect"
@@ -379,88 +338,46 @@ export default function Header() {
         </div>
       </div>
 
-      {/* --- CART SIDEBAR (SAME AS YOUR CODE) --- */}
-
+      {/* --- CART SIDEBAR --- */}
       <div
         className={`w-[320px] z-50 bg-white shadow-2xl h-screen fixed top-0 right-0 transform transition-all duration-500 ${opencart ? "translate-x-0" : "translate-x-full"}`}
       >
-        {/* Header Section */}
         <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
-          <Link href="/Cart">
-            <h3 className="text-[20px] font-bold">Cart</h3>
-          </Link>
+          <Link href="/Cart"><h3 className="text-[20px] font-bold">Cart</h3></Link>
           <RxCross2
             className="cursor-pointer text-2xl"
             onClick={() => setopencart(false)}
           />
         </div>
 
-        {/* Scrollable Area */}
         <div className="h-[calc(100vh-190px)] overflow-y-auto custom-scrollbar px-4 py-6">
           <div className="flex flex-col gap-6 text-center">
             {tokan ? (
               <>
                 {cartdetails && cartdetails.length > 0 ? (
                   cartdetails.map((item) => {
-                    const isLiked = wishlistItems.some(
-                      (wItem) => wItem._id === item._id,
-                    );
-
+                    const isLiked = wishlistItems.some((wItem) => wItem._id === item._id);
                     return (
-                      <div
-                        key={item._id}
-                        className="w-full flex justify-center"
-                      >
+                      <div key={item._id} className="w-full flex justify-center">
                         <div className="w-full bg-white shadow-md hover:shadow-xl rounded-xl overflow-hidden border border-gray-100">
-                          <img
-                            src={item.productImg}
-                            alt={item.ProductName}
-                            className="h-40 w-full object-cover"
-                          />
+                          <img src={item.productImg} alt={item.ProductName} className="h-40 w-full object-cover" />
                           <div className="px-4 py-3">
-                            <span className="text-gray-400 text-[12px] uppercase block mb-1">
-                              Nest Of Tables
-                            </span>
-                            <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">
-                              {item.ProductName}
-                            </p>
-
+                            <span className="text-gray-400 text-[12px] uppercase block mb-1">Nest Of Tables</span>
+                            <p className="text-lg font-bold text-black truncate block capitalize font-[cha] hover:text-[#C09578]">{item.ProductName}</p>
                             <div className="border-t my-3 border-[#ccc]"></div>
-
                             <div className="flex flex-col items-center gap-2">
                               <div className="flex items-center gap-2">
-                                <p className="text-sm text-gray-600 line-through">
-                                  Rs. {item.price}
-                                </p>
-                                <p className="text-lg font-semibold text-black">
-                                  Rs. {item.SalePrice}
-                                </p>
+                                <p className="text-sm text-gray-600 line-through">Rs. {item.price}</p>
+                                <p className="text-lg font-semibold text-black">Rs. {item.SalePrice}</p>
                               </div>
-
                               <div className="flex gap-2 mt-2">
-                                <div
-                                  onClick={(e) =>
-                                    handleLikeClick(e, item, isLiked)
-                                  }
-                                  className="p-2 border border-[#ebebeb] bg-[#f9f9f9] cursor-pointer rounded-md"
-                                >
-                                  <FaHeart
-                                    className={`transition-colors duration-300 ${isLiked ? "text-[#c09578]" : "text-gray-400"}`}
-                                  />
+                                <div className="p-2 border border-[#ebebeb] bg-[#f9f9f9] cursor-pointer rounded-md">
+                                  <FaHeart className={`transition-colors duration-300 ${isLiked ? "text-[#c09578]" : "text-gray-400"}`} />
                                 </div>
                                 <button
                                   onClick={() => {
-                                    axios
-                                      .delete(
-                                        `${basurl}cart/delete-cart/${item._id}`,
-                                      )
-                                      .then((res) => {
-                                        if (res.data._status === true) {
-                                          dispatch(
-                                            removeItemFromCart(item._id),
-                                          );
-                                        }
-                                      });
+                                    axios.delete(`${basurl}cart/delete-cart/${item._id}`)
+                                      .then((res) => { if (res.data._status === true) dispatch(removeItemFromCart(item._id)); });
                                   }}
                                   className="bg-[#ebebeb] px-3 py-1 text-[12px] font-bold uppercase rounded-md hover:bg-red-50 hover:text-red-500 transition-all"
                                 >
@@ -473,21 +390,12 @@ export default function Header() {
                       </div>
                     );
                   })
-                ) : (
-                  <div className="py-10 text-gray-400 font-medium">
-                    Your cart is empty!
-                  </div>
-                )}
+                ) : <div className="py-10 text-gray-400 font-medium">Your cart is empty!</div>}
               </>
-            ) : (
-              <div className="py-10 text-gray-400 font-medium">
-                Please login to see cart!
-              </div>
-            )}
+            ) : <div className="py-10 text-gray-400 font-medium">Please login to see cart!</div>}
           </div>
         </div>
 
-        {/* Total & Checkout (Bottom Fixed) */}
         <div className="absolute bottom-0 left-0 w-full p-5 bg-white border-t">
           <div className="flex justify-between items-center mb-4 text-xl font-bold">
             <span>Total:</span>

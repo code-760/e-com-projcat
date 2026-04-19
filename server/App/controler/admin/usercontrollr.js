@@ -44,8 +44,8 @@ let userviwe = async (req, rec) => {
   rec.send({
     status: true,
     messages: "create api",
-    path: process.env.PROFILEIMAGEPATH,
-    data: userdata,
+    // path: process.env.PROFILEIMAGEPATH,
+    // data: userdata,
   });
 };
 // 1. Multi Delete API
@@ -95,7 +95,7 @@ let userchangeStatus = async (req, res) => {
     res.send({
       status: true, // YAHAN FIX KIYA HAI: underscore hata diya frontend se match karne ke liye
       message: "User status changed successfully",
-      updetdeta,
+      // updetdeta,
     });
   } catch (error) {
     console.error("Status Update Error:", error);

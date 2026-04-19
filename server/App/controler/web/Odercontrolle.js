@@ -118,7 +118,7 @@ let viweoder = async (req, res) => {
     _status: "success",
     path: process.env.PRODUCTIMAGEPATH,
     message: "Oder retrieved successfully",
-    data: oderdata,
+    // data: oderdata,
   });
  
 };

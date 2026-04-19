@@ -22,20 +22,31 @@ function AuthWrapper({ children }) {
           headers: { Authorization: `Bearer ${tokan}` },
         }
       )
-      .then((response) => {
-        console.log("API Response:", response.data);
-        // return response;
+      .then((response) => response.data)
+      .then((fainldata) => {
+      
+        return fainldata;
       })
+      .catch((error) => {
+        console.error("API Error:", error);
+        return null; // Error handling ke liye null return karna
+      });
 
-      if (res.data?._status || res.data?.data) {
-        const { UserName, useremail, userprofile } = res.data.data;
-        // console.log("User Details:", res.data.data);
+      // console.log("AuthWrapper API Response:", data); // Debugging ke liye response log karna
+      // console.log("User Details:", res);
+      if (res?._status || res?.data) {
+        const { UserName, useremail, userprofile } = res.data;
+        
 
         const safeUserData = {
           UserName,
           useremail,
           userprofile,
         };
+
+
+        // console.log("fat",safeUserData);
+        
 
         // Redux update - Isse infinite loop nahi banega kyunki dependencies managed hain
         dispatch(setUserData(safeUserData));

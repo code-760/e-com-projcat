@@ -32,7 +32,7 @@ let Addcart = async (req, res) => {
     res.status(200).send({
       _status: "success",
       message: "Product added to cart successfully",
-      data: data
+      // data: data
     });
 
   } catch (error) {
@@ -68,7 +68,7 @@ let viweCart = async (req, res) => {
       _status: "success",
       path: process.env.PRODUCTIMAGEPATH, // Check karein ye .env mein sahi hai
       message: "Cart retrieved successfully",
-      data: datacart
+      // data: datacart
     });
 
   } catch (error) {

@@ -136,7 +136,7 @@ let product_website_viwe = async (req, rec) => {
       .populate("material", "materialName")
       .sort(sortOption);
 
-      console.log(data, "filtered products");
+      // console.log(data, "filtered products");
       
 
     rec.status(200).send({

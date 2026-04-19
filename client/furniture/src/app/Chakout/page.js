@@ -144,7 +144,7 @@ function Chakout() {
           }
 
           // Backend spelling check: fainlrezorpayOrder
-          console.log(data,"jjjjjj")
+          // console.log(data,"jjjjjj")
           let { fainlrezorpayOrder } = data;
           console.log("Razorpay Order Details:", fainlrezorpayOrder);
 

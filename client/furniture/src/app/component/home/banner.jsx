@@ -13,20 +13,7 @@ export default function Banner({ bannerdata }) {
   // Optimization: State ki jagah useMemo use karein taaki har render par naya array na bane
   const banners = useMemo(() => bannerdata || [], [bannerdata]);
 
-  console.log(banners);
-
-  const settings = {
-    dots: true,
-    infinite: banners.length > 1, // Agar 1 hi banner ho toh infinite loop band kar dein
-    speed: 800,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: banners.length > 1, // Single banner par autoplay ki CPU waste na karein
-    autoplaySpeed: 4000,
-    fade: true, // Smooth transition, CPU par kam load padta hai sliding se
-    lazyLoad: "progressive", // Sirf wahi image load hogi jo screen par hai
-  };
-
+ 
   if (banners.length === 0) return null;
 
   return (
@@ -42,8 +29,6 @@ export default function Banner({ bannerdata }) {
           }}
       modules={[Pagination,Autoplay]}
       className="mySwiper"
-      onSlideChange={() => console.log("slide change")}
-      onSwiper={(swiper) => console.log(swiper)}
     >
       <div className="w-full h-[300px] md:h-[550px] overflow-hidden bg-gray-100">
         {banners.map((item) => (

@@ -35,7 +35,7 @@ let Oderviwe = async (req, rec) => {
     status: true,
     messages: "create api",
     path: process.env.PRODUCTIMAGEPATH,
-    data
+    // data
   });
 };
 
