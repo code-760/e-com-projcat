@@ -17,9 +17,11 @@ import {
   RiArrowDownSLine,
 } from "react-icons/ri";
 import { magamanu } from "../api-servis/megamanu";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [menu, setMenu] = useState([]);
   const [opencart, setopencart] = useState(false);
   const [openMobileMenu, setOpenMobileMenu] = useState(false);
@@ -46,6 +48,8 @@ export default function Header() {
     );
   }, [cartdetails]);
 
+
+
   useEffect(() => {
     if (tokan) {
       dispatch(fetchcart());
@@ -57,16 +61,21 @@ export default function Header() {
     magamanu()
       .then(setMenu)
       .catch((err) => console.error("Menu Error:", err));
-  }, []);
+  }, [])
+
+
 
   const Logout = () => {
     dispatch(removetokan());
-    window.location.href = "/Login-Register";
+    router.push("/Login-Register");
   };
 
   const toggleMobileSub = (idx) => {
     setActiveMobileSub(activeMobileSub === idx ? null : idx);
   };
+
+  console.log(userData,"user data ");
+  
 
   return (
     <div className="w-full bg-white">
@@ -84,14 +93,14 @@ export default function Header() {
           >
             <div className="flex items-center gap-3 cursor-pointer">
               <img
-                src={userData?.userprofile || "/default-avatar.png"}
+                src={userData?.userprofile || "https://i.pinimg.com/736x/5f/40/6a/5f406ab25e8942cbe0da6485afd26b71.jpg"}
                 alt="Profile"
                 className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-white shadow-md ring-2 ring-purple-100"
               />
               <div className="hidden sm:block text-left">
                 {/* Fixed internal nesting error: Changed 'p' to 'span' */}
                 <span className="text-sm font-semibold text-gray-700 block">
-                  {userData?.UserName || "Guest"}
+                  {userData?.UserName || "User"}
                 </span>
                 <span className="text-xs text-gray-500 block">{userData?.useremail}</span>
               </div>
